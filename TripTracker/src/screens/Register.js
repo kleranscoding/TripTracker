@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     }
 })
 
+const appToken = tokenName
 
 function containWhiteSpace(text) { return regexWhitespace.test(text) }
 
@@ -54,14 +55,13 @@ export default class Register extends Component {
         stylePwd: styles["input"], styleConfirmPwd: styles["input"], 
     }
 
-
-    register = (e) => {
+    submitRegister = (e) => {
         e.preventDefault()
         console.log(this.state.username,this.state.email)
         console.log(this.state.password,this.state.confirmPwd)
         let errUsername= true, errEmail= true, errPwd= true, errConfirmPwd= true
         let username= this.state.username, email= this.state.email,
-        pwd= this.state.password, pwdConfirm= this.state.confirmPwd
+          pwd= this.state.password, pwdConfirm= this.state.confirmPwd
         // validate username
         if (!username || !validateUsername(username)) {
             this.setState({ msgUsername: errorMsg.emptyUsername, styleUsername: styles["inputErr"], })
@@ -97,6 +97,35 @@ export default class Register extends Component {
         // final validation
         if (errUsername || errEmail || errPwd || errConfirmPwd) return
         Alert.alert("success")
+        //*/
+        fetch(serverURL+'/api/users/register',{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username, email, "password": pwd,
+            }),
+        }).then(res=>{
+            if (res.status!==200) { 
+                console.log(res.status)
+                if (res.status===409) {
+                    this.setState({ 
+                        msgEmail: errorMsg.existsEmail, 
+                        styleEmail: styles["inputErr"],
+                    })
+                }
+                return console.log(res._bodyText) 
+            }
+            console.log("user created")
+            this._loginAsync(res)
+        }).catch(err=>{return console.log(err)})
+    }
+
+    _loginAsync = async(res) => {
+        await AsyncStorage.setItem(appToken,res.headers.map['x-token'])
+        this.props.navigation.navigate('MainContent');
     }
 
     handleInput = (evt,name) => {
@@ -187,7 +216,7 @@ export default class Register extends Component {
             {this.state.msgConfirmPwd}
           </Text>
           <View style={styles["register_btn"]}>
-            <Button onPress={this.register} title="Register" color="#ffffff"/>
+            <Button onPress={this.submitRegister} title="Register" color="#ffffff"/>
           </View>
         </KeyboardAwareScrollView>
         )

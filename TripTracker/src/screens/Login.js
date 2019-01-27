@@ -100,7 +100,6 @@ export default class Login extends Component {
 
     _loginAsync = async(res) => {
         await AsyncStorage.setItem(appToken,res.headers.map['x-token'])
-        console.log(this.props)
         this.props.navigation.navigate('MainContent');
     }
 

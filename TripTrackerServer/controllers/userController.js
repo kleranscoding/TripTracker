@@ -3,6 +3,7 @@ const BAD_REQ = 400;
 const UNAUTH = 401;
 const FORBIDDEN = 403;
 const NOTFOUND = 404;
+const CONFLICT = 409;
 const INTERNAL_ERR = 500;
 
 const EXPIRE= "12h";
@@ -61,13 +62,13 @@ router.post('/register',(req,res)=>{
         // check if email exists in db
         db.User.findOne({email: req.body.email}).then(user=>{
             if (user) {
-                return res.status(BAD_REQ).json({
+                return res.status(CONFLICT).json({
                     "success": false, "message": "email is taken"
                 })
             }
             db.User.create(newUser).then(user=>{
                 if (user) {
-                    let token = jwt.sign({id: user.id}.config.jwtSecret,{
+                    let token = jwt.sign({id: user.id},config.jwtSecret,{
                         expiresIn: EXPIRE,
                     })
                     res.header('x-token',token)

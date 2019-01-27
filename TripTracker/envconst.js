@@ -21,4 +21,5 @@ export const errorMsg = {
     emptyPwd: '* at least 6 characters',
     whiteSpace: '* cannot contain space',
     pwdNotMatched: 'passwords do no match',
+    existsEmail: 'email exists'
 }
