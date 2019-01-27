@@ -1,14 +1,20 @@
 import React from 'react';
-import { AsyncStorage, Alert, StyleSheet, Text, View, Image } from 'react-native';
-import { TouchableHighlight } from 'react-native';
-import { Appbar, Modal, Button } from 'react-native-paper';
+import { StyleSheet, Image } from 'react-native';
+import { Appbar } from 'react-native-paper';
 import { createBottomTabNavigator } from 'react-navigation';
+import { Ionicons } from '@expo/vector-icons';
 
-import LoginModal from './screens/LoginModal';
-import Login from './screens/Login';
 import Auth from './screens/Auth';
-import Nav from './Nav'
-import { serverURL } from '../envconst'
+
+
+const styles = StyleSheet.create({
+  appbarHeader:{
+    backgroundColor: 'rgb(36,152,216)',
+  },
+  contentTitle: {
+    fontSize: 36, fontFamily: 'Avenir',
+  },
+})
 
 class Intro extends React.Component {
   render() {
@@ -25,84 +31,32 @@ class Intro extends React.Component {
 export default Splash = createBottomTabNavigator({
     Home: {
       screen: Intro,
+      navigationOptions: () => ({
+        tabBarIcon: (ð) => (
+          <Ionicons name="ios-home" size={28} color="rgb(36,152,219)" />
+        ),
+        title: {fontSize: 20}
+      }),
     }, 
     "Login/Register": {
       screen: Auth,
-    }, 
-})
-
-
-/*
-export default class Splash extends React.Component {
-
-  state = {
-    text: '', isLoggedIn: false,
-    loginModalVisible: false,
-    index: 0,
-    routes: [
-      {'key': 'home', 'title': 'Home', 'icon': 'home'},
-      {'key': 'login', 'title': 'Login/Sign Up', 'icon': 'launch'},
-      //{'key': 'signup', 'title': 'Sign Up', 'icon': 'add'},
-    ],
-  }
-
-  _handleIndexChange = index => this.setState({ index });
-
-  _renderScene = ({route}) => {
-    switch (route.key) {
-      case 'home':
-        return <Intro />
-      case 'login':
-        return (<Auth />)
-    }
-}
-
-  setModalVisible = (visible)=> {
-    this.setState({loginModalVisible: visible});
-  }
-
-  _showToken = async() => {
-    try {
-      const token = await AsyncStorage.getItem('token') || "none";
-      console.log(token)
-      Alert.alert(token)
-    } catch (err) {
-      console.log(err)
-    }
-    
-  }
-
-  render() {
-    return (
-      <React.Fragment>
-
-        <BottomNavigation style={{backgroundColor: '#a4fa8e'}}
-          navigationState={this.state}
-          onIndexChange={this._handleIndexChange}
-          renderScene={this._renderScene}
-        />
-
-        <Modal 
-          animationType="slide"
-          transparent={false}
-          visible={this.state.loginModalVisible}
-          onRequestClose={() => { Alert.alert('Modal has been closed.');}}>
-          <LoginModal setModalVisible={this.setModalVisible} modalVisible={this.state.loginModalVisible} />
-        </Modal>
-
-      </React.Fragment>
-    );
-  }
-}
-//*/
-
-//*
-const styles = StyleSheet.create({
-  appbarHeader:{
-    backgroundColor: 'rgb(36,152,216)',
+      navigationOptions: () => ({
+        tabBarIcon: () => (
+          <Ionicons name="ios-log-in" size={28} color="rgb(36,152,219)" />
+        )
+      }),
+    },
   },
-  contentTitle: {
-    fontSize: 36,
+  {
+    tabBarOptions: {
+        activeTintColor: 'rgb(248,248,248)', 
+        inactiveTintColor: 'rgb(143,154,186)',  
+        style: {
+            backgroundColor: 'rgb(49,90,158)', 
+        },
+        labelStyle: {
+          fontSize: 16, fontFamily: 'Avenir',
+        }
+    }
   },
-})
-//*/
+)

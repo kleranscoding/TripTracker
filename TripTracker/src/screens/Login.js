@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Alert, View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import { Alert, View, Text, TextInput, StyleSheet } from 'react-native';
 import { AsyncStorage, TouchableHighlight } from 'react-native';
+import { Button } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {serverURL, tokenName, pwdLen, regexEmail, regexWhitespace, errorMsg} from '../../envconst'
@@ -14,24 +15,21 @@ const styles = StyleSheet.create({
     },
     "login_btn": {
         marginTop: 25,
-        borderRadius: 10,
-        backgroundColor: 'rgba(36,152,219,0.5)',
+        borderRadius: 25,
+        backgroundColor: 'rgba(36,152,219,0.75)',
+        marginLeft:'25%', width: '50%',
     },
     "input": {
-        marginTop: 15,
-        marginBottom: 15,
-        borderBottomColor: 'rgba(5,5,5,0.25)',
-        borderBottomWidth: 1,
+        marginTop: 15, marginBottom: 15,
+        borderBottomColor: 'rgba(5,5,5,0.25)', borderBottomWidth: 1,
         fontSize: 18,
     },
     "inputErr": {
-        borderColor: 'rgba(255,0,0,0.5)',
-        borderWidth: 1,
-        borderRadius: 5,
-        marginTop: 15,
-        marginBottom: 15,
-        fontSize: 18,
+        borderColor: 'rgba(255,0,0,0.5)', borderWidth: 1, borderRadius: 5,
+        marginTop: 15, marginBottom: 15,
         padding: 5,
+        fontSize: 18,
+        
     },
     errorText: {
         color: 'rgba(255,0,0,0.5)',
@@ -173,9 +171,9 @@ export default class Login extends Component {
           <Text style={styles.errorText}>
             {this.state.msgPwd}
           </Text>
-          <View style={styles["login_btn"]}>
-            <Button onPress={this.login} title="Log In" color="#ffffff"/>
-          </View>
+          <Button onPress={this.login} style={styles["login_btn"]}>
+            <Text style={{color: 'rgb(255,255,255)'}}>Log In</Text>
+          </Button>
           
         </KeyboardAwareScrollView>
         )

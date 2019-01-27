@@ -11,7 +11,7 @@ class LoginScreen extends Component {
         title: 'Login',
         headerTintColor: '#fafafa',
         headerTitleStyle: {
-            fontSize: 24,
+            fontSize: 24, fontFamily: 'Avenir',
         },
         headerStyle: {
             backgroundColor: 'rgba(36,152,219,0.5)'
@@ -36,7 +36,7 @@ class RegisterScreen extends Component {
         title: 'Register',
         headerTintColor: '#fafafa',
         headerTitleStyle: {
-            fontSize: 24,
+            fontSize: 24, fontFamily: 'Avenir',
         },
         headerStyle: {
             backgroundColor: 'rgba(36,152,219,0.5)'
