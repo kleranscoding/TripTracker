@@ -51,22 +51,20 @@ export default class Logout extends Component {
     }
 
     render() {
-        console.log(this.props.navigation)
         return(
-        <View style={styles.modalLogout}>
-            <Text style={styles.modalText}>
-                Are you sure you want to log out?
-            </Text>
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                <Button onPress={this._cancel} style={styles.modalBtnCancel}>
-                    <Text>Cancel</Text>
-                </Button>
-                <Button onPress={this._signOutAsync} style={styles.modalBtnConfirm}>
-                    <Text style={{color: 'white'}}>Log Out</Text>
-                </Button>
-            </View>
+    <View style={styles.modalLogout}>
+        <Text style={styles.modalText}>
+            Are you sure you want to log out?
+        </Text>
+        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            <Button onPress={this._cancel} style={styles.modalBtnCancel}>
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this._signOutAsync} style={styles.modalBtnConfirm}>
+                <Text style={{color: 'white'}}>Log Out</Text>
+            </Button>
         </View>
-
+    </View>
         )
     }
 } 

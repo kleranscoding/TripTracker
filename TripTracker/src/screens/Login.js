@@ -74,8 +74,8 @@ export default class Login extends Component {
         console.log(errEmail , errPwd)
         // final validation
         if (errEmail || errPwd) return
-        //Alert.alert("success")
-        //*
+        
+        // attempt to login
         fetch(serverURL+'/api/users/login',{
             method: 'POST',
             headers: {
@@ -90,10 +90,9 @@ export default class Login extends Component {
             if (res.status!==200) { return console.log(res._bodyText) }
             console.log("user found")
             this._loginAsync(res)
-            this._showToken()
+            //this._showToken()
         })
         .catch(err=>{ console.log(err) })
-        //*/
     }
 
     _loginAsync = async(res) => {

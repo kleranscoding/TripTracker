@@ -92,8 +92,7 @@ export default class Register extends Component {
         }
         // final validation
         if (errUsername || errEmail || errPwd || errConfirmPwd) return
-        //Alert.alert("success")
-        //*/
+        // attempt to register
         fetch(serverURL+'/api/users/register',{
             method: 'POST',
             headers: {
@@ -105,7 +104,6 @@ export default class Register extends Component {
             }),
         }).then(res=>{
             if (res.status!==200) { 
-                console.log(res.status)
                 if (res.status===409) {
                     this.setState({ 
                         msgEmail: errorMsg.existsEmail, 

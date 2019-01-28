@@ -52,16 +52,15 @@ function verifyToken(token) {
 
 // profile route
 router.get('/profile',(req,res)=>{
-    console.log(req)
+    
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
             "success": false, "message": "forbidden"
         });
     }
     let userToken = req.headers.authorization.split(" ")[1];
-    console.log("user:",userToken)
     let decodedToken = verifyToken(userToken);
-    console.log("decoded:",decodedToken)
+    
     if (decodedToken.id===undefined) {
         decodedToken["success"]= false
         return res.status(UNAUTH).json(decodedToken)
@@ -79,7 +78,16 @@ router.get('/profile',(req,res)=>{
             "email": user.email,
             "image": user.image,
         };
-        return res.json(userObj)
+        db.Trip.find({"traveler": decodedToken.id}).then(trips=>{
+            userObj["trips"]= trips
+            return res.json(userObj)
+        }).catch(err=>{
+            console.log(err)
+            return res.status(INTERNAL_ERR).json({
+                "success": false, "message": "db error"
+            })
+        })
+        
     })
 })
 

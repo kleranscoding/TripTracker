@@ -1,51 +1,15 @@
 
 import React, { Component } from 'react';
-import { AsyncStorage, View, Text, Button } from 'react-native';
+import { View, Text, Button } from 'react-native';
 import { createBottomTabNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
 import { } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
 import { serverURL, tokenName } from './config/envConst';
 import Profile from './Profile';
+import TripContainer from './TripContainer';
 import Logout from './screens/Logout';
 
-
-class HomeScreen extends Component {
-
-    _signOutAsync = async () => {
-      await AsyncStorage.removeItem(tokenName)
-      this.props.navigation.navigate('Splash');
-    };
-  
-    render() {
-      return(
-        <View>
-          <Text>Home</Text>
-          <Button onPress={()=>this.props.navigation.navigate('Other')} title="Go to Other"/>
-          <Button onPress={this._signOutAsync} title="Log Out"/>
-        </View>
-      )
-    }
-  
-  }
-  
-class OtherScreen extends Component {
-
-    _signOutAsync = async () => {
-        await AsyncStorage.removeItem(tokenName)
-        this.props.navigation.navigate('Splash');
-    }
-
-    render() {
-        return(
-        <View>
-            <Text>Other</Text>
-            <Button onPress={()=>this.props.navigation.navigate('Profile')} title="Go to Home"/>
-        </View>
-        )
-    }
-}
-  
 
 const MainContentStack = createBottomTabNavigator({ 
     Profile: {
@@ -58,7 +22,13 @@ const MainContentStack = createBottomTabNavigator({
         }),
     }, 
     Trips: {
-        screen: OtherScreen,
+        screen: TripContainer,
+        navigationOptions: () => ({
+            tabBarIcon: () => (
+              <Ionicons name="ios-briefcase" size={28} color="rgb(36,152,219)" />
+            ),
+            title: {fontSize: 20}
+        }),
     },
     Logout: {
         screen: Logout,
