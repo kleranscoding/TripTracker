@@ -36,7 +36,53 @@ function createTimeStamp(timeRequired) {
 }
 
 
+function verifyToken(token) {
+    let decoded = {};
+    jwt.verify(token,config.jwtSecret,function(err,verified){
+        if (err) {
+            decoded= {"message": err.message };
+        } else {
+            decoded = verified;
+        }
+    })
+    return decoded;
+}
+
 /* /////////////// ROUTES AND CONTROLLERS /////////////// */
+
+// profile route
+router.get('/profile',(req,res)=>{
+    console.log(req)
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    console.log("user:",userToken)
+    let decodedToken = verifyToken(userToken);
+    console.log("decoded:",decodedToken)
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false
+        return res.status(UNAUTH).json(decodedToken)
+    }
+
+    db.User.findById(decodedToken.id).then(user=>{
+        if (!user) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "user not found"
+            })
+        }
+        // store user object
+        let userObj = {
+            "username": user.username,
+            "email": user.email,
+            "image": user.image,
+        };
+        return res.json(userObj)
+    })
+})
+
 
 // register route
 router.post('/register',(req,res)=>{
@@ -123,6 +169,7 @@ router.post('/login',(req,res)=>{
     })
     
 });
+
 
 
 router.get('/all',(req,res)=>{

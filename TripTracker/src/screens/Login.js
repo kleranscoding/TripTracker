@@ -4,7 +4,7 @@ import { AsyncStorage, TouchableHighlight } from 'react-native';
 import { Button } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import {serverURL, tokenName, pwdLen, regexEmail, regexWhitespace, errorMsg} from '../../envconst'
+import {serverURL, tokenName, pwdLen, regexEmail, regexWhitespace, errorMsg} from '../config/envConst'
 
 const styles = StyleSheet.create({
     "login": {
@@ -74,7 +74,7 @@ export default class Login extends Component {
         console.log(errEmail , errPwd)
         // final validation
         if (errEmail || errPwd) return
-        Alert.alert("success")
+        //Alert.alert("success")
         //*
         fetch(serverURL+'/api/users/login',{
             method: 'POST',

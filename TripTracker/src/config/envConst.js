@@ -1,9 +1,10 @@
 
-const index = 1
+const index = 2
 
 const urls = [
     "http://10.1.6.227:8001",
-    "http://localhost:8001"
+    "http://localhost:8001",
+    "http://192.168.1.147:8001",
 ]
 
 export const pwdLen = 6

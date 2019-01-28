@@ -3,7 +3,7 @@ import { Alert, ScrollView, KeyboardAvoidingView, Text, TextInput, View, StyleSh
 import { AsyncStorage, TouchableHighlight } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import {serverURL, tokenName, pwdLen, regexEmail, regexWhitespace, regexUsername, errorMsg} from '../../envconst'
+import {serverURL, tokenName, pwdLen, regexEmail, regexWhitespace, regexUsername, errorMsg} from '../config/envConst'
 
 const styles = StyleSheet.create({
     "register": {
@@ -15,7 +15,8 @@ const styles = StyleSheet.create({
     "register_btn": {
         marginTop: 25,
         borderRadius: 25,
-        backgroundColor: 'rgba(36,152,219,0.5)',
+        backgroundColor: 'rgba(36,152,219,0.75)',
+        marginLeft:'25%', width: '50%',
     },
     "input": {
         marginTop: 15, marginBottom: 15,
@@ -91,7 +92,7 @@ export default class Register extends Component {
         }
         // final validation
         if (errUsername || errEmail || errPwd || errConfirmPwd) return
-        Alert.alert("success")
+        //Alert.alert("success")
         //*/
         fetch(serverURL+'/api/users/register',{
             method: 'POST',
@@ -200,7 +201,7 @@ export default class Register extends Component {
           </Text>
           <TextInput name="password" type="password" style={this.state.stylePwd} autoCapitalize = 'none' secureTextEntry={true}
             onBlur={()=>this.onBlurPwd("password","msgPwd","stylePwd")} onFocus={()=>this.onFocus("msgPwd","stylePwd")}
-            onChange={(e)=>this.handleInput(e,"password")} placeholder='Password' />
+            onChange={(e)=>this.handleInput(e,"password")} placeholder='Enter Password' />
           <Text style={styles.errorText}>
             {this.state.msgPwd}
           </Text>
@@ -211,7 +212,7 @@ export default class Register extends Component {
             {this.state.msgConfirmPwd}
           </Text>
           <View style={styles["register_btn"]}>
-            <Button onPress={this.submitRegister} title="Register" color="#ffffff"/>
+            <Button onPress={this.submitRegister} title="Register Now" color="#ffffff"/>
           </View>
         </KeyboardAwareScrollView>
         )

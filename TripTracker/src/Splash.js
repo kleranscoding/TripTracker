@@ -32,7 +32,7 @@ export default Splash = createBottomTabNavigator({
     Home: {
       screen: Intro,
       navigationOptions: () => ({
-        tabBarIcon: (ð) => (
+        tabBarIcon: () => (
           <Ionicons name="ios-home" size={28} color="rgb(36,152,219)" />
         ),
         title: {fontSize: 20}
