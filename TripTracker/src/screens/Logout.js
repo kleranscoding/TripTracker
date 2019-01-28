@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         margin: 20,
     },
     modalBtnConfirm: {
-        backgroundColor: 'rgb(77,77,255)',
+        backgroundColor: 'rgb(49,90,158)',
         borderRadius: 25,
         margin: 20,
     }

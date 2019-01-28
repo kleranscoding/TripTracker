@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button } from  'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 import { serverURL, tokenName } from './config/envConst';
+
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -63,6 +65,14 @@ export default class TripContainer extends Component {
             <Appbar.Content title="Trips" titleStyle={styles.contentTitle} />
         </Appbar.Header>
         
+        <View style={{justifyContent: 'center', margin: 15 }}>
+          <Button style={{borderRadius: 20, width: '40%', marginLeft: '30%', backgroundColor: 'rgb(49,90,158)'}}>
+            <Text style={{color: 'rgb(255,255,255)', fontSize: 20}}>
+              + New Trip
+            </Text>  
+          </Button>
+        </View>
+
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
         </ScrollView>
