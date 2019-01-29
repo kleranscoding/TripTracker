@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Alert, View, Text, TextInput, StyleSheet } from 'react-native';
-import { AsyncStorage, TouchableHighlight } from 'react-native';
+import { AsyncStorage, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -170,9 +170,12 @@ export default class Login extends Component {
           <Text style={styles.errorText}>
             {this.state.msgPwd}
           </Text>
-          <Button onPress={this.login} style={styles["login_btn"]}>
-            <Text style={{color: 'rgb(255,255,255)'}}>Log In</Text>
-          </Button>
+          <TouchableOpacity onPress={this.login} style={styles["login_btn"]}>
+            <Text style={{color: 'rgb(255,255,255)', 
+                textAlign: 'center', fontSize: 20, padding: 10}}>
+                Log In
+            </Text>
+          </TouchableOpacity>
           
         </KeyboardAwareScrollView>
         )

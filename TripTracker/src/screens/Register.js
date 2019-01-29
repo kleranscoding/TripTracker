@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, ScrollView, KeyboardAvoidingView, Text, TextInput, View, StyleSheet, Button } from 'react-native';
+import { Alert, TouchableOpacity ,Text, TextInput, View, StyleSheet, Button } from 'react-native';
 import { AsyncStorage, TouchableHighlight } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -209,9 +209,13 @@ export default class Register extends Component {
           <Text style={styles.errorText}>
             {this.state.msgConfirmPwd}
           </Text>
-          <View style={styles["register_btn"]}>
-            <Button onPress={this.submitRegister} title="Register Now" color="#ffffff"/>
-          </View>
+          <TouchableOpacity onPress={this.submitRegister} style={styles["register_btn"]}>
+            <Text style={{color: 'rgb(255,255,255)', 
+              textAlign: 'center', fontSize: 20, padding: 10}}>
+              Register
+            </Text>
+          </TouchableOpacity>
+
         </KeyboardAwareScrollView>
         )
     }

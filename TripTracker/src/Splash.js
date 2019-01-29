@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet, ScrollView, Text, Image } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import { createBottomTabNavigator } from 'react-navigation';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,7 +23,14 @@ class Intro extends React.Component {
         <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
             <Appbar.Content title="Trip Tracker" titleStyle={styles.contentTitle} />
           </Appbar.Header>
-        <Image resizeMode="contain" source={require('../assets/travel_logo.png')}/>
+        <ScrollView style={{paddingTop: 30, backgroundColor: 'rgba(36,152,216,0.25)'}}>
+          <Image resizeMode="contain" style={{justifyContent: 'center', width: '100%', height: 200}}
+              source={require('../assets/travel_logo.png')}/>
+          <Text style={{margin: 20, fontSize: 18, padding: 5, textAlign: 'center',}}>
+            Sur casernes eut pic criaient couvrent defoncat heureuse. Bon oeil aux mats tuer chez poil peur. Saut poil il fils un nous je eu idee. Si mais haut oh ah quoi loin. Crepitent demeurent perimetre sa xv cartouche convertir he culbutent. Cercle qu valoir ca bruits le ca. Oeufs feu dit sorte rente trois ecole mur moins. 
+          </Text>
+        </ScrollView>
+        
       </React.Fragment>)
   }
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, Image, ScrollView } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button } from  'react-native-paper';
+import MapView from 'react-native-maps';
 
 import { serverURL, tokenName } from './config/envConst';
 
@@ -22,8 +23,38 @@ const styles = StyleSheet.create({
     tripInfo: {
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
+    },
+    imgStyle: {
+      width: 125,
+      height: 125,
     }
 })
+
+
+
+class MapContainer extends Component {
+    
+  state = {
+      region: {
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+      },
+  }
+  
+  onRegionChange = (region)=> {
+      this.setState({ region })
+    }
+
+  render() {
+      return(
+  <MapView style={{margin: 20, height: '25%'}} 
+    region={this.state.region} onRegionChange={this.onRegionChange} />
+      )
+  }
+  
+}
 
 
 export default class Profile extends Component {
@@ -56,7 +87,14 @@ export default class Profile extends Component {
 
     render() {
         let numTrips = this.state.trips.length>0 ? 
-            <Text style={styles.tripInfo}>`You have ${this.state.trips.length} trips`</Text> : 
+            <React.Fragment>
+              <Button onPress={()=>this.props.navigation.navigate('Trips')}
+                style={{borderRadius: 20, width: '50%', marginLeft: '25%', backgroundColor: 'rgb(49,90,158)'}}>
+                <Text style={{color: 'rgb(255,255,255)'}}>
+                  {`You have ${this.state.trips.length} trips`}
+                </Text>
+              </Button>
+            </React.Fragment>: 
             <React.Fragment>
               <Text style={styles.tripInfo}>You don't have any trip yet</Text>
               <Button onPress={()=>this.props.navigation.navigate('Trips')}
@@ -74,14 +112,17 @@ export default class Profile extends Component {
         
         {/* <Text style={styles.greeting}>Welcome, {this.state.username}!</Text> */}
         
-        <View style={{flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)'}}>
-          <Image source={{uri: serverURL+'/'+this.state.image}} style={{width: 125, height: 125,}}/>
-          <View style={{justifyContent: 'center', margin: 10}}>
+        <View style={{flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)', 
+          borderBottomWidth: '2', borderBottomColor: 'grey' }}>
+          <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}/>
+          <View style={{justifyContent: 'center', margin: 10, }}>
             <Text style={styles.profileInfo}>{this.state.username}</Text>
             <Text style={styles.profileInfo}>{this.state.email}</Text>
           </View> 
         </View>
-
+        
+        <MapContainer />
+      
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
         </ScrollView>
