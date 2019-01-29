@@ -7,7 +7,7 @@ const CONFLICT = 409;
 const INTERNAL_ERR = 500;
 
 const EXPIRE= "12h";
-const defaultImg = "images/default_profile.jpg";
+const defaultImg = "images/default_trip.jpg";
 const maxFileSize = 10*1024*1024;
 
 require('../database/connection');
@@ -56,6 +56,8 @@ router.post('/new',(req,res)=>{
         "startDate": req.body.startDate,
         "endDate": req.body.endDate,
         "traveler": decodedToken.id,
+        "isFav": false,
+        "image": defaultImg,
     };
     console.log(newTrip);
     db.Trip.create(newTrip).then(trip=>{
@@ -63,7 +65,9 @@ router.post('/new',(req,res)=>{
             return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
         }
         return res.json({
-            "id": trip._id, "title": trip.title, "startDate": trip.startDate, "endDate": trip.endDate,
+            "id": trip._id, "title": trip.title, 
+            "startDate": trip.startDate, "endDate": trip.endDate,
+            "isFav": trip.isFav, "image": trip.image,
         });
     })
 });

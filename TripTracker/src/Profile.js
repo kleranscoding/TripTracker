@@ -4,7 +4,8 @@ import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button } from  'react-native-paper';
 import MapView from 'react-native-maps';
 
-import { serverURL, tokenName } from './config/envConst';
+import { serverURL, tokenName, imgHgtWdt } from './config/envConst';
+
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -18,15 +19,14 @@ const styles = StyleSheet.create({
         fontSize: 24, fontFamily: 'Avenir',
     },
     profileInfo: {
-        fontSize: 24, fontFamily: 'Avenir',
+        fontSize: 20, fontFamily: 'Avenir',
     },
     tripInfo: {
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
     },
     imgStyle: {
-      width: 125,
-      height: 125,
+      width: imgHgtWdt, height: imgHgtWdt, 
     }
 })
 
@@ -49,7 +49,7 @@ class MapContainer extends Component {
 
   render() {
       return(
-  <MapView style={{margin: 20, height: '25%'}} 
+  <MapView style={{margin: 20, height: '30%'}} 
     region={this.state.region} onRegionChange={this.onRegionChange} />
       )
   }
@@ -114,7 +114,8 @@ export default class Profile extends Component {
         
         <View style={{flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)', 
           borderBottomWidth: '2', borderBottomColor: 'grey' }}>
-          <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}/>
+          <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
+                    
           <View style={{justifyContent: 'center', margin: 10, }}>
             <Text style={styles.profileInfo}>{this.state.username}</Text>
             <Text style={styles.profileInfo}>{this.state.email}</Text>

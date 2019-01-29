@@ -7,16 +7,14 @@ const TripSchema = new mongoose.Schema({
     },
     startDate: {
         type: String,
-        required: true,
     },
-    endDate: {
-        type: String,
-        required: true,
-    },
+    endDate: { type: String, },
     traveler: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
-    }
+    },
+    isFav: { type: Boolean, },
+    image: { type: String, },
 });
 
 const Trip = mongoose.model('Trip',TripSchema);

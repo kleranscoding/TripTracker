@@ -15,6 +15,8 @@ export const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)
 
 export const serverURL = urls[index]
 
+export const imgHgtWdt = 75
+
 export const tokenName = "TripTrackerToken"
 
 export const errorMsg = {

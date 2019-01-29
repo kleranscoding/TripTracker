@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal'
 
-import { serverURL, tokenName } from './config/envConst';
+import { serverURL, tokenName,regexWhitespace } from './config/envConst';
 
 
 const styles = StyleSheet.create({
@@ -43,6 +43,9 @@ const styles = StyleSheet.create({
     },
 })
 
+function validateWhtieSpaceOnly(text) {
+    return regexWhitespace.test(text)
+}
 
 class NewTripModal extends Component {
     
@@ -76,15 +79,15 @@ class NewTripModal extends Component {
         let startDate = this.state.dateStart, endDate = this.state.dateEnd
         let errTitle= true, errDateStart= true, errDateEnd= true
         console.log(tripTitle, startDate, endDate)
-        if (!tripTitle) {
+        if (!tripTitle || validateWhtieSpaceOnly(tripTitle) ) {
             this.setState({errTripTitle: true})
         } else {
             errTitle= false
         }
-        if (startDate) {
+        if (!(startDate && endDate && startDate.localeCompare(endDate)<=0) ) {
+            if (startDate.localeCompare(endDate)>0) Alert.alert("invalid dates")
+        } else {
             errDateStart= false
-        }
-        if (endDate) { 
             errDateEnd= false
         }
         console.log(errTitle, errDateStart, errDateEnd)
@@ -136,7 +139,7 @@ class NewTripModal extends Component {
 
       <ScrollView>
         
-        <TextInput label='Enter Trip Title' mode="outlined" 
+        <TextInput label='Enter Trip Title' mode="outlined" value={this.state.tripTitle}
             onChangeText={text => this.setState({ tripTitle: text })}
             onBlur={this.onBlur} onFocus={this.onFocus}
             style={{margin: 20, borderRadius: 5, backgroundColor: 'rgb(255,255,255)' }} 
@@ -220,7 +223,6 @@ export default class TripContainer extends Component {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res=>{
-                console.log(res)
                 if (res.status===200) {
                     res.json().then(data=>{
                         this.setState({ trips: data.trips, })
