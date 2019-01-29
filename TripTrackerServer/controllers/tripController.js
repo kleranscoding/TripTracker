@@ -59,7 +59,6 @@ router.post('/new',(req,res)=>{
         "isFav": false,
         "image": defaultImg,
     };
-    console.log(newTrip);
     db.Trip.create(newTrip).then(trip=>{
         if (!trip) {
             return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
@@ -70,6 +69,26 @@ router.post('/new',(req,res)=>{
             "isFav": trip.isFav, "image": trip.image,
         });
     })
+});
+
+router.delete('/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    console.log(req.params.id)
+    
+    return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
 });
 
 module.exports = router;

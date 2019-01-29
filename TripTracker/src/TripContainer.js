@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, 
     TouchableHighlight, Modal, Alert, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput } from  'react-native-paper';
+import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal'
@@ -21,6 +21,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
     },
+    addNewBtn: {
+        marginLeft: '25%', 
+        borderRadius: 20, width: '50%', 
+        backgroundColor: 'rgb(49,90,158)'
+    },
+})
+
+const modalStyles = StyleSheet.create({
     newTripGreeting: {
         textAlign: 'center', 
         fontSize: 24, fontFamily: 'Avenir', color: 'rgb(255,255,255)',
@@ -29,6 +37,10 @@ const styles = StyleSheet.create({
         marginRight: 5, 
         textAlign: 'right', fontSize: 18, color: 'rgb(255,255,255)',
     },
+    modalHeader: {
+        marginBottom: 20, 
+        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
+    },
     datepicker: {
         justifyContent: 'center', flexDirection: 'row', alignItems: 'center',
     },
@@ -36,16 +48,27 @@ const styles = StyleSheet.create({
         borderColor: 'rgb(255,0,0)', borderWidth: 1, borderRadius: 5,
     },
     "create_btn": {
-        marginTop: 25,
+        marginTop: 25, marginLeft:'25%', 
         borderRadius: 25,
         backgroundColor: 'rgba(36,152,219,0.75)',
-        marginLeft:'25%', width: '50%',
+        width: '50%',
+    },
+    "create_btn_text": {
+        padding: 10, 
+        textAlign: 'center', fontSize: 20, color: 'rgb(255,255,255)'
     },
 })
 
-function validateWhtieSpaceOnly(text) {
-    return regexWhitespace.test(text)
-}
+const cardStyles = StyleSheet.create({
+    container: { flex: 1, },
+    content: { padding: 4, },
+    card: { margin: 10, },
+    cardImg: {
+        width: '100%', height: 200,
+    },
+})
+
+function validateWhtieSpaceOnly(text) { return regexWhitespace.test(text) }
 
 class NewTripModal extends Component {
     
@@ -54,21 +77,6 @@ class NewTripModal extends Component {
         dateStart: '', dateEnd: '',
         errTripTitle: false,
         errDateStartStyle: {fontSize: 18}, errDateEndStyle: {fontSize: 18},
-    }
-
-    setDate = (newDate)=> {
-        this.setState({chosenDate: newDate});
-    }
-
-    onFocus = () => {
-        this.setState({errTripTitle: false})
-    }
-
-    onBlur = (evt) => {
-        if (!evt.nativeEvent.text) {
-            this.setState({errTripTitle: true})
-            return
-        }
     }
 
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
@@ -118,21 +126,29 @@ class NewTripModal extends Component {
         })
     }
 
+    setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
 
-    updateDate = (name,date) => {
-        this.setState({ [name]: date })
+    onFocus = () => { this.setState({errTripTitle: false}) }
+
+    onBlur = (evt) => {
+        if (!evt.nativeEvent.text) {
+            this.setState({errTripTitle: true})
+            return
+        }
     }
+
+    updateDate = (name,date) => { this.setState({ [name]: date }) }
 
     render() {
         return (
     <React.Fragment>
-      <View style={{marginBottom: 20, paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' }}>
+      <View style={modalStyles.modalHeader}>
         <TouchableHighlight onPress={()=>this.props.setModalVisible(false)}>
-          <Text style={styles.closeModalText}>
+          <Text style={modalStyles.closeModalText}>
             Close &times;
           </Text>
         </TouchableHighlight>
-        <Text style={styles.newTripGreeting}>
+        <Text style={modalStyles.newTripGreeting}>
             New Trip Info
         </Text>
       </View>
@@ -146,7 +162,7 @@ class NewTripModal extends Component {
             error={this.state.errTripTitle}
         />
         
-        <View style={styles.datepicker}>
+        <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
@@ -165,7 +181,7 @@ class NewTripModal extends Component {
         </View>
     
 
-        <View style={styles.datepicker}>
+        <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
@@ -183,8 +199,8 @@ class NewTripModal extends Component {
             />
         </View>
 
-        <TouchableOpacity onPress={this.submitTripInfo} style={styles["create_btn"]}>
-            <Text style={{textAlign: 'center', fontSize: 20, padding: 10, color: 'rgb(255,255,255)'}}>
+        <TouchableOpacity onPress={this.submitTripInfo} style={modalStyles["create_btn"]}>
+            <Text style={modalStyles["create_btn_text"]}>
                 Create Trip
             </Text>
         </TouchableOpacity>
@@ -199,24 +215,23 @@ class NewTripModal extends Component {
 
 export default class TripContainer extends Component {
 
-    state= {
-        trips: [],
-        modalVisible: false,
+    constructor(props) {
+        super(props)
+        props.navigation.addListener('didFocus',payload => {
+            console.debug('didFocus', payload);
+            this._getTripInfo()
+        })
+        this.state= {
+            trips: [], modalVisible: false,
+        }
     }
 
-    setModalVisible = (visible) => {
-        this.setState({modalVisible: visible})
-    }
+    componentDidMount = () => { this._getTripInfo() }
 
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
-    addTrips = (trip) => {
-        let trips = this.state.trips
-        trips.push(trip)
-        this.setState({ trips })
-    }
 
-    componentDidMount = () => {
+    _getTripInfo = () => {
         this._getToken().then(token=>{
             //*
             fetch(serverURL+'/api/users/profile' ,{
@@ -236,12 +251,42 @@ export default class TripContainer extends Component {
         })
     }
 
+    addTrips = (trip) => {
+        let trips = this.state.trips
+        trips.push(trip)
+        this.setState({ trips })
+    }
+
+
+    setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
+    
     render() {
 
         let numTrips = this.state.trips.length>0 ? 
             <Text style={styles.tripInfo}>{`You have ${this.state.trips.length} trips`}</Text> : 
             <Text style={styles.tripInfo}>You don't have any trip yet</Text>
-            
+        
+        let allTrips = []
+        this.state.trips.map((trip,index)=>{
+            return allTrips.push(
+                <Card style={cardStyles.card} key={index}>
+                  <Card.Content>
+                    <Title >{trip.title}</Title>
+                    <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
+                    <Paragraph>Trip from {trip.startDate} to {trip.endDate}</Paragraph>
+                  </Card.Content>
+                  <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
+                    <TouchableOpacity >
+                      <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
+                        Learn More
+                      </Text>
+                    </TouchableOpacity>
+                  </Card.Actions>
+                </Card>
+            )
+        })
+        
+
         return (
     <React.Fragment>
         
@@ -251,18 +296,20 @@ export default class TripContainer extends Component {
         
         <View style={{justifyContent: 'center', padding: 15, 
             borderBottomWidth: 2, borderBottomColor: 'grey', }}>
-          <Button style={{borderRadius: 20, width: '50%', marginLeft: '25%', 
-            backgroundColor: 'rgb(49,90,158)'}}
+          <TouchableOpacity style={styles.addNewBtn}
             onPress={()=>this.setModalVisible(true)}>
-            <Text style={{color: 'rgb(255,255,255)', fontSize: 20}}>
+            <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
               + New Trip
             </Text>  
-          </Button>
+          </TouchableOpacity>
           
         </View>
+        
+        {numTrips}
 
         <ScrollView style={{marginTop: 25}}>
-          {numTrips}
+          
+          {allTrips}
         </ScrollView>
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}

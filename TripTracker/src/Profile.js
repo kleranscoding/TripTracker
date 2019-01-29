@@ -27,9 +27,12 @@ const styles = StyleSheet.create({
     },
     imgStyle: {
       width: imgHgtWdt, height: imgHgtWdt, 
-    }
+    },
+    profileInfoWrapper: {
+      flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)', 
+      borderBottomWidth: 2, borderBottomColor: 'grey', 
+    },
 })
-
 
 
 class MapContainer extends Component {
@@ -43,9 +46,7 @@ class MapContainer extends Component {
       },
   }
   
-  onRegionChange = (region)=> {
-      this.setState({ region })
-    }
+  onRegionChange = (region)=> { this.setState({ region }) }
 
   render() {
       return(
@@ -56,18 +57,25 @@ class MapContainer extends Component {
   
 }
 
-
 export default class Profile extends Component {
-
-    state = {
+    constructor(props) {
+      super(props)
+      props.navigation.addListener('didFocus',payload => {
+          console.debug('didFocus', payload);
+          this._getProfileInfo()
+      })
+      this.state = {
         username: '', email: '', image: '', trips: [],
+      }
     }
 
+    componentDidMount = () => { this._getProfileInfo() }
+    
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
-    componentDidMount = () => {
+    _getProfileInfo = () => {
       this._getToken().then(token=>{
-        console.log("profile: ",token)
+        //console.log("profile: ",token)
         fetch(serverURL+'/api/users/profile',{
           method: 'GET',
           headers: { 'Authorization': `Bearer ${token}` }
@@ -86,6 +94,7 @@ export default class Profile extends Component {
     }
 
     render() {
+
         let numTrips = this.state.trips.length>0 ? 
             <React.Fragment>
               <Button onPress={()=>this.props.navigation.navigate('Trips')}
@@ -112,8 +121,7 @@ export default class Profile extends Component {
         
         {/* <Text style={styles.greeting}>Welcome, {this.state.username}!</Text> */}
         
-        <View style={{flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)', 
-          borderBottomWidth: '2', borderBottomColor: 'grey' }}>
+        <View style={styles.profileInfoWrapper}>
           <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
                     
           <View style={{justifyContent: 'center', margin: 10, }}>
