@@ -1,0 +1,9 @@
+[
+    {
+        "email": "user1@gmail.com",
+        "password": "$2b$10$vsyBxHQNIhiR8LN9.U8gY.B3qMKcGS7AHstV6uWgxQkAhsN5uZ7Iy",
+        "username": "UserOne",
+        "city": "San Francisco",
+        "image": "images/default_profile.jpg"
+    }
+]
