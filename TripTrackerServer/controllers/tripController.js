@@ -87,8 +87,31 @@ router.delete('/:id',(req,res)=>{
     }
 
     console.log(req.params.id)
+    db.Trip.findById(req.params.id).then(trip=>{
+        if (!trip) {
+            return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
+        } else {
+            console.log(trip.traveler.toString(),decodedToken.id)
+            // check if same owner
+            if (trip.traveler.toString()!==decodedToken.id) {
+                return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+            }
+            db.Trip.findByIdAndRemove(req.params.id).then(deletedTrip=>{
+                if (!deletedTrip) {
+                    return res.status(NOTFOUND).json({"success": false, "message": "cannot delete trip"});
+                } else {
+                    let removedTrip = {
+                        "id": deletedTrip.id, "title": deletedTrip.title, 
+                        "startDate": deletedTrip.startDate, "endDate": deletedTrip.endDate,
+                        "isFav": deletedTrip.isFav, "image": deletedTrip.image,
+                    };
+                    return res.json(removedTrip);
+                }
+            });
+        }
+    });
     
-    return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
+    //return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
 });
 
 module.exports = router;

@@ -79,8 +79,16 @@ router.get('/profile',(req,res)=>{
             "image": user.image,
         };
         db.Trip.find({"traveler": decodedToken.id}).then(trips=>{
-            userObj["trips"]= trips
-            return res.json(userObj)
+            let userTrips = [];
+            trips.map(trip=>{
+                userTrips.push({
+                    "id": trip._id, "title": trip.title,
+                    "startDate": trip.startDate, "endDate": trip.endDate,
+                    "isFav": trip.isFav, "image": trip.image,  
+                });
+            });
+            userObj["trips"]= userTrips;
+            return res.json(userObj);
         }).catch(err=>{
             console.log(err)
             return res.status(INTERNAL_ERR).json({

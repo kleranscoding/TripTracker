@@ -34,7 +34,7 @@ const MainContentStack = createBottomTabNavigator({
         screen: Logout,
         navigationOptions: () => ({
             tabBarIcon: () => (
-              <Ionicons name="ios-log-out" size={28} color="rgb(36,152,219)" />
+              <Ionicons name="ios-exit" size={28} color="rgb(36,152,219)" />
             ),
             title: {fontSize: 20}
         }),

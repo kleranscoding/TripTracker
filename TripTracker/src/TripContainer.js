@@ -4,7 +4,6 @@ import { AsyncStorage, StyleSheet, View, Text, ScrollView,
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal'
 
 import { serverURL, tokenName,regexWhitespace } from './config/envConst';
@@ -111,7 +110,7 @@ class NewTripModal extends Component {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    "title": tripTitle, "startDate": startDate, "endDate": endDate,
+                    "title": tripTitle.trim(), "startDate": startDate, "endDate": endDate,
                 }),
             }).then(res=>{
                 if (res.status===200) {
@@ -234,7 +233,7 @@ export default class TripContainer extends Component {
     _getTripInfo = () => {
         this._getToken().then(token=>{
             //*
-            fetch(serverURL+'/api/users/profile' ,{
+            fetch(serverURL+'/api/users/profile',{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res=>{
@@ -260,6 +259,35 @@ export default class TripContainer extends Component {
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
     
+    onPress = (index) => {
+        console.log(this.state.trips[index])
+    }
+
+    deleteTrip = (index) => {
+        console.log(this.state.trips[index])
+        let tripId = this.state.trips[index].id
+        this._getToken().then(token=>{
+            fetch(serverURL+'/api/trips/'+tripId,{
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res=>{
+                if (res.status===200) {
+                    res.json().then(data=>{
+                        console.log(data)
+                        let filteredTrips = this.state.trips.filter(trip=>{
+                            return (trip.id!==data.id)
+                        })
+                        this.setState({ trips: filteredTrips, })
+                    })
+                }
+                    
+            }).catch(err=>{ console.log(err) })
+
+        }).catch(error=>{
+            console.log("get token error:",error)
+        })
+    }
+
     render() {
 
         let numTrips = this.state.trips.length>0 ? 
@@ -271,17 +299,31 @@ export default class TripContainer extends Component {
             return allTrips.push(
                 <Card style={cardStyles.card} key={index}>
                   <Card.Content>
+                    <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                        onPress={()=>this.onPress(index)}>
+                        <Ionicons name="ios-build" size={28} color="rgb(36,152,219)"/>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                        onPress={()=>this.deleteTrip(index)}>
+                        <Ionicons name="ios-trash" size={28} color="rgb(36,152,219)"/>
+                      </TouchableOpacity>
+                    </View>
+                    
+
                     <Title >{trip.title}</Title>
                     <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                     <Paragraph>Trip from {trip.startDate} to {trip.endDate}</Paragraph>
                   </Card.Content>
+
                   <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
-                    <TouchableOpacity >
+                    <TouchableOpacity onPress={()=>this.onPress(index)}>
                       <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
                         Learn More
                       </Text>
                     </TouchableOpacity>
                   </Card.Actions>
+
                 </Card>
             )
         })
