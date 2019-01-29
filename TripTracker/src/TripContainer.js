@@ -17,11 +17,12 @@ const styles = StyleSheet.create({
         fontSize: 24, fontFamily: 'Avenir',
     },
     tripInfo: {
+        marginTop: 5,
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
     },
     addNewBtn: {
-        marginLeft: '25%', 
+        marginTop: 10 , marginLeft: '25%', 
         borderRadius: 20, width: '50%', 
         backgroundColor: 'rgb(49,90,158)'
     },
@@ -179,7 +180,6 @@ class NewTripModal extends Component {
             />
         </View>
     
-
         <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
             <ModalDatePicker startDate={new Date()}
@@ -216,19 +216,21 @@ export default class TripContainer extends Component {
 
     constructor(props) {
         super(props)
-        props.navigation.addListener('didFocus',payload => {
-            console.debug('didFocus', payload);
-            this._getTripInfo()
-        })
+        
         this.state= {
             trips: [], modalVisible: false,
         }
     }
 
-    componentDidMount = () => { this._getTripInfo() }
+    componentDidMount = () => { 
+        // this.props.navigation.addListener('didFocus',payload => {
+        //     console.debug('didFocus', payload);
+        //     this._getTripInfo()
+        // })
+        this._getTripInfo() 
+    }
 
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
-
 
     _getTripInfo = () => {
         this._getToken().then(token=>{
@@ -299,6 +301,7 @@ export default class TripContainer extends Component {
             return allTrips.push(
                 <Card style={cardStyles.card} key={index}>
                   <Card.Content>
+                    
                     <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                       <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
                         onPress={()=>this.onPress(index)}>
@@ -306,14 +309,15 @@ export default class TripContainer extends Component {
                       </TouchableOpacity>
                       <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
                         onPress={()=>this.deleteTrip(index)}>
-                        <Ionicons name="ios-trash" size={28} color="rgb(36,152,219)"/>
+                        <Ionicons name="ios-trash" size={28} color="rgb(225,5,5)"/>
                       </TouchableOpacity>
                     </View>
                     
-
-                    <Title >{trip.title}</Title>
+                    <Title style={{fontSize: 24}}>{trip.title}</Title>
                     <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
-                    <Paragraph>Trip from {trip.startDate} to {trip.endDate}</Paragraph>
+                    <Paragraph style={{fontSize: 16}}>
+                      Time: {trip.startDate} to {trip.endDate}
+                    </Paragraph>
                   </Card.Content>
 
                   <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
@@ -336,18 +340,16 @@ export default class TripContainer extends Component {
             <Appbar.Content title="Trips" titleStyle={styles.contentTitle} />
         </Appbar.Header>
         
-        <View style={{justifyContent: 'center', padding: 15, 
+        <View style={{justifyContent: 'center', padding: 10, 
             borderBottomWidth: 2, borderBottomColor: 'grey', }}>
-          <TouchableOpacity style={styles.addNewBtn}
-            onPress={()=>this.setModalVisible(true)}>
+          {numTrips}
+        </View>
+
+        <TouchableOpacity style={styles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
             <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
               + New Trip
             </Text>  
-          </TouchableOpacity>
-          
-        </View>
-        
-        {numTrips}
+        </TouchableOpacity>
 
         <ScrollView style={{marginTop: 25}}>
           

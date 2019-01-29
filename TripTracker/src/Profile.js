@@ -60,16 +60,18 @@ class MapContainer extends Component {
 export default class Profile extends Component {
     constructor(props) {
       super(props)
-      props.navigation.addListener('didFocus',payload => {
-          console.debug('didFocus', payload);
-          this._getProfileInfo()
+      this.focusListner = this.props.navigation.addListener('didFocus',payload => {
+        console.debug('didFocus', payload);
+        this._getProfileInfo()
       })
       this.state = {
         username: '', email: '', image: '', trips: [],
       }
     }
 
-    componentDidMount = () => { this._getProfileInfo() }
+    componentDidMount = () => {  this._getProfileInfo() }
+
+    componentWillUnmount = () => { this.focusListner.remove() }
     
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
