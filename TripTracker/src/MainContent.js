@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { serverURL, tokenName } from './config/envConst';
 import Profile from './Profile';
-import TripContainer from './TripContainer';
+import TripScreen from './TripContainer';
 import Logout from './screens/Logout';
 
 
@@ -22,7 +22,7 @@ const MainContentStack = createBottomTabNavigator({
         }),
     }, 
     Trips: {
-        screen: TripContainer,
+        screen: TripScreen,
         navigationOptions: () => ({
             tabBarIcon: () => (
               <Ionicons name="ios-briefcase" size={28} color="rgb(36,152,219)" />

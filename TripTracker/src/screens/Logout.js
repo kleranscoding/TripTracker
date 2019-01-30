@@ -38,21 +38,13 @@ const styles = StyleSheet.create({
 export default class Logout extends Component {
     constructor(props) {
         super(props)
-        // const focusListner = this.props.navigation.addListener('didFocus',payload => {
-        //     console.debug('didFocus', payload);
-        //     this.setModalVisible(true)
-        // })
         this.state = {
             modalVisible: true,
         }
     }
     
     componentDidMount = () => { 
-        this.setModalVisible(true) 
-    }
-
-    componentWillMount = () => {
-        //this.focusListner.remove()
+        // /this.setModalVisible(true) 
     }
 
     _signOutAsync = async () => {
@@ -69,7 +61,7 @@ export default class Logout extends Component {
 
     render() {
         return(
-    // <Modal animationType="slide" transparent={false} visible={this.state.modalVisible} onRequestClose={() => { Alert.alert('Modal has been closed.'); this.setModalVisible(false) }}>
+    //<Modal animationType="slide" transparent={false} visible={this.state.modalVisible} onRequestClose={() => { Alert.alert('Modal has been closed.'); this.setModalVisible(false) }}>
         <View style={styles.modalLogout}>
             <Text style={styles.modalText}>
                 Are you sure you want to log out?
@@ -83,7 +75,7 @@ export default class Logout extends Component {
                 </Button>
             </View>
         </View>
-    // </Modal>
+    //</Modal>
         )
     }
 } 

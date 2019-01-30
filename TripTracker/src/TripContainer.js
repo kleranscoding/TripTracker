@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ModalDatePicker from 'react-native-datepicker-modal'
 
 import { serverURL, tokenName,regexWhitespace } from './config/envConst';
-
+import DetailScreen from './DetailScreen'
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -62,13 +62,17 @@ const modalStyles = StyleSheet.create({
 const cardStyles = StyleSheet.create({
     container: { flex: 1, },
     content: { padding: 4, },
-    card: { margin: 10, },
+    card: { 
+        margin: 10, 
+        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1,
+    },
     cardImg: {
         width: '100%', height: 200,
     },
 })
 
 function validateWhtieSpaceOnly(text) { return regexWhitespace.test(text) }
+
 
 class NewTripModal extends Component {
     
@@ -212,13 +216,24 @@ class NewTripModal extends Component {
 }
 
 
-export default class TripContainer extends Component {
+class TripContainer extends Component {
 
     constructor(props) {
         super(props)
         
         this.state= {
             trips: [], modalVisible: false,
+        }
+    }
+
+    static navigationOptions = {
+        title: 'Trips',
+        headerTintColor: '#fafafa',
+        headerTitleStyle: {
+            fontSize: 24, fontFamily: 'Avenir',
+        },
+        headerStyle: {
+            backgroundColor: 'rgba(36,152,219,0.85)',
         }
     }
 
@@ -263,6 +278,12 @@ export default class TripContainer extends Component {
     
     onPress = (index) => {
         console.log(this.state.trips[index])
+    }
+
+    toTripDetails = (index) => {
+        this.props.navigation.navigate('DetailScreen',{
+            tripId: this.state.trips[index].id, title: this.state.trips[index].title,
+        })
     }
 
     deleteTrip = (index) => {
@@ -312,8 +333,8 @@ export default class TripContainer extends Component {
                         <Ionicons name="ios-trash" size={28} color="rgb(225,5,5)"/>
                       </TouchableOpacity>
                     </View>
-                    
-                    <Title style={{fontSize: 24}}>{trip.title}</Title>
+
+                    <Title style={{fontSize: 24, marginBottom: 5}}>{trip.title}</Title>
                     <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                     <Paragraph style={{fontSize: 16}}>
                       Time: {trip.startDate} to {trip.endDate}
@@ -321,7 +342,7 @@ export default class TripContainer extends Component {
                   </Card.Content>
 
                   <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
-                    <TouchableOpacity onPress={()=>this.onPress(index)}>
+                    <TouchableOpacity onPress={()=>this.toTripDetails(index)}>
                       <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
                         Learn More
                       </Text>
@@ -336,9 +357,9 @@ export default class TripContainer extends Component {
         return (
     <React.Fragment>
         
-        <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
+        {/* <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
             <Appbar.Content title="Trips" titleStyle={styles.contentTitle} />
-        </Appbar.Header>
+        </Appbar.Header> */}
         
         <View style={{justifyContent: 'center', padding: 10, 
             borderBottomWidth: 2, borderBottomColor: 'grey', }}>
@@ -368,3 +389,12 @@ export default class TripContainer extends Component {
         )
     }
 }
+
+export default TripScreen = createStackNavigator({
+    TripScreen: {
+        screen: TripContainer,
+    },
+    DetailScreen: {
+        screen: DetailScreen,
+    }
+})

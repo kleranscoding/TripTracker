@@ -60,7 +60,7 @@ class MapContainer extends Component {
 export default class Profile extends Component {
     constructor(props) {
       super(props)
-      this.focusListner = this.props.navigation.addListener('didFocus',payload => {
+      this.focusListener = this.props.navigation.addListener('didFocus',payload => {
         console.debug('didFocus', payload);
         this._getProfileInfo()
       })
@@ -71,7 +71,7 @@ export default class Profile extends Component {
 
     componentDidMount = () => {  this._getProfileInfo() }
 
-    componentWillUnmount = () => { this.focusListner.remove() }
+    componentWillUnmount = () => { this.focusListener.remove() }
     
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
@@ -96,7 +96,6 @@ export default class Profile extends Component {
     }
 
     render() {
-
         let numTrips = this.state.trips.length>0 ? 
             <React.Fragment>
               <Button onPress={()=>this.props.navigation.navigate('Trips')}

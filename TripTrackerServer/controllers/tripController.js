@@ -35,6 +35,41 @@ function verifyToken(token) {
     return decoded;
 }
 
+// get trip details
+router.get('/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Trip.findById(req.params.id).then(trip=>{
+        if (!trip) {
+            return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
+        } else {
+            console.log(trip.traveler.toString(),decodedToken.id)
+            // check if same owner
+            if (trip.traveler.toString()!==decodedToken.id) {
+                return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+            }
+            return res.json({
+                "id": trip._id, "title": trip.title,
+                "startDate": trip.startDate, "endDate": trip.endDate,
+                "isFav": trip.isFav, "image": trip.image,
+                "locations": [],
+            })
+        }
+    });
+});
+
 
 // create new trip
 router.post('/new',(req,res)=>{
@@ -71,6 +106,7 @@ router.post('/new',(req,res)=>{
     })
 });
 
+// delete trip by id
 router.delete('/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
