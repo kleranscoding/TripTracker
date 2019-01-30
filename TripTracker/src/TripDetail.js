@@ -290,8 +290,8 @@ class MapContainer extends Component {
         super(props)
         this.state = {
             region: {
-                latitude: props.geocode.lat,
-                longitude: props.geocode.lng,
+                latitude: props.geocode.lat? parseFloat(props.geocode.lat): 0,
+                longitude: props.geocode.lng? parseFloat(props.geocode.lng): 0,
                 latitudeDelta: 0.0922,longitudeDelta: 0.0421,
             },
         }

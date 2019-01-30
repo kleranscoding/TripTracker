@@ -96,8 +96,10 @@ class NewTripModal extends Component {
         } else {
             errTitle= false
         }
-        if (!(startDate && endDate && startDate.localeCompare(endDate)<=0) ) {
-            if (startDate.localeCompare(endDate)>0) Alert.alert("invalid dates")
+        if (!(startDate && endDate)) {
+            Alert.alert("Please pick a date")
+        } else if (startDate.localeCompare(endDate)>0) {
+            Alert.alert("Invalid dates")
         } else {
             errDateStart= false
             errDateEnd= false

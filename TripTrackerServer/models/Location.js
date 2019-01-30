@@ -15,8 +15,8 @@ const LocationSchema = new mongoose.Schema({
         type: String,
     },
     geocode: {
-        lat: { type: Number, },
-        lng: { type: Number, },
+        lat: { type: String, },
+        lng: { type: String, },
     },
     trip: {
         type: mongoose.Schema.Types.ObjectId, 

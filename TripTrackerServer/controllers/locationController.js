@@ -101,8 +101,8 @@ router.post('/new',(req,res)=>{
                 "startDate": req.body.startDate, "endDate": req.body.endDate,
                 "formateAddress": req.body.formatAddr,
                 "geocode": {
-                    "lat": parseFloat(req.body.geocode.lat), 
-                    "lng": parseFloat(req.body.geocode.lng),
+                    "lat": req.body.geocode.lat, 
+                    "lng": req.body.geocode.lng,
                 },
                 "trip": req.body.tripId,
                 "image": defaultImg,
