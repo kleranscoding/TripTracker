@@ -4,10 +4,13 @@ import { AsyncStorage, StyleSheet, View, Text, ScrollView, Image,
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import ModalDatePicker from 'react-native-datepicker-modal'
+import MapView from 'react-native-maps';
+import ModalDatePicker from 'react-native-datepicker-modal';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
-import { serverURL, tokenName,regexWhitespace } from './config/envConst';
-
+import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
+import { GOOGLAPI } from '../envAPI';
+ 
 const styles = StyleSheet.create({
     imgSmall: {
         width: '50%', height: 75,
@@ -67,6 +70,19 @@ const modalStyles = StyleSheet.create({
     },
 })
 
+const cardStyles = StyleSheet.create({
+    container: { flex: 1, },
+    content: { padding: 4, },
+    card: { 
+        margin: 10, 
+        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1,
+    },
+    cardImg: {
+        width: '100%', height: 200,
+    },
+})
+
+function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
 class LocationContainer extends Component {
     
@@ -103,39 +119,56 @@ class LocationContainer extends Component {
 
 
 class NewLocModal extends Component {
-    
-    state= {
-        location: '',
-        dateStart: '', dateEnd: '',
-        errLoc: false,
-        errDateStartStyle: {fontSize: 18}, errDateEndStyle: {fontSize: 18},
+    constructor() {
+        super()
+        this.location= ''
+        this.formatAddr= ''
+        this.geocode = {}
+        this.state = {
+            dateStart: '', dateEnd: '',
+        }
     }
-
+    
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     submitLocInfo = () => {
-        return
-        let location = this.state.location
+        let refLoc = this.refs["location"].state.text, stateLoc = this.location
+        let formatAddr = this.formatAddr, geocode = this.geocode
         let startDate = this.state.dateStart, endDate = this.state.dateEnd
+
+        // use ref.state[location] if state[location] does not match ref.state[location]
+        let location = stateLoc
+        if (refLoc!==stateLoc) {
+            location= refLoc
+            formatAddr= '' 
+            geocode= { "lat": '', "lng": '' }
+        } 
+        // check errors
         let errLoc= true, errDateStart= true, errDateEnd= true
-        console.log(location, startDate, endDate)
+        let errMsgLoc= '', errDates= '' 
+        console.log(location);console.log(formatAddr);console.log(geocode);console.log(startDate, endDate)
         if (!location || validateWhtieSpaceOnly(location) ) {
-            this.setState({errLoc: true})
+            errMsgLoc = '- Please enter a location'
         } else {
-            errTitle= false
+            errLoc= false
         }
-        if (!(startDate && endDate && startDate.localeCompare(endDate)<=0) ) {
-            if (startDate.localeCompare(endDate)>0) Alert.alert("invalid dates")
+        if (!(startDate && endDate)) {
+            errDates = "- Please select dates"
+        } else if (startDate.localeCompare(endDate)>0) {
+            errDates = "- Dates are invalid"
         } else {
             errDateStart= false
             errDateEnd= false
         }
         console.log(errLoc, errDateStart, errDateEnd)
-        if (errLoc || errDateStart || errDateEnd) return
-
+        if (errLoc || errDateStart || errDateEnd) {
+            Alert.alert("Hang on!\n"+errMsgLoc+'\n'+errDates)
+            return
+        }
+        
         this._getToken().then(token=>{
             
-            fetch(serverURL+'/api/trips/new',{
+            fetch(serverURL+'/api/locations/new',{
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -143,13 +176,15 @@ class NewLocModal extends Component {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    "tripId": this.props.tripId,
                     "location": location.trim(), "startDate": startDate, "endDate": endDate,
+                    "formatAddr": formatAddr, "geocode": geocode,
                 }),
             }).then(res=>{
                 if (res.status===200) {
                   res.json().then(data=>{
                     this.props.setModalVisible(false)
-                    this.props.addTrips(data)
+                    this.props.addLocs(data)
                   })
                 }
             }).catch(err=>{ console.log(err) })
@@ -159,15 +194,6 @@ class NewLocModal extends Component {
     }
 
     setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
-
-    onFocus = () => { this.setState({errLoc: false}) }
-
-    onBlur = (evt) => {
-        if (!evt.nativeEvent.text) {
-            this.setState({errLoc: true})
-            return
-        }
-    }
 
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
@@ -187,12 +213,27 @@ class NewLocModal extends Component {
 
       <ScrollView>
         
-        <TextInput label='Enter Location' mode="outlined" value={this.state.location}
-            onChangeText={text => this.setState({ location: text })}
-            onBlur={this.onBlur} onFocus={this.onFocus}
-            style={{margin: 20, borderRadius: 5, backgroundColor: 'rgb(255,255,255)' }} 
-            error={this.state.errLoc}
-        />
+      <GooglePlacesAutocomplete 
+        ref="location"
+        query={{ key: GOOGLAPI, types: ['geocode', 'cities'] }}
+        placeholder='Enter Location'
+        minLength={2}
+        autoFocus={false}
+        returnKeyType={'next'}
+        fetchDetails={true}
+        currentLocation={false}
+        renderDescription={row => row.description} 
+        onPress={(data, details = null) => { 
+            console.log(data.description);console.log(details["formatted_address"]);console.log(details.geometry.location)
+            this.location= data.description
+            this.formatAddr= details["formatted_address"]
+            this.geocode= details.geometry.location
+        }}
+        style={{margin: 20, borderRadius: 5, fontSize: 18, }}
+        debounce={200} />
+
+        {/* <TextInput label='Enter Location' mode="outlined" value={this.state.location}
+            style={{margin: 20, borderRadius: 5, backgroundColor: 'rgb(255,255,255)' }} /> */}
         
         <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
@@ -243,12 +284,37 @@ class NewLocModal extends Component {
     }
 }
 
+class MapContainer extends Component {
+    
+    constructor(props) {
+        super(props)
+        this.state = {
+            region: {
+                latitude: props.geocode.lat,
+                longitude: props.geocode.lng,
+                latitudeDelta: 0.0922,longitudeDelta: 0.0421,
+            },
+        }
+    }
+    
+    onRegionChange = (region)=> { this.setState({ region }) }
+  
+    render() {
+        return(
+            <MapView style={{margin: 20, height: '75%', }} 
+                region={this.state.region} onRegionChange={this.onRegionChange} />
+        )
+    }
+    
+  }
 
-class DetailScreen extends Component {
+
+export default class TripDetail extends Component {
 
     constructor(props) {
         super(props)
         this.state = { 
+            locations: [],
             tripDetails: {},
             resize: false,
             modalVisible: false,
@@ -299,9 +365,11 @@ class DetailScreen extends Component {
     }
 
     addLocs = (loc) => {
-        let locations = this.state.locations
+        let locations = this.state.tripDetails.locations
         locations.push(loc)
-        this.setState({ locations })
+        this.setState(prevState=>({ 
+            ...prevState.tripDetails, locations 
+        }))
     }
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
@@ -325,6 +393,50 @@ class DetailScreen extends Component {
     render() {
         console.log("locations")
         console.log(this.state.tripDetails.locations)
+        
+        let allLocs = []
+        if (this.state.tripDetails.locations) {
+            this.state.tripDetails.locations.map((loc,index)=>{
+                return allLocs.push(
+                    <Card style={cardStyles.card} key={index}>
+                      <Card.Content>
+                        
+                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                            >
+                            <Ionicons name="ios-build" size={28} color="rgb(36,152,219)"/>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                            >
+                            <Ionicons name="ios-trash" size={28} color="rgb(225,5,5)"/>
+                          </TouchableOpacity>
+                        </View>
+    
+                        <Title style={{fontSize: 24, marginBottom: 5}}>{loc.location}</Title>
+                        <View style={cardStyles.cardImg}>
+                            <MapContainer geocode={loc.geocode} />
+                        </View>
+                        
+                        {/* <Card.Cover source={{ uri: serverURL+'/'+loc.image }} style={cardStyles.cardImg} /> */}
+                        <Paragraph style={{fontSize: 16}}>
+                          Time: {loc.startDate} to {loc.endDate}
+                        </Paragraph>
+                      </Card.Content>
+    
+                      <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
+                        <TouchableOpacity >
+                          <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
+                            Learn More
+                          </Text>
+                        </TouchableOpacity>
+                      </Card.Actions>
+    
+                    </Card>
+                )
+            })
+        }
+        
+
         return (
     <React.Fragment>
         <View style={this.state.imgView}>
@@ -343,10 +455,11 @@ class DetailScreen extends Component {
                 </Text>
             </TouchableOpacity>
         </View>
-        <ScrollView style={{margin: 10, }}>
+        <ScrollView style={{margin: 10, marginTop: 25}}>
             {this.state.tripDetails.locations!==undefined?
             <LocationContainer locations={this.state.tripDetails.locations} />:null
             }
+            {allLocs}
         </ScrollView>
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
@@ -354,13 +467,10 @@ class DetailScreen extends Component {
               Alert.alert('Modal has been closed.')
               this.setModalVisible(false)
         }}>
-            <NewLocModal setModalVisible={this.setModalVisible} addLocs={this.addLocs} />
+            <NewLocModal setModalVisible={this.setModalVisible} addLocs={this.addLocs} tripId={this.state.tripDetails.id} />
         </Modal>
     </React.Fragment>
         )
     }
 }
 
-
-
-export default DetailScreen

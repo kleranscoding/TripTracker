@@ -41,8 +41,7 @@ class MapContainer extends Component {
       region: {
           latitude: 37.78825,
           longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.0922,longitudeDelta: 0.0421,
       },
   }
   
@@ -50,8 +49,8 @@ class MapContainer extends Component {
 
   render() {
       return(
-  <MapView style={{margin: 20, height: '30%'}} 
-    region={this.state.region} onRegionChange={this.onRegionChange} />
+        <MapView style={{margin: 20, height: '30%'}} 
+          region={this.state.region} onRegionChange={this.onRegionChange} />
       )
   }
   
@@ -101,7 +100,9 @@ export default class Profile extends Component {
               <Button onPress={()=>this.props.navigation.navigate('Trips')}
                 style={{borderRadius: 20, width: '50%', marginLeft: '25%', backgroundColor: 'rgb(49,90,158)'}}>
                 <Text style={{color: 'rgb(255,255,255)'}}>
-                  {`You have ${this.state.trips.length} trips`}
+                  { this.state.trips.length>1 ? 
+                    `You have ${this.state.trips.length} trips` : `You have ${this.state.trips.length} trip` 
+                  }
                 </Text>
               </Button>
             </React.Fragment>: 

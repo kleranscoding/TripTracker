@@ -1,5 +1,5 @@
 
-const index = 0
+const index = 0+2
 
 const urls = [
     "http://10.1.6.227:8001",
@@ -11,6 +11,7 @@ const urls = [
 
 export const pwdLen = 6
 export const regexWhitespace = /\s/g
+export const regexWhitespaceOnly = /^\s+$/
 export const regexUsername = /[a-zA-Z0-9]{2,}/i
 export const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 

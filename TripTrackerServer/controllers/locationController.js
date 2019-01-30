@@ -7,7 +7,7 @@ const CONFLICT = 409;
 const INTERNAL_ERR = 500;
 
 const EXPIRE= "12h";
-const defaultImg = "images/default_trip.jpg";
+const defaultImg = "images/default_loc.jpg";
 const maxFileSize = 10*1024*1024;
 
 require('../database/connection');
@@ -22,7 +22,6 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 
 
-
 function verifyToken(token) {
     let decoded = {};
     jwt.verify(token,config.jwtSecret,function(err,verified){
@@ -35,6 +34,7 @@ function verifyToken(token) {
     return decoded;
 }
 
+/*
 // get trip details
 router.get('/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -60,31 +60,18 @@ router.get('/:id',(req,res)=>{
             if (trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
             }
-            db.Location.find({"trip": trip._id}).then(locations=>{
-                let locArr= [];
-                if (locations) {
-                    locations.map(loc=>{
-                        return locArr.push({
-                            "id": loc._id, "location": loc.location, 
-                            "startDate": loc.startDate, "endDate": loc.endDate,
-                            "formateAddress": req.body.formatAddress,
-                            "geocode": loc.geocode, "image": loc.image,
-                        });
-                    });
-                } 
-                return res.json({ 
-                    "id": trip._id, "title": trip.title,
-                    "startDate": trip.startDate, "endDate": trip.endDate,
-                    "isFav": trip.isFav, "image": trip.image,
-                    "locations": locArr,
-                }); 
-            });
+            return res.json({
+                "id": trip._id, "title": trip.title,
+                "startDate": trip.startDate, "endDate": trip.endDate,
+                "isFav": trip.isFav, "image": trip.image,
+                "locations": [],
+            })
         }
     });
 });
+//*/
 
-
-// create new trip
+// create new location
 router.post('/new',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
@@ -99,24 +86,45 @@ router.post('/new',(req,res)=>{
         return res.status(UNAUTH).json(decodedToken);
     }
 
-    let newTrip = {
-        "title": req.body.title,
-        "startDate": req.body.startDate, "endDate": req.body.endDate,
-        "traveler": decodedToken.id,
-        "isFav": false, "image": defaultImg,
-    };
-    db.Trip.create(newTrip).then(trip=>{
+    console.log(req.body)
+
+    db.Trip.findById(req.body.tripId).then(trip=>{
         if (!trip) {
-            return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+            return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
+        } else {
+            // check if same owner
+            if (trip.traveler.toString()!==decodedToken.id) {
+                return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+            }
+            let newLoc = {
+                "location": req.body.location, 
+                "startDate": req.body.startDate, "endDate": req.body.endDate,
+                "formateAddress": req.body.formatAddr,
+                "geocode": {
+                    "lat": parseFloat(req.body.geocode.lat), 
+                    "lng": parseFloat(req.body.geocode.lng),
+                },
+                "trip": req.body.tripId,
+                "image": defaultImg,
+            };
+            db.Location.create(newLoc).then(loc=>{
+                if (!loc) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+                }
+                return res.json({
+                    "id": loc._id, "location": loc.location, 
+                    "startDate": loc.startDate, "endDate": loc.endDate,
+                    "formateAddress": req.body.formatAddress,
+                    "geocode": loc.geocode, "image": loc.image,
+                })
+            });
         }
-        return res.json({
-            "id": trip._id, "title": trip.title, 
-            "startDate": trip.startDate, "endDate": trip.endDate,
-            "isFav": trip.isFav, "image": trip.image,
-        });
     });
+    
+    //*/
 });
 
+/*
 // delete trip by id
 router.delete('/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -160,5 +168,6 @@ router.delete('/:id',(req,res)=>{
     
     //return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
 });
+//*/
 
 module.exports = router;
