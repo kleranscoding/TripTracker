@@ -10,6 +10,9 @@ import { serverURL, tokenName,regexWhitespace, regexWhitespaceOnly } from './con
 import TripDetail from './TripDetail'
 import LocationDetail from './LocationDetail';
 
+/**
+ * STYLESHEETS
+ */
 const styles = StyleSheet.create({
     appbarHeader:{
         backgroundColor: 'rgb(36,152,216)',
@@ -43,7 +46,7 @@ const modalStyles = StyleSheet.create({
         paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
     },
     datepicker: {
-        justifyContent: 'center', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
     },
     "datepicker_err": {
         borderColor: 'rgb(255,0,0)', borderWidth: 1, borderRadius: 5,
@@ -72,9 +75,15 @@ const cardStyles = StyleSheet.create({
     },
 })
 
+
+/**
+ * FUNCTIONS
+ */
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
-
+/**
+ * MODAL
+ */
 class NewTripModal extends Component {
     
     state= {
@@ -177,7 +186,7 @@ class NewTripModal extends Component {
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
                 if (!date) {
-                    return (<Text style={{fontSize: 18}}>Pick a start date</Text>)
+                    return (<Text style={{fontSize: 18}}>Click here to select a start date</Text>)
                 }
                 let selectedDate= `${year}-${month}-${day}`
                 return <Text style={{fontSize: 18}}>{selectedDate}</Text>
@@ -194,7 +203,7 @@ class NewTripModal extends Component {
             <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Pick an end date"
+                    let selectedDate = "Click here to select an end date"
                     if (date) { 
                         selectedDate = `${year}-${month}-${day}` 
                     }
@@ -221,7 +230,9 @@ class NewTripModal extends Component {
     }
 }
 
-
+/**
+ * TRIPCONTAINER
+ */
 class TripContainer extends Component {
 
     constructor(props) {
@@ -363,10 +374,6 @@ class TripContainer extends Component {
 
         return (
     <React.Fragment>
-        
-        {/* <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-            <Appbar.Content title="Trips" titleStyle={styles.contentTitle} />
-        </Appbar.Header> */}
         
         <View style={{justifyContent: 'center', padding: 10, 
             borderBottomWidth: 2, borderBottomColor: 'grey', }}>

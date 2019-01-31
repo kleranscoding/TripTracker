@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, Modal, View, Text } from 'react-native';
 import { createBottomTabNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
-import { Portal, Appbar, Button } from  'react-native-paper';
+import { Portal, Appbar, Button, } from  'react-native-paper';
 
 import { serverURL, tokenName } from '../config/envConst';
 
@@ -62,6 +62,10 @@ export default class Logout extends Component {
     render() {
         return(
     //<Modal animationType="slide" transparent={false} visible={this.state.modalVisible} onRequestClose={() => { Alert.alert('Modal has been closed.'); this.setModalVisible(false) }}>
+    <React.Fragment>
+        <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
+            <Appbar.Content title="Log Out" titleStyle={styles.contentTitle} />
+        </Appbar.Header>
         <View style={styles.modalLogout}>
             <Text style={styles.modalText}>
                 Are you sure you want to log out?
@@ -75,6 +79,7 @@ export default class Logout extends Component {
                 </Button>
             </View>
         </View>
+    </React.Fragment>
     //</Modal>
         )
     }

@@ -1,28 +1,35 @@
 
 import React, { Component } from 'react';
-import { View, Text, Button } from 'react-native';
-import { createBottomTabNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
-import { } from  'react-native-paper';
+import { StyleSheet, View, Text, Button } from 'react-native';
+import { createBottomTabNavigator, createAppContainer, } from 'react-navigation';
+import { Appbar } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 
-import { serverURL, tokenName } from './config/envConst';
 import Profile from './Profile';
 import TripScreen from './TripContainer';
 import Logout from './screens/Logout';
 
 
-class ExchangeRate extends Component {
-    render() {
-        return(
-            <Text style={{flex: 1}}>Under Construction</Text>
-        )
-    }
-}
+const styles = StyleSheet.create({
+    appbarHeader:{
+      backgroundColor: 'rgb(36,152,216)',
+    },
+    contentTitle: {
+      fontSize: 24, fontFamily: 'Avenir',
+    },
+})
 
 class Favorites extends Component {
     render() {
         return(
-            <Text style={{flex: 1}}>Under Construction</Text>
+        <React.Fragment>
+            <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
+                <Appbar.Content title="Favorites" titleStyle={styles.contentTitle} />
+            </Appbar.Header>
+            <View style={{flex: 1, justifyContent: 'center'}}>
+                <Text style={{textAlign: 'center'}}> Under Construction </Text>
+            </View>
+        </React.Fragment>
         )
     }
 }
