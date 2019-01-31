@@ -34,8 +34,8 @@ function verifyToken(token) {
     return decoded;
 }
 
-/*
-// get trip details
+//*
+// get location details
 router.get('/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
@@ -51,21 +51,34 @@ router.get('/:id',(req,res)=>{
         return res.status(UNAUTH).json(decodedToken);
     }
 
-    db.Trip.findById(req.params.id).then(trip=>{
-        if (!trip) {
-            return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
+    db.Location.findById(req.params.id).populate('trip').then(loc=>{
+        if (!loc) {
+            return res.status(NOTFOUND).json({"success": false, "message": "location not found"});
         } else {
-            console.log(trip.traveler.toString(),decodedToken.id)
+            console.log(loc.trip.traveler.toString(),decodedToken.id,loc.trip.traveler.toString()===decodedToken.id)
             // check if same owner
-            if (trip.traveler.toString()!==decodedToken.id) {
+            if (loc.trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
             }
-            return res.json({
-                "id": trip._id, "title": trip.title,
-                "startDate": trip.startDate, "endDate": trip.endDate,
-                "isFav": trip.isFav, "image": trip.image,
-                "locations": [],
-            })
+            db.Spending.find({"location": loc._id}).then(spendings=>{
+                let spendArr= [];
+                if (spendings) {
+                    spendings.map(spend=>{
+                        return spendArr.push({
+                            "id": spend._id, 
+                            "date": spend.startDate, "name": spend.name, 
+                            "amount": spend.amount, "currency": spend.currency,
+                            "category": spend.category, "note": spend.note,
+                        });
+                    });
+                } 
+                return res.json({
+                    "id": loc._id, "location": loc.location,
+                    "startDate": loc.startDate, "endDate": loc.endDate,
+                    "formatAddress": loc.formatAddress, "geocode": loc.geocode,
+                    "image": loc.image, "spendings": spendArr,
+                });
+            });
         }
     });
 });
@@ -125,8 +138,8 @@ router.post('/new',(req,res)=>{
 });
 
 /*
-// delete trip by id
-router.delete('/:id',(req,res)=>{
+// delete location by id
+router.delete('delete/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
             "success": false, "message": "forbidden"
@@ -142,8 +155,8 @@ router.delete('/:id',(req,res)=>{
     }
 
     console.log(req.params.id)
-    db.Trip.findById(req.params.id).then(trip=>{
-        if (!trip) {
+    db.Location.findById(req.params.id).then(loc=>{
+        if (!loc) {
             return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
         } else {
             console.log(trip.traveler.toString(),decodedToken.id)
@@ -151,16 +164,17 @@ router.delete('/:id',(req,res)=>{
             if (trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
             }
-            db.Trip.findByIdAndRemove(req.params.id).then(deletedTrip=>{
-                if (!deletedTrip) {
+            db.Location.findByIdAndRemove(req.params.id).then(deletedLoc=>{
+                if (!deletedLoc) {
                     return res.status(NOTFOUND).json({"success": false, "message": "cannot delete trip"});
                 } else {
-                    let removedTrip = {
-                        "id": deletedTrip.id, "title": deletedTrip.title, 
-                        "startDate": deletedTrip.startDate, "endDate": deletedTrip.endDate,
-                        "isFav": deletedTrip.isFav, "image": deletedTrip.image,
+                    let removedLoc = {
+                        "id": deletedLoc.id, "location": deletedLoc.location, 
+                        "startDate": deletedLoc.startDate, "endDate": deletedLoc.endDate,
+                        "formatAddress": deletedLoc.formatAddress, "geocode": deletedLoc.geocode,
+                        "image": deletedLoc.image,
                     };
-                    return res.json(removedTrip);
+                    return res.json(removedLoc);
                 }
             });
         }

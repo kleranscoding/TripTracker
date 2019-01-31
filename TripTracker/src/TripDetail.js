@@ -55,7 +55,7 @@ const modalStyles = StyleSheet.create({
         paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
     },
     datepicker: {
-        justifyContent: 'center', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
     },
     "datepicker_err": {
         borderColor: 'rgb(255,0,0)', borderWidth: 1, borderRadius: 5,
@@ -80,7 +80,7 @@ const cardStyles = StyleSheet.create({
         borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1, borderRadius: 10,
     },
     cardIndiv: {
-        fontSize: 28, fontFamily: 'Avenir',
+        fontSize: 20, fontFamily: 'Avenir',
         padding: 10, textAlign: 'center',
     },
     cardImg: {
@@ -88,8 +88,16 @@ const cardStyles = StyleSheet.create({
     },
 })
 
+
+/**
+ * FUNCTIONS
+ */
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
+
+/**
+ * LOCATION CONTAINER
+ */
 class LocationContainer extends Component {
     
     constructor(props) {
@@ -106,8 +114,7 @@ class LocationContainer extends Component {
     }
 
     render() {
-        console.log("render")
-        console.log(this.state.locations)
+        //console.log("render");console.log(this.state.locations)
         //let numLocs = null
         let numLocs = this.state.locations.length>0 ? 
             this.state.locations.length > 1 ?
@@ -123,7 +130,9 @@ class LocationContainer extends Component {
     }
 }
 
-
+/**
+ * MODAL
+ */
 class NewLocModal extends Component {
     constructor() {
         super()
@@ -246,7 +255,7 @@ class NewLocModal extends Component {
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
                 if (!date) {
-                    return (<Text style={{fontSize: 18}}>Pick a start date</Text>)
+                    return (<Text style={{fontSize: 18}}>Click here to select a start date</Text>)
                 }
                 let selectedDate= `${year}-${month}-${day}`
                 return <Text style={{fontSize: 18}}>{selectedDate}</Text>
@@ -263,7 +272,7 @@ class NewLocModal extends Component {
             <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Pick an end date"
+                    let selectedDate = "Click here to select an end date"
                     if (date) { 
                         selectedDate = `${year}-${month}-${day}` 
                     }
@@ -290,6 +299,9 @@ class NewLocModal extends Component {
     }
 }
 
+/**
+ * MAPCONTAINER
+ */
 class MapContainer extends Component {
     
     constructor(props) {
@@ -315,7 +327,9 @@ class MapContainer extends Component {
     }
 }
 
-
+/**
+ * TRIP LIST
+ */
 class TripList extends Component {
 
     constructor(props) {
@@ -405,8 +419,7 @@ class TripList extends Component {
     }
 
     render() {
-        console.log("locations")
-        console.log(this.state.tripDetails.locations)
+        //console.log("locations") ; console.log(this.state.tripDetails.locations)
         
         let allLocs = []
         if (this.state.tripDetails.locations) {
@@ -500,8 +513,8 @@ class TripList extends Component {
     }
 }
 
-export default TripDetail = TripList
 
+export default TripDetail = TripList
 /*
 export default TripDetail = createStackNavigator({
     TripListScreen: {

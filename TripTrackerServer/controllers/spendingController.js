@@ -34,7 +34,6 @@ function verifyToken(token) {
 }
 
 
-
 // create new expenditure
 router.post('/new',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -56,7 +55,7 @@ router.post('/new',(req,res)=>{
         "currency": req.body.currency,
         "date": req.body.date,
         "category": req.body.category,
-        "location": req.body.locId,
+        "location": req.body.location,
         "note": req.body.note,
     };
     db.Spending.create(newSpending).then(spend=>{
@@ -67,7 +66,7 @@ router.post('/new',(req,res)=>{
             "id": spend._id, "name": spend.name, 
             "date": spend.date, "currency": spend.currency,
             "amount": spend.amount, "category": spend.category,
-            "note": spend.note, "location": spend.location,
+            "note": spend.note,
         });
     });
 });

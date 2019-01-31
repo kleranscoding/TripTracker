@@ -11,6 +11,22 @@ import TripScreen from './TripContainer';
 import Logout from './screens/Logout';
 
 
+class ExchangeRate extends Component {
+    render() {
+        return(
+            <Text style={{flex: 1}}>Under Construction</Text>
+        )
+    }
+}
+
+class Favorites extends Component {
+    render() {
+        return(
+            <Text style={{flex: 1}}>Under Construction</Text>
+        )
+    }
+}
+
 const MainContentStack = createBottomTabNavigator({ 
     Profile: {
         screen: Profile,
@@ -26,6 +42,15 @@ const MainContentStack = createBottomTabNavigator({
         navigationOptions: () => ({
             tabBarIcon: () => (
               <Ionicons name="ios-briefcase" size={28} color="rgb(36,152,219)" />
+            ),
+            title: {fontSize: 20}
+        }),
+    },
+    Favorites: {
+        screen: Favorites,
+        navigationOptions: () => ({
+            tabBarIcon: () => (
+              <Ionicons name="ios-star" size={28} color="rgb(36,152,219)" />
             ),
             title: {fontSize: 20}
         }),
@@ -54,8 +79,6 @@ const MainContentStack = createBottomTabNavigator({
     }
 },
 )
-  
-
 
 export default MainContent = createAppContainer(MainContentStack)
 

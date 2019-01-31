@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     imgView: {
         height: 250, 
     },
-    locInfo: {
+    spendInfo: {
         marginTop: 5,
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
@@ -59,7 +59,7 @@ const modalStyles = StyleSheet.create({
         paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
     },
     datepicker: {
-        justifyContent: 'center', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
     },
     "datepicker_err": {
         borderColor: 'rgb(255,0,0)', borderWidth: 1, borderRadius: 5,
@@ -120,6 +120,41 @@ class MapContainer extends Component {
 }
 
 /**
+ * LOCATION CONTAINER
+ */
+class SpendingContainer extends Component {
+    
+    constructor(props) {
+        super(props)
+        this.state = {
+            spendings: []
+        }
+    }
+    
+    componentDidMount = () => {
+        console.log("didmount")
+        console.log(this.props.spendings)
+        this.setState({ spendings: this.props.spendings})
+    }
+
+    render() {
+        //console.log("render");console.log(this.state.spendings)
+        //let numLocs = null
+        let numSpends = this.state.spendings.length>0 ? 
+            this.state.spendings.length > 1 ?
+                <Text style={styles.spendInfo}>{`There are ${this.state.spendings.length} spendings`}</Text> :
+                <Text style={styles.spendInfo}>{`There is ${this.state.spendings.length} spending`}</Text> :
+            <Text style={styles.spendInfo}>You don't have any expenditure in this location yet</Text>
+        
+        return(
+        <React.Fragment>
+            {numSpends}
+        </React.Fragment>
+        )
+    }
+}
+
+/**
  * MODAL
  */
 class NewSpendModal extends Component {
@@ -141,62 +176,43 @@ class NewSpendModal extends Component {
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     submitSpendInfo = () => {
-        let errCat= true, errCur= true
-        let errMsgCat = '', errMsgCur = ''
+        let errDate= true, errName= true, errAmt= true, errCat= true
+        let errMsgDate= '', errMsgName= '', errMsgAmt='', errMsgCat = ''
+        if (!this.state.date) {
+            errMsgDate= '- Please select a date'
+        } else {
+            errDate= false
+        }
+        if (!this.state.name || validateWhtieSpaceOnly(this.state.name)) {
+            errMsgName= '- Please describe this expenditure'
+        } else {
+            errName= false
+        }
+        if (!this.state.amount) {
+            errMsgAmt= '- Please enter an amount'
+        } else {
+            errAmt= false
+        }
         if (this.state.catIndex===null) {
             errMsgCat = "- Please select a category"
         } else {
             errCat= false
         }
-        if (this.state.catIndex===null) {
-            errMsgCur = "- Please select a currency"
-        } else {
-            errCur= false
-        }
-        if (errCat || errCur) {
-            Alert.alert("Hang On!\n"+errMsgCat+"\n"+errMsgCur)
+        if (errDate || errName || errAmt || errCat) {
+            Alert.alert("Hang On!\n"+
+            errMsgName+"\n"+errMsgAmt+"\n"+errMsgDate+"\n"+errMsgCat)
             return
         }
-        console.log(this.state.category)
+        console.log(this.state.date)
+        console.log(this.state.name)
+        console.log(this.state.amount)
         console.log(this.state.currency)
-        /*
-        let refLoc = this.refs["location"].state.text, stateLoc = this.location
-        let formatAddr = this.formatAddr, geocode = this.geocode
-        let startDate = this.state.dateStart, endDate = this.state.dateEnd
-
-        // use ref.state[location] if state[location] does not match ref.state[location]
-        let location = stateLoc
-        if (refLoc!==stateLoc) {
-            location= refLoc
-            formatAddr= '' 
-            geocode= { "lat": '', "lng": '' }
-        } 
-        // check errors
-        let errLoc= true, errDateStart= true, errDateEnd= true
-        let errMsgLoc= '', errDates= '' 
-        console.log(location);console.log(formatAddr);console.log(geocode);console.log(startDate, endDate)
-        if (!location || validateWhtieSpaceOnly(location) ) {
-            errMsgLoc = '- Please enter a location'
-        } else {
-            errLoc= false
-        }
-        if (!(startDate && endDate)) {
-            errDates = "- Please select dates"
-        } else if (startDate.localeCompare(endDate)>0) {
-            errDates = "- Dates are invalid"
-        } else {
-            errDateStart= false
-            errDateEnd= false
-        }
-        console.log(errLoc, errDateStart, errDateEnd)
-        if (errLoc || errDateStart || errDateEnd) {
-            Alert.alert("Hang on!\n"+errMsgLoc+'\n'+errDates)
-            return
-        }
-        
+        console.log(this.state.category)
+        console.log(this.state.note || 'empty string')
+        //*
         this._getToken().then(token=>{
             
-            fetch(serverURL+'/api/locations/new',{
+            fetch(serverURL+'/api/spendings/new',{
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -204,15 +220,15 @@ class NewSpendModal extends Component {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    "tripId": this.props.tripId,
-                    "location": location.trim(), "startDate": startDate, "endDate": endDate,
-                    "formatAddr": formatAddr, "geocode": geocode,
+                    "location": this.props.locId,
+                    "name": this.state.name.trim(), "date": this.state.date, "category": this.state.category,
+                    "currency": this.state.currency, "amount": this.state.amount,
                 }),
             }).then(res=>{
                 if (res.status===200) {
                   res.json().then(data=>{
                     this.props.setModalVisible(false)
-                    this.props.addLocs(data)
+                    this.props.addSpends(data)
                   })
                 }
             }).catch(err=>{ console.log(err) })
@@ -230,11 +246,12 @@ class NewSpendModal extends Component {
             catLabels[this.state.catIndex]= catLabels[this.state.catIndex].replace(selectText,"")
         }
         catLabels[index]= catLabels[index]+selectText
-        this.setState(prevState=>({ 
+        this.setState({ 
             catIndex: index,
             category: Categories[index].label,
+            resizeCat: false,
             catLabels 
-        }))
+        })
     }
 
     setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
@@ -288,17 +305,20 @@ class NewSpendModal extends Component {
         let catButtonGrp = []
         Categories.map((cat,index)=>{
             return catButtonGrp.push(
-            <View key={index} >
+            <View key={index} style={{alignSelf: 'flex-start'}}>
                 <Button icon={cat.icon} ref={"cat_"+index}
                     onPress={()=>this.selectCategory(index)}>
-                    {this.state.catLabels[index]}
+                    <Text style={{color: 'rgb(255,255,255)', textAlign: 'left', padding: 5, fontSize: 18}}>
+                        {this.state.catLabels[index]}
+                    </Text>
                 </Button>
             </View>
             )
         })
         // create currency picker group
         let currencyGrp = this.state.currencyList.map((currency,index)=>{
-            return (<Picker.Item key={index} label={currency[1]+" ("+currency[0]+")"} value={currency[0]} />)
+            return (<Picker.Item itemStyle={{ color: "rgb(255,255,255)", fontSize:16 }}
+                key={index} label={currency[1]+" ("+currency[0]+")"} value={currency[0]} />)
         })
 
 
@@ -318,14 +338,12 @@ class NewSpendModal extends Component {
       <ScrollView>
         
       <KeyboardAwareScrollView style={{marginBottom: 50}}>
-        <TextInput label='What did you spend on?' mode="outlined" 
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
         
         <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Pick a date"
+                    let selectedDate = "Click here to select a date"
                     if (date) { 
                         selectedDate = `${year}-${month}-${day}` 
                     }
@@ -333,14 +351,19 @@ class NewSpendModal extends Component {
                 }}
                 onDateChanged={({ year, month, day, date }) => {
                     if (date) {
-                        this.updateDate("dateEnd",`${year}-${month}-${day}`)
+                        this.updateDate("date",`${year}-${month}-${day}`)
                     }
                 }}
             />
         </View>
 
-        <TextInput label='How much is that?' mode="outlined" 
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+        <TextInput label='What did you spend on?' mode="outlined" 
+            onChangeText={text => this.setState({ name: text })}
+            style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+        
+        <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
+            onChangeText={text => this.setState({ amount: text })}
+            style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
 
         <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
             <TouchableOpacity onPress={this.resizeCurrency}>
@@ -348,32 +371,34 @@ class NewSpendModal extends Component {
                     Currency: {this.state.currency+" selected"}
                 </Text>
             </TouchableOpacity>
-            {/* <View> */}
-                {this.state.resizeCurr && 
-                <Picker selectedValue={this.state.currency} prompt='Options'
-                    onValueChange={(itemValue, itemIndex) => this.setState({currency: itemValue})}>
+            {this.state.resizeCurr && 
+                <Picker selectedValue={this.state.currency} mode="dropdown"
+                    onValueChange={(itemVal, itemIndex) => {
+                        this.setState({
+                            currency: itemVal,
+                            resizeCurr: false, 
+                        })
+                }}>
                     {currencyGrp}
                 </Picker>}
-            {/* </View> */}
         </View>
         
         <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
             <TouchableOpacity onPress={this.resizeCat}>
                 <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
-                    Select category
+                    {this.state.resizeCat? 'Select a category' : 
+                        this.state.category!=='' ? 
+                        'Category: '+this.state.category+' selected': 'Select category'}
                 </Text>
             </TouchableOpacity>
-            {/* <View> */}
-                {this.state.resizeCat && catButtonGrp}
-            {/* </View>    */}
+            {this.state.resizeCat && catButtonGrp}
+ 
         </View>
         
-        
         <TextInput label='A little more about it maybe? (optional)' mode="outlined" multiline={true}
+            onChangeText={text => this.setState({ note: text })}
             style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
     
-
-
         <TouchableOpacity onPress={this.submitSpendInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Add Expenditure
@@ -498,7 +523,6 @@ export default class LocationDetail extends Component {
     
                         <Title style={{fontSize: 24, marginBottom: 5}}>{spend.name}</Title>
                         
-                        {/* <Card.Cover source={{ uri: serverURL+'/'+loc.image }} style={cardStyles.cardImg} /> */}
                         <Paragraph style={{fontSize: 16}}>
                           Date: {spend.date}
                         </Paragraph>
@@ -531,7 +555,7 @@ export default class LocationDetail extends Component {
         </View>
         <ScrollView style={{margin: 10, marginTop: 25}}>
             {this.state.locDetails.spendings!==undefined?
-            <LocationContainer locations={this.state.locDetails.spendings} />:null
+            <SpendingContainer spendings={this.state.locDetails.spendings} />:null
             }
             {allSpendings}
         </ScrollView>
