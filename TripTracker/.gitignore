@@ -1,6 +1,7 @@
 node_modules/**/*
 .expo/*
 package-lock.json
+envAPI.js
 npm-debug.*
 *.jks
 *.p12

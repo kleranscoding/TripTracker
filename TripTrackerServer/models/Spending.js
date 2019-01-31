@@ -5,12 +5,8 @@ const SpendingSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    description: {
+    note: {
         type: String,
-    },
-    location: {
-        type: String,
-        required: true
     },
     date: {
         type: String,
@@ -24,15 +20,14 @@ const SpendingSchema = new mongoose.Schema({
         required: true,
     },
     category: {
-        type: mongoose.Schema.Types.ObjectId, 
+        type: String, 
         required: true,
-        ref: 'Category',
     },
-    trip: {
+    location: {
         type: mongoose.Schema.Types.ObjectId, 
-        required: true,
-        ref: 'Trip',
-    }
+        ref: 'Location',
+    },
+    
 });
 
 const Spending = mongoose.model('Spending', SpendingSchema);

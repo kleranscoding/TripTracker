@@ -6,8 +6,9 @@ import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import ModalDatePicker from 'react-native-datepicker-modal'
 
-import { serverURL, tokenName,regexWhitespace } from './config/envConst';
-import DetailScreen from './DetailScreen'
+import { serverURL, tokenName,regexWhitespace, regexWhitespaceOnly } from './config/envConst';
+import TripDetail from './TripDetail'
+import LocationDetail from './LocationDetail';
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -71,7 +72,7 @@ const cardStyles = StyleSheet.create({
     },
 })
 
-function validateWhtieSpaceOnly(text) { return regexWhitespace.test(text) }
+function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
 
 class NewTripModal extends Component {
@@ -96,8 +97,10 @@ class NewTripModal extends Component {
         } else {
             errTitle= false
         }
-        if (!(startDate && endDate && startDate.localeCompare(endDate)<=0) ) {
-            if (startDate.localeCompare(endDate)>0) Alert.alert("invalid dates")
+        if (!(startDate && endDate)) {
+            Alert.alert("Please pick a date")
+        } else if (startDate.localeCompare(endDate)>0) {
+            Alert.alert("Invalid dates")
         } else {
             errDateStart= false
             errDateEnd= false
@@ -122,6 +125,9 @@ class NewTripModal extends Component {
                   res.json().then(data=>{
                     this.props.setModalVisible(false)
                     this.props.addTrips(data)
+                    this.props.navigation.navigate('TripDetail',{
+                        tripId: data.id, title: data.title
+                    })
                   })
                 }
             }).catch(err=>{ console.log(err) })
@@ -281,7 +287,7 @@ class TripContainer extends Component {
     }
 
     toTripDetails = (index) => {
-        this.props.navigation.navigate('DetailScreen',{
+        this.props.navigation.navigate('TripDetail',{
             tripId: this.state.trips[index].id, title: this.state.trips[index].title,
         })
     }
@@ -290,7 +296,7 @@ class TripContainer extends Component {
         console.log(this.state.trips[index])
         let tripId = this.state.trips[index].id
         this._getToken().then(token=>{
-            fetch(serverURL+'/api/trips/'+tripId,{
+            fetch(serverURL+'/api/trips/delete/'+tripId,{
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res=>{
@@ -313,8 +319,9 @@ class TripContainer extends Component {
 
     render() {
 
-        let numTrips = this.state.trips.length>0 ? 
+        let numTrips = this.state.trips.length>0 ? this.state.trips.length>1 ?
             <Text style={styles.tripInfo}>{`You have ${this.state.trips.length} trips`}</Text> : 
+            <Text style={styles.tripInfo}>{`You have ${this.state.trips.length} trip`}</Text> : 
             <Text style={styles.tripInfo}>You don't have any trip yet</Text>
         
         let allTrips = []
@@ -373,7 +380,6 @@ class TripContainer extends Component {
         </TouchableOpacity>
 
         <ScrollView style={{marginTop: 25}}>
-          
           {allTrips}
         </ScrollView>
 
@@ -382,7 +388,8 @@ class TripContainer extends Component {
               Alert.alert('Modal has been closed.')
               this.setModalVisible(false)
         }}>
-            <NewTripModal setModalVisible={this.setModalVisible} addTrips={this.addTrips} />
+            <NewTripModal setModalVisible={this.setModalVisible} addTrips={this.addTrips} 
+              navigation={this.props.navigation}/>
         </Modal>
 
     </React.Fragment>
@@ -394,7 +401,10 @@ export default TripScreen = createStackNavigator({
     TripScreen: {
         screen: TripContainer,
     },
-    DetailScreen: {
-        screen: DetailScreen,
-    }
+    TripDetail: {
+        screen: TripDetail,
+    },
+    LocationDetail: {
+        screen: LocationDetail,
+    },
 })

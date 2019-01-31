@@ -1,6 +1,7 @@
 const routes = require('express').Router();
 const user = require('../controllers/userController');
 const trip = require('../controllers/tripController');
+const location = require('../controllers/locationController');
 
 routes.get('/', (request,response)=>{
     response.header('x-token','abcdefg')
@@ -10,9 +11,12 @@ routes.get('/', (request,response)=>{
     });
 });
 
+
 routes.use('/api/users',user);
 
 routes.use('/api/trips',trip);
+
+routes.use('/api/locations',location);
 
 
 module.exports = routes;

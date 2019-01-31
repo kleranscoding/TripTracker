@@ -7,16 +7,24 @@ const LocationSchema = new mongoose.Schema({
     },
     startDate: {
         type: String,
-        required: true,
     },
     endDate: {
         type: String,
-        required: true,
+    },
+    formatAddress: {
+        type: String,
+    },
+    geocode: {
+        lat: { type: String, },
+        lng: { type: String, },
     },
     trip: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Trip',
-    }
+    },
+    image: {
+        type: String,
+    },
 });
 
 const Location = mongoose.model('Location',LocationSchema);
