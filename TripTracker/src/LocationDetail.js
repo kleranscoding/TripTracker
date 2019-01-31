@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, Image,
-    TouchableHighlight, Modal, Alert, TouchableOpacity, FlatList, } from 'react-native';
+    TouchableHighlight, Modal, Alert, TouchableOpacity, 
+    FlatList, Picker, } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
+import { Appbar, Button, TextInput, Card, Title, Paragraph, FAB  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
+import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
 
+
+/**
+ * STYLESHEETS
+ */
 const styles = StyleSheet.create({
     imgSmall: {
         width: '50%', height: 75,
@@ -83,10 +88,16 @@ const cardStyles = StyleSheet.create({
     },
 })
 
+/**
+ * FUNCTIONS AND CONSTANTs 
+ */
+const selectText = ' (selected)'
 
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
-
+/**
+ * MAPCONTAINER
+ */
 class MapContainer extends Component {
     
     constructor(props) {
@@ -100,18 +111,17 @@ class MapContainer extends Component {
         }
     }
     
-    //onRegionChange = (region)=> { this.setState({ region }) }
-  
     render() {
         return(
             <MapView style={{margin: 20, height: '75%', }} 
-                initialRegion = {this.state.region}
-                //region={this.state.region} onRegionChange={this.onRegionChange} 
-            />
+                initialRegion = {this.state.region} />
         )
     }
 }
 
+/**
+ * MODAL
+ */
 class NewSpendModal extends Component {
     constructor() {
         super()
@@ -119,13 +129,36 @@ class NewSpendModal extends Component {
         this.formatAddr= ''
         this.geocode = {}
         this.state = {
-            dateStart: '', dateEnd: '',
+            catIndex: null,
+            name: '', category: '', date: '',
+            amount: '', currency: 'USD', note: '',
+            catLabels: Categories.map(cat=>{ return cat.label }),
+            currencyList: currencyInfo,
+            resizeCurr: false, resizeCat: false,
         }
     }
     
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     submitSpendInfo = () => {
+        let errCat= true, errCur= true
+        let errMsgCat = '', errMsgCur = ''
+        if (this.state.catIndex===null) {
+            errMsgCat = "- Please select a category"
+        } else {
+            errCat= false
+        }
+        if (this.state.catIndex===null) {
+            errMsgCur = "- Please select a currency"
+        } else {
+            errCur= false
+        }
+        if (errCat || errCur) {
+            Alert.alert("Hang On!\n"+errMsgCat+"\n"+errMsgCur)
+            return
+        }
+        console.log(this.state.category)
+        console.log(this.state.currency)
         /*
         let refLoc = this.refs["location"].state.text, stateLoc = this.location
         let formatAddr = this.formatAddr, geocode = this.geocode
@@ -189,11 +222,86 @@ class NewSpendModal extends Component {
         //*/
     }
 
+    selectCategory = (index) => {
+        
+        let catLabels= this.state.catLabels
+        if (this.state.catIndex===index) return
+        if (this.state.catIndex!==null) {
+            catLabels[this.state.catIndex]= catLabels[this.state.catIndex].replace(selectText,"")
+        }
+        catLabels[index]= catLabels[index]+selectText
+        this.setState(prevState=>({ 
+            catIndex: index,
+            category: Categories[index].label,
+            catLabels 
+        }))
+    }
+
     setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
 
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
+    resizeSelector = (name) => {
+        if (this.state[name]) {
+            this.setState({
+                [name]: false,
+                
+            })
+        } else {
+            this.setState({
+                [name]: true,
+                
+            })
+        }
+    }
+
+    resizeCurrency = () => {
+        if (this.state.resizeCurr) {
+            this.setState({
+                resizeCurr: false,
+                
+            })
+        } else {
+            this.setState({
+                resizeCurr: true,
+                
+            })
+        }
+    }
+
+    resizeCat = () => {
+        if (this.state.resizeCat) {
+            this.setState({
+                resizeCat: false,
+                
+            })
+        } else {
+            this.setState({
+                resizeCat: true,
+                
+            })
+        }
+    }
+
     render() {
+        // create category button group
+        let catButtonGrp = []
+        Categories.map((cat,index)=>{
+            return catButtonGrp.push(
+            <View key={index} >
+                <Button icon={cat.icon} ref={"cat_"+index}
+                    onPress={()=>this.selectCategory(index)}>
+                    {this.state.catLabels[index]}
+                </Button>
+            </View>
+            )
+        })
+        // create currency picker group
+        let currencyGrp = this.state.currencyList.map((currency,index)=>{
+            return (<Picker.Item key={index} label={currency[1]+" ("+currency[0]+")"} value={currency[0]} />)
+        })
+
+
         return (
     <React.Fragment>
       <View style={modalStyles.modalHeader}>
@@ -213,19 +321,6 @@ class NewSpendModal extends Component {
         <TextInput label='What did you spend on?' mode="outlined" 
             style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
         
-        <TextInput label='How much is that?' mode="outlined" 
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-
-        <TextInput label='Currency?' mode="outlined" 
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-
-        <TextInput label='Category?' mode="outlined" 
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-
-        <TextInput label='A little more about it maybe? (optional)' mode="outlined" multiline={true}
-            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-    
-
         <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
             <ModalDatePicker startDate={new Date()}
@@ -244,6 +339,41 @@ class NewSpendModal extends Component {
             />
         </View>
 
+        <TextInput label='How much is that?' mode="outlined" 
+            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+
+        <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
+            <TouchableOpacity onPress={this.resizeCurrency}>
+                <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
+                    Currency: {this.state.currency+" selected"}
+                </Text>
+            </TouchableOpacity>
+            {/* <View> */}
+                {this.state.resizeCurr && 
+                <Picker selectedValue={this.state.currency} prompt='Options'
+                    onValueChange={(itemValue, itemIndex) => this.setState({currency: itemValue})}>
+                    {currencyGrp}
+                </Picker>}
+            {/* </View> */}
+        </View>
+        
+        <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
+            <TouchableOpacity onPress={this.resizeCat}>
+                <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
+                    Select category
+                </Text>
+            </TouchableOpacity>
+            {/* <View> */}
+                {this.state.resizeCat && catButtonGrp}
+            {/* </View>    */}
+        </View>
+        
+        
+        <TextInput label='A little more about it maybe? (optional)' mode="outlined" multiline={true}
+            style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+    
+
+
         <TouchableOpacity onPress={this.submitSpendInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Add Expenditure
@@ -260,7 +390,9 @@ class NewSpendModal extends Component {
 }
 
 
-
+/**
+ * LOCATIONDETAIL
+ */
 export default class LocationDetail extends Component {
 
     constructor(props) {
@@ -365,7 +497,6 @@ export default class LocationDetail extends Component {
                         </View>
     
                         <Title style={{fontSize: 24, marginBottom: 5}}>{spend.name}</Title>
-                        
                         
                         {/* <Card.Cover source={{ uri: serverURL+'/'+loc.image }} style={cardStyles.cardImg} /> */}
                         <Paragraph style={{fontSize: 16}}>
