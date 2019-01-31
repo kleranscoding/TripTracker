@@ -3,7 +3,7 @@ import { AsyncStorage, StyleSheet, View, Text, ScrollView, Image,
     TouchableHighlight, Modal, Alert, TouchableOpacity, 
     FlatList, Picker, } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph, FAB  } from  'react-native-paper';
+import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
@@ -95,6 +95,8 @@ const selectText = ' (selected)'
 
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
+_getToken = async() => { return await AsyncStorage.getItem(tokenName) }
+
 /**
  * MAPCONTAINER
  */
@@ -120,16 +122,9 @@ class MapContainer extends Component {
 }
 
 /**
- * LOCATION CONTAINER
+ * SPENDING CONTAINER
  */
 class SpendingContainer extends Component {
-    
-    constructor(props) {
-        super(props)
-        this.state = {
-            spendings: []
-        }
-    }
     
     componentDidMount = () => {
         console.log("didmount")
@@ -140,10 +135,10 @@ class SpendingContainer extends Component {
     render() {
         //console.log("render");console.log(this.state.spendings)
         //let numLocs = null
-        let numSpends = this.state.spendings.length>0 ? 
-            this.state.spendings.length > 1 ?
-                <Text style={styles.spendInfo}>{`There are ${this.state.spendings.length} spendings`}</Text> :
-                <Text style={styles.spendInfo}>{`There is ${this.state.spendings.length} spending`}</Text> :
+        let numSpends = this.props.spendings.length>0 ? 
+            this.props.spendings.length > 1 ?
+                <Text style={styles.spendInfo}>{`There are ${this.props.spendings.length} spendings`}</Text> :
+                <Text style={styles.spendInfo}>{`There is ${this.props.spendings.length} spending`}</Text> :
             <Text style={styles.spendInfo}>You don't have any expenditure in this location yet</Text>
         
         return(
@@ -203,12 +198,7 @@ class NewSpendModal extends Component {
             errMsgName+"\n"+errMsgAmt+"\n"+errMsgDate+"\n"+errMsgCat)
             return
         }
-        console.log(this.state.date)
-        console.log(this.state.name)
-        console.log(this.state.amount)
-        console.log(this.state.currency)
-        console.log(this.state.category)
-        console.log(this.state.note || 'empty string')
+        console.log(this.state.date);console.log(this.state.name);console.log(this.state.amount);console.log(this.state.currency);console.log(this.state.category);console.log(this.state.note || 'empty string')
         //*
         this._getToken().then(token=>{
             
@@ -222,11 +212,13 @@ class NewSpendModal extends Component {
                 body: JSON.stringify({
                     "location": this.props.locId,
                     "name": this.state.name.trim(), "date": this.state.date, "category": this.state.category,
-                    "currency": this.state.currency, "amount": this.state.amount,
+                    "currency": this.state.currency, "amount": this.state.amount, "note": this.state.note,
                 }),
             }).then(res=>{
                 if (res.status===200) {
                   res.json().then(data=>{
+                    console.log("add spends: ")
+                    console.log(data)
                     this.props.setModalVisible(false)
                     this.props.addSpends(data)
                   })
@@ -423,10 +415,10 @@ export default class LocationDetail extends Component {
     constructor(props) {
         super(props)
         this.state = { 
-            spendings: [],
+            selectOnDelete: {}, selectOnEdit: {},
             locDetails: props.navigation.getParam("location"),
             resize: false,
-            modalVisible: false,
+            modalVisible: false, modalDelete: false,
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
         }
     }
@@ -477,6 +469,12 @@ export default class LocationDetail extends Component {
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
 
+    setModalDelete = (visible) => { 
+        this.setState({
+            modalDelete: visible, selectOnDelete: {},
+        }) 
+    }
+
     resizeImg = () => {
         if (this.state.resize) {
             this.setState({
@@ -501,6 +499,29 @@ export default class LocationDetail extends Component {
         }))
     }
 
+    _onDeleteSpending = (index) => {
+        this.setState({
+            selectOnDelete: this.state.locDetails.spendings[index], 
+            modalDelete: true,
+        })
+        //this.setModalDelete(true)
+    }
+
+    _removeSpending = (data) => {
+        let filteredSpendings = this.state.locDetails.spendings.filter(spend=>{
+            return (spend.id!==data.id)
+        })
+        //this.setState({ trips: filteredTrips, })
+        //*
+        this.setState(prevState=>({
+            locDetails: {
+                ...prevState.locDetails, spendings: filteredSpendings,
+            },
+            modalDelete: false,
+        }))
+        //*/
+    }
+
     render() {
 
         let allSpendings = []
@@ -513,16 +534,20 @@ export default class LocationDetail extends Component {
                         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                           <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
                             >
-                            <Ionicons name="ios-build" size={28} color="rgb(36,152,219)"/>
+                            <Ionicons name="ios-build" size={40} color="rgb(36,152,219)"/>
                           </TouchableOpacity>
                           <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                            >
-                            <Ionicons name="ios-trash" size={28} color="rgb(225,5,5)"/>
+                            onPress={()=>this._onDeleteSpending(index)}>
+                            <Ionicons name="ios-trash" size={40} color="rgb(225,5,5)"/>
                           </TouchableOpacity>
                         </View>
     
-                        <Title style={{fontSize: 24, marginBottom: 5}}>{spend.name}</Title>
-                        
+                        <Title style={{fontSize: 24, marginBottom: 5}}>
+                            {spend.name}
+                        </Title>
+                        <Paragraph style={{fontSize: 20}}>
+                            {spend.currency+' '+spend.amount}
+                        </Paragraph>
                         <Paragraph style={{fontSize: 16}}>
                           Date: {spend.date}
                         </Paragraph>
@@ -555,8 +580,7 @@ export default class LocationDetail extends Component {
         </View>
         <ScrollView style={{margin: 10, marginTop: 25}}>
             {this.state.locDetails.spendings!==undefined?
-            <SpendingContainer spendings={this.state.locDetails.spendings} />:null
-            }
+            <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
             {allSpendings}
         </ScrollView>
 
@@ -564,11 +588,79 @@ export default class LocationDetail extends Component {
           onRequestClose={() => {
               Alert.alert('Modal has been closed.')
               this.setModalVisible(false)
-        }}>
+            }}>
             <NewSpendModal setModalVisible={this.setModalVisible} addSpends={this.addSpends} locId={this.state.locDetails.id} />
         </Modal>
 
+        <Modal animationType="slide" transparent={false} visible={this.state.modalDelete}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModalDelete(false)
+            }}>
+            <DeleteSpendModal selectOnDelete={this.state.selectOnDelete} 
+                setModalDelete={this.setModalDelete}
+                removeSpending={this._removeSpending} />
+        </Modal>
+
     </React.Fragment>
+        )
+    }
+}
+
+
+class DeleteSpendModal extends Component {
+
+    _cancelDelete = () => {
+        this.props.setModalDelete(false);
+    }
+
+    _deleteSpending = () => {
+        console.log("to delete spending")
+        _getToken().then(token=>{
+            console.log(token)
+            console.log(this.props.selectOnDelete.id)
+            //*
+            fetch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}`, },
+            }).then(res=>{
+                res.json().then(data=>{
+                    this.props.removeSpending(data)
+                })
+            })
+            //*/
+        }) 
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <View style={modalStyles.modalHeader}>
+                    <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
+                    <Text style={modalStyles.closeModalText}>
+                        Close &times;
+                    </Text>
+                    </TouchableHighlight>
+                    <Text style={modalStyles.newLocGreeting}>
+                        {'Warning: Deleting '+this.props.selectOnDelete.name}
+                    </Text>
+                </View>
+                <View >
+                    <Text >
+                        {'Are you sure you want to delete '+this.props.selectOnDelete.name}?
+                    </Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                        <Button onPress={this._cancelDelete} >
+                            <Text>Cancel</Text>
+                        </Button>
+                        <Button onPress={this._deleteSpending} 
+                            style={{backgroundColor: 'red', borderRadius: 10, }}>
+                            <Text style={{color: 'white'}}>Delete</Text>
+                        </Button>
+                    </View>
+                </View>
+
+            </React.Fragment>
         )
     }
 }

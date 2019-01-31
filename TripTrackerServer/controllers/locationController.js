@@ -66,7 +66,7 @@ router.get('/:id',(req,res)=>{
                     spendings.map(spend=>{
                         return spendArr.push({
                             "id": spend._id, 
-                            "date": spend.startDate, "name": spend.name, 
+                            "date": spend.date, "name": spend.name, 
                             "amount": spend.amount, "currency": spend.currency,
                             "category": spend.category, "note": spend.note,
                         });

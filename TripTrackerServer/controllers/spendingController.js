@@ -33,7 +33,6 @@ function verifyToken(token) {
     return decoded;
 }
 
-
 // create new expenditure
 router.post('/new',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -67,6 +66,43 @@ router.post('/new',(req,res)=>{
             "date": spend.date, "currency": spend.currency,
             "amount": spend.amount, "category": spend.category,
             "note": spend.note,
+        });
+    });
+});
+
+
+// delete new expenditure
+router.delete('/delete/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Spending.findById(req.params.id).populate({
+        path: 'location', populate: {path: 'trip'}
+    }).then(spend=>{
+        if (!spend) {
+            return res.status(NOTFOUND).json({"success": false, "message": "spending not found"});
+        }
+        if (spend.location.trip.traveler.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+        }
+        db.Spending.findByIdAndRemove(req.params.id).then(deleteSpend=>{
+            console.log(req.params.id, spend._id, req.params.id===spend._id.toString())
+            return res.json({
+                "id": deleteSpend._id, "name": deleteSpend.name, 
+                "date": deleteSpend.date, "currency": deleteSpend.currency,
+                "amount": deleteSpend.amount, "category": deleteSpend.category,
+                "note": deleteSpend.note, 
+            });
         });
     });
 });

@@ -62,6 +62,7 @@ const MainContentStack = createBottomTabNavigator({
             title: {fontSize: 20}
         }),
     },
+    /*
     Logout: {
         screen: Logout,
         navigationOptions: () => ({
@@ -71,6 +72,7 @@ const MainContentStack = createBottomTabNavigator({
             title: {fontSize: 20}
         }),
     },
+    //*/
 },
 {
     initialRouteName: 'Trips',

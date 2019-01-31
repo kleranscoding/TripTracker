@@ -36,28 +36,17 @@ const styles = StyleSheet.create({
 })
 
 export default class Logout extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            modalVisible: true,
-        }
-    }
     
-    componentDidMount = () => { 
-        // /this.setModalVisible(true) 
-    }
-
+    
     _signOutAsync = async () => {
+        this.props.setModalExit(false)
         await AsyncStorage.removeItem(tokenName)
-        this.props.navigation.navigate('Splash');
+        this.props.navigation.navigate('Splash')
     }
     
     _cancel = () => {
-        this.setModalVisible(false);
-        this.props.navigation.goBack()
+        this.props.setModalExit(false);
     }
-
-    setModalVisible = (visible) => { this.setState({ modalVisible: visible}) }
 
     render() {
         return(
@@ -75,7 +64,7 @@ export default class Logout extends Component {
                     <Text>Cancel</Text>
                 </Button>
                 <Button onPress={this._signOutAsync} style={styles.modalBtnConfirm}>
-                    <Text style={{color: 'white'}}>Log Out</Text>
+                    <Text style={{color: 'white'}}>Sign Off</Text>
                 </Button>
             </View>
         </View>
