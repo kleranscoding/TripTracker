@@ -38,6 +38,23 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
     },
+    rowFront: {
+		alignItems: 'flex-start',
+		backgroundColor: 'rgb(255,255,255)',
+		borderBottomColor: 'silver',
+		borderBottomWidth: 1,
+		justifyContent: 'center',
+        height: 75,
+        padding: 10,
+	},
+	rowBack: {
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingLeft: 15,
+    },
 })
 
 const locStyles = StyleSheet.create({
@@ -454,9 +471,10 @@ class TripList extends Component {
         let allLocs = []
         if (this.state.tripDetails.locations) {
             this.state.tripDetails.locations.map((loc,index)=>{
-                return allLocs.push({ locItem: loc ,key: index.toString() })
+                return allLocs.push({ loc: loc ,key: index.toString() })
             })  
         }
+        /*
         let locFlatList= (
         <FlatList data={allLocs}
             renderItem={({item, separators}) => (
@@ -486,6 +504,7 @@ class TripList extends Component {
               </Card.Actions>
             </Card>
         )}/>)
+        //*/
         
         return (
 
@@ -520,7 +539,42 @@ class TripList extends Component {
             </View>
         </View>
 
-        {locFlatList}
+        <SwipeListView
+            style={{backgroundColor: 'rgb(255,255,255)'}}
+            useFlatList
+            data={allLocs}
+            renderItem={ (data, rowMap) => {
+                let index= parseInt(data.item.key), loc = data.item.loc
+                return(
+                <TouchableHighlight style={styles.rowFront}
+                    onPress={()=>this.toLocDetails(index)}>
+                    
+                    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {loc.location}
+                      </Text>
+                      <Text>Date: {loc.startDate}</Text> 
+                    </View>
+
+                </TouchableHighlight>)
+            }}
+            renderHiddenItem={ (data, rowMap) => {
+                let index = parseInt(data.item.key)
+                return(
+                <View style={styles.rowBack}>
+                    <Button style={{borderRadius: 5 }} 
+                        onPress={()=>this.onPress(index)}>
+                        <Text>Edit</Text>
+                    </Button>
+                    <Button style={{borderRadius: 5,  }} 
+                        onPress={()=>this._onDeleteLoc(index)}>
+                        <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
+                    </Button>
+                </View>
+            )}}
+            leftOpenValue={80}
+            rightOpenValue={-80}
+        />
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
           onRequestClose={() => {

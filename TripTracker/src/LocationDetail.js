@@ -78,6 +78,7 @@ const modalStyles = StyleSheet.create({
     },
     datepicker: {
         justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
+        borderColor: 'silver', borderWidth: 1, margin: 10,
     },
     "datepicker_err": {
         borderColor: 'rgb(255,0,0)', borderWidth: 1, borderRadius: 5,
@@ -373,18 +374,16 @@ class NewSpendModal extends Component {
             onChangeText={text => this.setState({ name: text })}
             style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
         
-        <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
-            onChangeText={text => this.setState({ amount: text })}
-            style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-
-        <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
+        <View style={{flexDirection: this.state.resizeCurr? 'column' : 'row', alignContent: 'center', }}>
+          <View style={{width: this.state.resizeCurr? '100%' : '40%', padding: 10, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 5}}>
             <TouchableOpacity onPress={this.resizeCurrency}>
                 <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
                     Currency: {this.state.currency+" selected"}
                 </Text>
             </TouchableOpacity>
             {this.state.resizeCurr && 
-                <Picker selectedValue={this.state.currency} mode="dropdown"
+                <Picker style={{backgroundColor: 'rgb(255,255,255)'}}
+                    selectedValue={this.state.currency} mode="dropdown"
                     onValueChange={(itemVal, itemIndex) => {
                         this.setState({
                             currency: itemVal,
@@ -393,14 +392,21 @@ class NewSpendModal extends Component {
                 }}>
                     {currencyGrp}
                 </Picker>}
+          </View>
+          <View style={{width: this.state.resizeCurr? '100%' : '50%'}}>
+          <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
+            onChangeText={text => this.setState({ amount: text })}
+            style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+        </View>
         </View>
         
+        
         <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
-            <TouchableOpacity onPress={this.resizeCat}>
+            <TouchableOpacity onPress={this.resizeCat} style={{backgroundColor: 'rgba(49,90,158,0.5)'}}>
                 <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
                     {this.state.resizeCat? 'Select a category' : 
                         this.state.category!=='' ? 
-                        'Category: '+this.state.category+' selected': 'Select category'}
+                        'Category: '+this.state.category+' selected': 'Select a category'}
                 </Text>
             </TouchableOpacity>
             {this.state.resizeCat && catButtonGrp}
