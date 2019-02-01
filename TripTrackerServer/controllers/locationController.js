@@ -137,9 +137,9 @@ router.post('/new',(req,res)=>{
     //*/
 });
 
-/*
+//*
 // delete location by id
-router.delete('delete/:id',(req,res)=>{
+router.delete('/delete/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
             "success": false, "message": "forbidden"
@@ -155,13 +155,13 @@ router.delete('delete/:id',(req,res)=>{
     }
 
     console.log(req.params.id)
-    db.Location.findById(req.params.id).then(loc=>{
+    db.Location.findById(req.params.id).populate('trip').then(loc=>{
         if (!loc) {
             return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
         } else {
-            console.log(trip.traveler.toString(),decodedToken.id)
+            console.log(loc.trip.traveler.toString(),decodedToken.id,loc.trip.traveler.toString()===decodedToken.id)
             // check if same owner
-            if (trip.traveler.toString()!==decodedToken.id) {
+            if (loc.trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
             }
             db.Location.findByIdAndRemove(req.params.id).then(deletedLoc=>{
@@ -179,7 +179,6 @@ router.delete('delete/:id',(req,res)=>{
             });
         }
     });
-    
     //return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
 });
 //*/

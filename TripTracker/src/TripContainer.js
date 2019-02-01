@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, 
     TouchableHighlight, Modal, Alert, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
+import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import ModalDatePicker from 'react-native-datepicker-modal'
 
@@ -15,7 +15,7 @@ import LocationDetail from './LocationDetail';
  */
 const styles = StyleSheet.create({
     appbarHeader:{
-        backgroundColor: 'rgb(36,152,216)',
+        backgroundColor: 'rgb(36,152,219)',
     },
     contentTitle: {
         fontSize: 24, fontFamily: 'Avenir',
@@ -67,8 +67,8 @@ const cardStyles = StyleSheet.create({
     container: { flex: 1, },
     content: { padding: 4, },
     card: { 
-        margin: 10, borderRadius: 25 ,
-        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1,
+        margin: 10, borderRadius: 10,
+        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 2,
     },
     cardImg: {
         width: '50%', height: 100,
@@ -395,7 +395,12 @@ class TripContainer extends Component {
                       <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                     
                       <View style={{margin: 10}}>
-                        
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            Duration: 
+                            <Text style={{color: 'rgb(49,90,158)'}}>
+                                {' '+getDaysDiffText(trip.startDate,trip.endDate)}
+                            </Text>
+                        </Paragraph>
                         <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
                             From: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
@@ -407,12 +412,6 @@ class TripContainer extends Component {
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.endDate}
                             </Text> 
-                        </Paragraph>
-                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
-                            Duration: 
-                            <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+getDaysDiffText(trip.startDate,trip.endDate)}
-                            </Text>
                         </Paragraph>
                       </View>
                     
@@ -451,7 +450,7 @@ class TripContainer extends Component {
     <React.Fragment>
         
         <View style={{justifyContent: 'space-between', padding: 10, flexDirection: 'row',
-            borderBottomWidth: 2, borderBottomColor: 'grey', }}>
+            borderBottomWidth: 1, borderBottomColor: 'silver', }}>
           {numTrips}
           {/* <TouchableOpacity style={styles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
             <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
@@ -465,6 +464,9 @@ class TripContainer extends Component {
             </Text>  
           </Button>
         </View>
+
+        <Searchbar
+            placeholder="Search" />
 
         <ScrollView style={{marginTop: 25}}>
           {allTrips}

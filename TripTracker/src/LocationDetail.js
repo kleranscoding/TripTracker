@@ -134,20 +134,14 @@ class MapContainer extends Component {
  */
 class SpendingContainer extends Component {
     
-    componentDidMount = () => {
-        console.log("didmount")
-        console.log(this.props.spendings)
-        this.setState({ spendings: this.props.spendings})
-    }
-
     render() {
-        //console.log("render");console.log(this.state.spendings)
-        //let numLocs = null
+        
+
         let numSpends = this.props.spendings.length>0 ? 
             this.props.spendings.length > 1 ?
-                <Text style={styles.spendInfo}>{`There are ${this.props.spendings.length} spendings`}</Text> :
-                <Text style={styles.spendInfo}>{`There is ${this.props.spendings.length} spending`}</Text> :
-            <Text style={styles.spendInfo}>You don't have any expenditure in this location yet</Text>
+                <Text style={styles.spendInfo}>{`${this.props.spendings.length} spendings`}</Text> :
+                <Text style={styles.spendInfo}>{`${this.props.spendings.length} spending`}</Text> :
+            <Text style={styles.spendInfo}>You don't have any expense at this location yet</Text>
         
         return(
         <React.Fragment>
@@ -206,7 +200,7 @@ class NewSpendModal extends Component {
             errMsgName+"\n"+errMsgAmt+"\n"+errMsgDate+"\n"+errMsgCat)
             return
         }
-        console.log(this.state.date);console.log(this.state.name);console.log(this.state.amount);console.log(this.state.currency);console.log(this.state.category);console.log(this.state.note || 'empty string')
+        //console.log(this.state.date);console.log(this.state.name);console.log(this.state.amount);console.log(this.state.currency);console.log(this.state.category);console.log(this.state.note || 'empty string')
         //*
         this._getToken().then(token=>{
             
@@ -226,7 +220,7 @@ class NewSpendModal extends Component {
                 if (res.status===200) {
                   res.json().then(data=>{
                     console.log("add spends: ")
-                    console.log(data)
+                    //console.log(data)
                     this.props.setModalVisible(false)
                     this.props.addSpends(data)
                   })
@@ -464,7 +458,7 @@ export default class LocationDetail extends Component {
             }).then(res=>{
                 if (res.status===200) {
                   res.json().then(data=>{
-                    console.log(data)
+                    //console.log(data)
                     this.setState({ locDetails: data })
                   })
                 }
@@ -626,8 +620,7 @@ class DeleteSpendModal extends Component {
     _deleteSpending = () => {
         console.log("to delete spending")
         _getToken().then(token=>{
-            console.log(token)
-            console.log(this.props.selectOnDelete.id)
+            //console.log(token);console.log(this.props.selectOnDelete.id)
             //*
             fetch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
                 method: 'DELETE',

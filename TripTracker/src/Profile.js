@@ -63,7 +63,8 @@ class MapContainer extends Component {
           initialRegion={this.state.region} >
           <Marker
             coordinate={this.state.region}
-            title="You" description="You are here" />
+            title={this.props.geolocation? "You": "San Francisco"} 
+            description={this.props.geolocation? "You are here": "San Francisco"}  />
         </MapView>
       )
   }
@@ -153,15 +154,13 @@ export default class Profile extends Component {
     <React.Fragment>
         
         <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-              <Appbar.Content title="Profile" titleStyle={styles.contentTitle} />
-              <TouchableOpacity onPress={()=>this.setModalExit(true)}
-                style={{alignItems: 'center', alignContent: 'flex-end'}}>
-                <Ionicons name="ios-exit" size={28} color="rgb(255,255,255)" />
-                <Text style={{color: "rgb(255,255,255)"}}>Sign Off</Text>
-              </TouchableOpacity> 
+          <Appbar.Content title={"Hi, "+this.state.username} titleStyle={styles.contentTitle} />
+          <TouchableOpacity onPress={()=>this.setModalExit(true)}
+            style={{alignItems: 'center', alignContent: 'flex-end'}}>
+            <Ionicons name="ios-exit" size={28} color="rgb(255,255,255)" />
+            <Text style={{color: "rgb(255,255,255)"}}>Log Out</Text>
+          </TouchableOpacity> 
         </Appbar.Header>
-        
-        {/* <Text style={styles.greeting}>Welcome, {this.state.username}!</Text> */}
         
         <View style={styles.profileInfoWrapper}>
           <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
