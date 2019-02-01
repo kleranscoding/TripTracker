@@ -1,12 +1,12 @@
-import React, {Component } from 'react';
+import React, { Component } from 'react';
 import { AppRegistry } from 'react-native';
-import { AsyncStorage, StyleSheet, Text, View, Button } from 'react-native';
-import { DefaultTheme, Appbar, Provider as PaperProvider } from 'react-native-paper';
-import { createSwitchNavigator, createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import { AsyncStorage, StyleSheet, } from 'react-native';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import { createSwitchNavigator, createAppContainer, } from 'react-navigation';
 
 import AuthLoading from './src/AuthLoading';
 import Splash from './src/Splash'
-import { tokenName, serverURL } from './src/config/envConst'
+
 
 import MainContent from './src/MainContent';
 
@@ -26,7 +26,13 @@ const styles = StyleSheet.create({
   },
   contentTitle: {
     fontSize: 36,
-  }
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ecf0f1',
+  },
 })
 
 const AppContainer = createAppContainer(createSwitchNavigator(
@@ -39,6 +45,7 @@ const AppContainer = createAppContainer(createSwitchNavigator(
     initialRouteName: 'AuthLoading',
   },
 ));
+
 
 export default function Main() {
 

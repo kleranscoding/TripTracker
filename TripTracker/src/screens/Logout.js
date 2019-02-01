@@ -50,7 +50,6 @@ export default class Logout extends Component {
 
     render() {
         return(
-    //<Modal animationType="slide" transparent={false} visible={this.state.modalVisible} onRequestClose={() => { Alert.alert('Modal has been closed.'); this.setModalVisible(false) }}>
     <React.Fragment>
         <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
             <Appbar.Content title="Log Out" titleStyle={styles.contentTitle} />
@@ -69,7 +68,6 @@ export default class Logout extends Component {
             </View>
         </View>
     </React.Fragment>
-    //</Modal>
         )
     }
 } 

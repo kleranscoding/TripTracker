@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, Image,
     TouchableHighlight, Modal, Alert, TouchableOpacity, 
-    FlatList, Picker, } from 'react-native';
+    FlatList, Picker, Dimensions, } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import MapView from 'react-native-maps';
+import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -56,7 +56,7 @@ const modalStyles = StyleSheet.create({
     },
     modalHeader: {
         marginBottom: 20, 
-        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
+        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,219)' 
     },
     datepicker: {
         justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
@@ -92,6 +92,10 @@ const cardStyles = StyleSheet.create({
  * FUNCTIONS AND CONSTANTs 
  */
 const selectText = ' (selected)'
+const screen = Dimensions.get('window');
+const ASPECT_RATIO = screen.width / screen.height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
@@ -116,7 +120,11 @@ class MapContainer extends Component {
     render() {
         return(
             <MapView style={{margin: 20, height: '75%', }} 
-                initialRegion = {this.state.region} />
+                initialRegion = {this.state.region} >
+                <Marker
+                    coordinate={this.state.region}
+                    title={this.props.location} />
+            </MapView>
         )
     }
 }
@@ -419,7 +427,7 @@ export default class LocationDetail extends Component {
             locDetails: props.navigation.getParam("location"),
             resize: false,
             modalVisible: false, modalDelete: false,
-            imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
+            imgView: styles.imgView, imgSize: styles.imgSmall,
         }
     }
 
@@ -534,11 +542,11 @@ export default class LocationDetail extends Component {
                         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                           <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
                             >
-                            <Ionicons name="ios-build" size={40} color="rgb(36,152,219)"/>
+                            <Ionicons name="ios-build" size={36} color="rgb(36,152,219)"/>
                           </TouchableOpacity>
                           <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
                             onPress={()=>this._onDeleteSpending(index)}>
-                            <Ionicons name="ios-trash" size={40} color="rgb(225,5,5)"/>
+                            <Ionicons name="ios-trash" size={36} color="rgb(225,5,5)"/>
                           </TouchableOpacity>
                         </View>
     
@@ -569,7 +577,8 @@ export default class LocationDetail extends Component {
         return(
     <React.Fragment>
         <View style={this.state.imgView}>
-            <MapContainer geocode={this.state.locDetails.geocode} />
+            <MapContainer location={this.state.locDetails.location} 
+                geocode={this.state.locDetails.geocode} />
         </View>
         <View style={{margin: 15, }}>
             <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>

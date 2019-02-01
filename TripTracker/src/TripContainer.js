@@ -43,7 +43,7 @@ const modalStyles = StyleSheet.create({
     },
     modalHeader: {
         marginBottom: 20, 
-        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
+        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,219)' 
     },
     datepicker: {
         justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
@@ -54,7 +54,7 @@ const modalStyles = StyleSheet.create({
     "create_btn": {
         marginTop: 25, marginLeft:'25%', 
         borderRadius: 25,
-        backgroundColor: 'rgba(36,152,219,0.75)',
+        backgroundColor: 'rgb(49,90,158)',
         width: '50%',
     },
     "create_btn_text": {
@@ -67,11 +67,11 @@ const cardStyles = StyleSheet.create({
     container: { flex: 1, },
     content: { padding: 4, },
     card: { 
-        margin: 10, 
+        margin: 10, borderRadius: 25 ,
         borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1,
     },
     cardImg: {
-        width: '100%', height: 200,
+        width: '50%', height: 100,
     },
 })
 
@@ -80,6 +80,22 @@ const cardStyles = StyleSheet.create({
  * FUNCTIONS
  */
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
+
+function getDaysDiff(startDateText,endDateText) {
+    var timeDiff = new Date(endDateText) - new Date(startDateText)
+    return Math.ceil(timeDiff / (1000 * 3600 * 24))+1
+}
+
+function getDaysDiffText(startDateText,endDateText) {
+    var timeDiff = new Date(endDateText) - new Date(startDateText)
+    var dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))+1
+    if (dayDiff>1) {
+        return dayDiff+' days'
+    }
+    return dayDiff+' day'
+}
+
+_getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
 /**
  * MODAL
@@ -161,16 +177,25 @@ class NewTripModal extends Component {
     render() {
         return (
     <React.Fragment>
-      <View style={modalStyles.modalHeader}>
-        <TouchableHighlight onPress={()=>this.props.setModalVisible(false)}>
+      {/* <View style={modalStyles.modalHeader}>
+        <Button icon="close" style={{backgroundColor: 'white'}}
+            onPress={()=>this.props.setModalVisible(false)}>
           <Text style={modalStyles.closeModalText}>
-            Close &times;
+            Close
           </Text>
-        </TouchableHighlight>
+        </Button>
         <Text style={modalStyles.newTripGreeting}>
             New Trip Info
         </Text>
-      </View>
+      </View> */}
+
+      <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
+        <Appbar.Content title="New Trip Info" titleStyle={styles.contentTitle} />
+        <Button onPress={()=>this.props.setModalVisible(false)}
+            style={{alignItems: 'center', alignContent: 'flex-end'}}>
+            <Text style={{color: "rgb(255,255,255)"}}>Close</Text>
+        </Button> 
+      </Appbar.Header>
 
       <ScrollView>
         
@@ -239,7 +264,8 @@ class TripContainer extends Component {
         super(props)
         
         this.state= {
-            trips: [], modalVisible: false,
+            trips: [], selectOnDelete: {},
+            modalVisible: false, modalDelete: false,
         }
     }
 
@@ -292,6 +318,8 @@ class TripContainer extends Component {
 
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
+
+    setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
     
     onPress = (index) => {
         console.log(this.state.trips[index])
@@ -300,6 +328,13 @@ class TripContainer extends Component {
     toTripDetails = (index) => {
         this.props.navigation.navigate('TripDetail',{
             tripId: this.state.trips[index].id, title: this.state.trips[index].title,
+        })
+    }
+
+    _onDeleteTrip = (index) => {
+        this.setState({
+            selectOnDelete: this.state.trips[index], 
+            modalDelete: true,
         })
     }
 
@@ -328,12 +363,24 @@ class TripContainer extends Component {
         })
     }
 
+    _removeTrip = (data) => {
+        let filteredTrips = this.state.trips.filter(trip=>{
+            return (trip.id!==data.id)
+        })
+        //this.setState({ trips: filteredTrips, })
+        //*
+        this.setState({
+            trips: filteredTrips,
+            modalDelete: false,
+        })
+        //*/
+    }
+
     render() {
 
-        let numTrips = this.state.trips.length>0 ? this.state.trips.length>1 ?
-            <Text style={styles.tripInfo}>{`You have ${this.state.trips.length} trips`}</Text> : 
-            <Text style={styles.tripInfo}>{`You have ${this.state.trips.length} trip`}</Text> : 
-            <Text style={styles.tripInfo}>You don't have any trip yet</Text>
+        let numTrips = this.state.trips.length>1 ?
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} trips found`}</Text> : 
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} trip found`}</Text>
         
         let allTrips = []
         this.state.trips.map((trip,index)=>{
@@ -341,50 +388,83 @@ class TripContainer extends Component {
                 <Card style={cardStyles.card} key={index}>
                   <Card.Content>
                     
-                    <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                        onPress={()=>this.onPress(index)}>
-                        <Ionicons name="ios-build" size={28} color="rgb(36,152,219)"/>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                        onPress={()=>this.deleteTrip(index)}>
-                        <Ionicons name="ios-trash" size={28} color="rgb(225,5,5)"/>
-                      </TouchableOpacity>
+                    <Title style={{fontSize: 24, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {trip.title.toUpperCase()}
+                    </Title>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
+                    
+                      <View style={{margin: 10}}>
+                        
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            From: 
+                            <Text style={{color: 'rgb(49,90,158)'}}>
+                                {' '+trip.startDate}
+                            </Text> 
+                        </Paragraph>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            Till: 
+                            <Text style={{color: 'rgb(49,90,158)'}}>
+                                {' '+trip.endDate}
+                            </Text> 
+                        </Paragraph>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            Duration: 
+                            <Text style={{color: 'rgb(49,90,158)'}}>
+                                {' '+getDaysDiffText(trip.startDate,trip.endDate)}
+                            </Text>
+                        </Paragraph>
+                      </View>
+                    
                     </View>
-
-                    <Title style={{fontSize: 24, marginBottom: 5}}>{trip.title}</Title>
-                    <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
-                    <Paragraph style={{fontSize: 16}}>
-                      Time: {trip.startDate} to {trip.endDate}
-                    </Paragraph>
+                    {/* <TouchableOpacity
+                        style={{backgroundColor: 'rgb(36,152,216)', padding: 10, borderRadius: 10, width: '50%'}}
+                        onPress={()=>this.toTripDetails(index)}>
+                      <Text style={{textAlign: 'center', fontSize: 18, color: 'rgb(255,255,255)' }}>
+                        Details
+                      </Text>
+                    </TouchableOpacity> */}
                   </Card.Content>
 
-                  <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
-                    <TouchableOpacity onPress={()=>this.toTripDetails(index)}>
-                      <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
-                        Learn More
-                      </Text>
-                    </TouchableOpacity>
+                  <Card.Actions style={{ margin: 10 }}>
+                    <View style={{flexDirection: 'row', }}>
+                      <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(81, 148, 255)' }} icon="more" mode="contained"
+                        onPress={()=>this.toTripDetails(index)}>
+                        <Text>Details</Text>
+                      </Button>
+                      <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
+                        onPress={()=>this.onPress(index)}>
+                        <Text>Edit</Text>
+                      </Button>
+                      <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(255,0,0)' }} icon="delete" mode="contained"
+                        onPress={()=>this._onDeleteTrip(index)}>
+                        <Text>Delete</Text>
+                      </Button>
+                    </View>
                   </Card.Actions>
 
                 </Card>
             )
         })
         
-
         return (
     <React.Fragment>
         
-        <View style={{justifyContent: 'center', padding: 10, 
+        <View style={{justifyContent: 'space-between', padding: 10, flexDirection: 'row',
             borderBottomWidth: 2, borderBottomColor: 'grey', }}>
           {numTrips}
-        </View>
-
-        <TouchableOpacity style={styles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
+          {/* <TouchableOpacity style={styles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
             <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
               + New Trip
             </Text>  
-        </TouchableOpacity>
+          </TouchableOpacity> */}
+          <Button style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 15}} icon="add" mode="contained"
+            onPress={()=>this.setModalVisible(true)}>
+            <Text style={{textAlign: 'center', padding: 5, color: 'rgb(255,255,255)', fontSize: 14}}>
+              Trip
+            </Text>  
+          </Button>
+        </View>
 
         <ScrollView style={{marginTop: 25}}>
           {allTrips}
@@ -399,7 +479,76 @@ class TripContainer extends Component {
               navigation={this.props.navigation}/>
         </Modal>
 
+        <Modal animationType="slide" transparent={false} visible={this.state.modalDelete}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModalVisible(false)
+        }}>
+            <DeleteTripModal setModalDelete={this.setModalDelete}
+                    selectOnDelete={this.state.selectOnDelete} 
+                    removeTrip={this._removeTrip} />
+        </Modal>
+
     </React.Fragment>
+        )
+    }
+}
+
+
+class DeleteTripModal extends Component {
+
+    _cancelDelete = () => {
+        this.props.setModalDelete(false);
+    }
+
+    _deleteTrip = () => {
+        console.log("to delete trip")
+        _getToken().then(token=>{
+            console.log(token)
+            console.log(this.props.selectOnDelete.id)
+            //*
+            fetch(serverURL+'/api/trips/delete/'+this.props.selectOnDelete.id,{
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}`, },
+            }).then(res=>{
+                res.json().then(data=>{
+                    this.props.removeTrip(data)
+                })
+            })
+            //*/
+        }) 
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <View style={modalStyles.modalHeader}>
+                    <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
+                    <Text style={modalStyles.closeModalText}>
+                        Close &times;
+                    </Text>
+                    </TouchableHighlight>
+                    <Text style={modalStyles.newLocGreeting}>
+                        {'Warning: Deleting '+this.props.selectOnDelete.title}
+                    </Text>
+                </View>
+                <View >
+                    <Text >
+                        {'Are you sure you want to delete '+this.props.selectOnDelete.title}?
+                    </Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                        <Button onPress={this._cancelDelete} >
+                            <Text>Cancel</Text>
+                        </Button>
+                        <Button 
+                            onPress={this._deleteTrip} 
+                            style={{backgroundColor: 'red', borderRadius: 10, }}>
+                            <Text style={{color: 'white'}}>Delete</Text>
+                        </Button>
+                    </View>
+                </View>
+
+            </React.Fragment>
         )
     }
 }

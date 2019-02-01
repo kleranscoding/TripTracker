@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import { AsyncStorage, StyleSheet, View, Text, Image, ScrollView } from 'react-native';
+import { AsyncStorage, StyleSheet, View, Text, Image, 
+    ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button } from  'react-native-paper';
-import MapView from 'react-native-maps';
+import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
+import { Ionicons } from '@expo/vector-icons';
+import { Constants, Location, Permissions } from 'expo';
 
 import { serverURL, tokenName, imgHgtWdt } from './config/envConst';
-
+import Logout from './screens/Logout';
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -34,15 +37,22 @@ const styles = StyleSheet.create({
     },
 })
 
+const screen = Dimensions.get('window');
+const ASPECT_RATIO = screen.width / screen.height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 class MapContainer extends Component {
-    
-  state = {
+  
+  constructor(props) {
+    super(props)
+    this.state = {
       region: {
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,longitudeDelta: 0.0421,
+          latitude: props.geolocation.latitude || 37.78825,
+          longitude: props.geolocation.longitude || -122.4324,
+          latitudeDelta: LATITUDE_DELTA,longitudeDelta: LONGITUDE_DELTA,
       },
+    }
   }
   
   onRegionChange = (region)=> { this.setState({ region }) }
@@ -50,7 +60,11 @@ class MapContainer extends Component {
   render() {
       return(
         <MapView style={{margin: 20, height: '30%'}} 
-          region={this.state.region} onRegionChange={this.onRegionChange} />
+          initialRegion={this.state.region} >
+          <Marker
+            coordinate={this.state.region}
+            title="You" description="You are here" />
+        </MapView>
       )
   }
   
@@ -65,13 +79,28 @@ export default class Profile extends Component {
       })
       this.state = {
         username: '', email: '', image: '', trips: [],
+        modalExit: false, geolocation: null,
       }
+    }
+
+    componentWillMount() {
+      this._getLocationAsync()
     }
 
     componentDidMount = () => {  this._getProfileInfo() }
 
     componentWillUnmount = () => { this.focusListener.remove() }
     
+    _getLocationAsync = async () => {
+      let { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status !== 'granted') { 
+        Alert.alert('Permission to access location was denied'); 
+        return; 
+      }
+      let geolocation = await Location.getCurrentPositionAsync({});
+      this.setState({ geolocation });
+    }
+
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     _getProfileInfo = () => {
@@ -94,7 +123,13 @@ export default class Profile extends Component {
       })
     }
 
+    setModalExit = (visible) => {
+      this.setState({ modalExit: visible})
+    }
+
+
     render() {
+      
         let numTrips = this.state.trips.length>0 ? 
             <React.Fragment>
               <Button onPress={()=>this.props.navigation.navigate('Trips')}
@@ -118,7 +153,12 @@ export default class Profile extends Component {
     <React.Fragment>
         
         <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-            <Appbar.Content title="Profile" titleStyle={styles.contentTitle} />
+              <Appbar.Content title="Profile" titleStyle={styles.contentTitle} />
+              <TouchableOpacity onPress={()=>this.setModalExit(true)}
+                style={{alignItems: 'center', alignContent: 'flex-end'}}>
+                <Ionicons name="ios-exit" size={28} color="rgb(255,255,255)" />
+                <Text style={{color: "rgb(255,255,255)"}}>Sign Off</Text>
+              </TouchableOpacity> 
         </Appbar.Header>
         
         {/* <Text style={styles.greeting}>Welcome, {this.state.username}!</Text> */}
@@ -131,12 +171,20 @@ export default class Profile extends Component {
             <Text style={styles.profileInfo}>{this.state.email}</Text>
           </View> 
         </View>
+        { this.state.geolocation ? <MapContainer geolocation={this.state.geolocation.coords} /> : null}
         
-        <MapContainer />
       
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
         </ScrollView>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalExit}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModalExit(false)
+            }}>
+            <Logout setModalExit={this.setModalExit} navigation={this.props.navigation} />
+        </Modal>
         
     </React.Fragment>
         )

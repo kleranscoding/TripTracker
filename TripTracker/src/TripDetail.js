@@ -81,7 +81,7 @@ const cardStyles = StyleSheet.create({
     },
     cardIndiv: {
         fontSize: 20, fontFamily: 'Avenir',
-        padding: 10, textAlign: 'center',
+        padding: 10, textAlign: 'left',
     },
     cardImg: {
         width: '100%', height: 200,
@@ -465,14 +465,18 @@ class TripList extends Component {
         }
         let locFlatList= (<FlatList data={allLocs}
             renderItem={({item, separators}) => (
-            <TouchableOpacity
+            
+            <View style={cardStyles.card}>
+              <TouchableOpacity 
                 onPress={()=>this.toLocDetails(parseInt(item.key))}
-                onShowUnderlay={separators.highlight} onHideUnderlay={separators.unhighlight}
-            >
-                <View style={cardStyles.card}>
+                onShowUnderlay={separators.highlight} onHideUnderlay={separators.unhighlight}>
+                <View >
                     <Text style={cardStyles.cardIndiv}>{item.locItem.location}</Text>
-                </View>
-            </TouchableOpacity>
+                </View>  
+              </TouchableOpacity>
+            </View>
+            
+            
         )}/>)
         
 
@@ -508,6 +512,8 @@ class TripList extends Component {
         }}>
             <NewLocModal setModalVisible={this.setModalVisible} addLocs={this.addLocs} tripId={this.state.tripDetails.id} />
         </Modal>
+
+
     </React.Fragment>
         )
     }
