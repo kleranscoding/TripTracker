@@ -387,7 +387,7 @@ class TripContainer extends Component {
             return allTrips.push(
                 <Card style={cardStyles.card} key={index}>
                   <Card.Content>
-                    
+                    <TouchableOpacity onPress={()=>this.toTripDetails(index)}>
                     <Title style={{fontSize: 24, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {trip.title.toUpperCase()}
                     </Title>
@@ -423,6 +423,7 @@ class TripContainer extends Component {
                         Details
                       </Text>
                     </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </Card.Content>
 
                   <Card.Actions style={{ margin: 10 }}>
@@ -465,8 +466,8 @@ class TripContainer extends Component {
           </Button>
         </View>
 
-        <Searchbar
-            placeholder="Search" />
+        <Searchbar style={{margin: 15}}
+            placeholder="Search Trip" />
 
         <ScrollView style={{marginTop: 25}}>
           {allTrips}
@@ -531,12 +532,12 @@ class DeleteTripModal extends Component {
                     </Text>
                     </TouchableHighlight>
                     <Text style={modalStyles.newLocGreeting}>
-                        {'Warning: Deleting '+this.props.selectOnDelete.title}
+                        {'Warning: Deleting\n'+this.props.selectOnDelete.title}
                     </Text>
                 </View>
                 <View >
                     <Text >
-                        {'Are you sure you want to delete '+this.props.selectOnDelete.title}?
+                        {'Are you sure you want to delete\n'+this.props.selectOnDelete.title}?
                     </Text>
                     <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                         <Button onPress={this._cancelDelete} >

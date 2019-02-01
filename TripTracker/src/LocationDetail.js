@@ -119,7 +119,7 @@ class MapContainer extends Component {
     
     render() {
         return(
-            <MapView style={{margin: 20, height: '75%', }} 
+            <MapView style={{marginLeft: 15, marginRight: 15, height: 150, }} 
                 initialRegion = {this.state.region} >
                 <Marker
                     coordinate={this.state.region}
@@ -181,7 +181,7 @@ class NewSpendModal extends Component {
             errDate= false
         }
         if (!this.state.name || validateWhtieSpaceOnly(this.state.name)) {
-            errMsgName= '- Please describe this expenditure'
+            errMsgName= '- Please describe this expense'
         } else {
             errName= false
         }
@@ -325,7 +325,7 @@ class NewSpendModal extends Component {
           </Text>
         </TouchableHighlight>
         <Text style={modalStyles.newLocGreeting}>
-            New Expenditure Info
+            New Expense Info
         </Text>
       </View>
 
@@ -533,17 +533,6 @@ export default class LocationDetail extends Component {
                     <Card style={cardStyles.card} key={index}>
                       <Card.Content>
                         
-                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                            >
-                            <Ionicons name="ios-build" size={36} color="rgb(36,152,219)"/>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                            onPress={()=>this._onDeleteSpending(index)}>
-                            <Ionicons name="ios-trash" size={36} color="rgb(225,5,5)"/>
-                          </TouchableOpacity>
-                        </View>
-    
                         <Title style={{fontSize: 24, marginBottom: 5}}>
                             {spend.name}
                         </Title>
@@ -554,13 +543,26 @@ export default class LocationDetail extends Component {
                           Date: {spend.date}
                         </Paragraph>
                       </Card.Content>
-    
-                      <Card.Actions style={{alignSelf: 'center', margin: 15 }}>
-                        <TouchableOpacity >
-                          <Text style={{fontSize: 18, color: 'rgb(36,152,216)' }}>
-                            Learn More
-                          </Text>
-                        </TouchableOpacity>
+
+                      <Card.Actions>
+                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          {/* <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                            >
+                            <Ionicons name="ios-build" size={36} color="rgb(36,152,219)"/>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
+                            onPress={()=>this._onDeleteSpending(index)}>
+                            <Ionicons name="ios-trash" size={36} color="rgb(225,5,5)"/>
+                          </TouchableOpacity> */}
+                          <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
+                            >
+                            <Text>Edit</Text>
+                            </Button>
+                            <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(255,0,0)' }} icon="delete" mode="contained"
+                              onPress={()=>this._onDeleteSpending(index)}>
+                            <Text>Delete</Text>
+                          </Button>
+                        </View>
                       </Card.Actions>
     
                     </Card>
@@ -570,20 +572,25 @@ export default class LocationDetail extends Component {
 
         return(
     <React.Fragment>
-        <View style={this.state.imgView}>
+        <View >
             <MapContainer location={this.state.locDetails.location} 
                 geocode={this.state.locDetails.geocode} />
         </View>
-        <View style={{margin: 15, }}>
+        
+        <View style={{margin: 10, }}>
             <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
-                    + Add Expenditures
+                    + Expenses
                 </Text>
             </TouchableOpacity>
         </View>
-        <ScrollView style={{margin: 10, marginTop: 25}}>
-            {this.state.locDetails.spendings!==undefined?
+
+        <View style={{margin: 5}}>
+        {this.state.locDetails.spendings!==undefined?
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
+        </View>
+
+        <ScrollView style={{margin: 10, marginTop: 25}}>
             {allSpendings}
         </ScrollView>
 
@@ -644,12 +651,12 @@ class DeleteSpendModal extends Component {
                     </Text>
                     </TouchableHighlight>
                     <Text style={modalStyles.newLocGreeting}>
-                        {'Warning: Deleting '+this.props.selectOnDelete.name}
+                        {'Warning: Deleting\n'+this.props.selectOnDelete.name}
                     </Text>
                 </View>
                 <View >
                     <Text >
-                        {'Are you sure you want to delete '+this.props.selectOnDelete.name}?
+                        {'Are you sure you want to delete\n'+this.props.selectOnDelete.name}?
                     </Text>
                     <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                         <Button onPress={this._cancelDelete} >

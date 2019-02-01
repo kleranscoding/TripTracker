@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, Image,
     TouchableHighlight, Modal, Alert, TouchableOpacity, 
-    FlatList, } from 'react-native';
+    FlatList, ImageBackground } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
+import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
@@ -253,6 +253,7 @@ class NewLocModal extends Component {
             this.formatAddr= details["formatted_address"]
             this.geocode= details.geometry.location
         }}/>
+
         <View style={{margin: 25 }}>
             {/* <View style={modalStyles.datepicker}> */}
                 <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
@@ -488,6 +489,9 @@ class TripList extends Component {
         return (
 
     <React.Fragment>
+
+      <ImageBackground source={{uri: serverURL+'/'+this.state.tripDetails.image}} style={{width: '100%', height: '100%'}}>
+  
         <View style={this.state.imgView}>
             <ScrollView style={{margin: 10, }}> 
                 <TouchableOpacity onPress={this.resizeImg}>
@@ -496,16 +500,25 @@ class TripList extends Component {
                 </TouchableOpacity>  
             </ScrollView>
         </View>
-        <View style={{margin: 15, }}>
-            <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
-                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
-                    + New Location
-                </Text>
-            </TouchableOpacity>
+
+        <View style={{backgroundColor: 'rgb(255,255,255)'}}>
+            <View style={{margin: 15, }}>
+                <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
+                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
+                        + Location
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        
+            <Searchbar style={{margin: 15}}
+                placeholder="Search Location" />
+            
+            <View style={{margin: 5}}>
+            {this.state.tripDetails.locations!==undefined?
+                <LocationContainer locations={this.state.tripDetails.locations} />:null }
+            </View>
         </View>
 
-        {this.state.tripDetails.locations!==undefined?
-            <LocationContainer locations={this.state.tripDetails.locations} />:null }
         {locFlatList}
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
@@ -526,6 +539,7 @@ class TripList extends Component {
                 removeLoc={this._removeLoc} />
         </Modal>
 
+        </ImageBackground>
     </React.Fragment>
         )
     }
@@ -566,12 +580,12 @@ class DeleteLocModal extends Component {
                     </Text>
                     </TouchableHighlight>
                     <Text style={modalStyles.newLocGreeting}>
-                        {'Warning: Deleting '+this.props.selectOnDelete.location}
+                        {'Warning: Deleting\n'+this.props.selectOnDelete.location}
                     </Text>
                 </View>
                 <View >
                     <Text >
-                        {'Are you sure you want to delete '+this.props.selectOnDelete.location}?
+                        {'Are you sure you want to delete\n'+this.props.selectOnDelete.location}?
                     </Text>
                     <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                         <Button onPress={this._cancelDelete} >
