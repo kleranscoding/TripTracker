@@ -63,6 +63,7 @@ router.get('/profile',(req,res)=>{
     
     if (decodedToken.id===undefined) {
         decodedToken["success"]= false;
+        console.log(decodedToken)
         return res.status(UNAUTH).json(decodedToken);
     }
 

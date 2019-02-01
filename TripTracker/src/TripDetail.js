@@ -8,10 +8,11 @@ import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
-import LocationDetail from './LocationDetail';
+
  
 const styles = StyleSheet.create({
     appbarHeader:{

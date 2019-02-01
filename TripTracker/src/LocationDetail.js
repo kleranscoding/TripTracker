@@ -8,7 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
@@ -34,6 +35,23 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
+    },
+    rowFront: {
+		alignItems: 'flex-start',
+		backgroundColor: 'rgb(255,255,255)',
+		borderBottomColor: 'silver',
+		borderBottomWidth: 1,
+		justifyContent: 'center',
+        height: 75,
+        padding: 10,
+	},
+	rowBack: {
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingLeft: 15,
     },
 })
 
@@ -529,6 +547,12 @@ export default class LocationDetail extends Component {
         let allSpendings = []
         if (this.state.locDetails.spendings) {
             this.state.locDetails.spendings.map((spend,index)=>{
+                return allSpendings.push({key: index.toString(), spend: spend})
+            })
+        }
+        /*
+        if (this.state.locDetails.spendings) {
+            this.state.locDetails.spendings.map((spend,index)=>{
                 return allSpendings.push(
                     <Card style={cardStyles.card} key={index}>
                       <Card.Content>
@@ -546,14 +570,6 @@ export default class LocationDetail extends Component {
 
                       <Card.Actions>
                         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                          {/* <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                            >
-                            <Ionicons name="ios-build" size={36} color="rgb(36,152,219)"/>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}
-                            onPress={()=>this._onDeleteSpending(index)}>
-                            <Ionicons name="ios-trash" size={36} color="rgb(225,5,5)"/>
-                          </TouchableOpacity> */}
                           <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
                             >
                             <Text>Edit</Text>
@@ -569,6 +585,7 @@ export default class LocationDetail extends Component {
                 )
             })
         }
+        //*/
 
         return(
     <React.Fragment>
@@ -590,9 +607,44 @@ export default class LocationDetail extends Component {
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
         </View>
 
-        <ScrollView style={{margin: 10, marginTop: 25}}>
-            {allSpendings}
-        </ScrollView>
+        <SwipeListView
+            useFlatList
+            data={allSpendings}
+            renderItem={ (data, rowMap) => {
+                let spend = data.item.spend
+                return(
+                <View style={styles.rowFront}>
+                    
+                    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {spend.name}
+                      </Text>
+                      <Text>{spend.currency+' '+spend.amount}</Text>
+                    </View>
+                      <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
+                        
+                        <Text>Date: {spend.date}</Text> 
+                    
+                    </View>
+                </View >)
+            }}
+            renderHiddenItem={ (data, rowMap) => {
+                let index = parseInt(data.item.key)
+                return(
+                <View style={styles.rowBack}>
+                    <Button style={{borderRadius: 5 }} 
+                        onPress={()=>this.onPress(index)}>
+                        <Text>Edit</Text>
+                    </Button>
+                    <Button style={{borderRadius: 5,  }} 
+                        onPress={()=>this._onDeleteSpending(index)}>
+                        <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
+                    </Button>
+                </View>
+            )}}
+            leftOpenValue={80}
+            rightOpenValue={-80}
+        />
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
           onRequestClose={() => {
