@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: 'silver',
 		borderBottomWidth: 1,
 		justifyContent: 'center',
-        height: 75,
+        height: 100,
         padding: 10,
 	},
 	rowBack: {
@@ -547,6 +547,7 @@ class TripList extends Component {
             style={{backgroundColor: 'rgb(255,255,255)'}}
             useFlatList
             data={allLocs}
+            disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), loc = data.item.loc
                 return(
@@ -566,17 +567,14 @@ class TripList extends Component {
                 let index = parseInt(data.item.key)
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} 
-                        onPress={()=>this.onPress(index)}>
-                        <Text>Edit</Text>
-                    </Button>
+                    <Text />
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteLoc(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>
             )}}
-            leftOpenValue={80}
+            
             rightOpenValue={-80}
         />
 

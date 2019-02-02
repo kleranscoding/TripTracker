@@ -58,9 +58,19 @@ const styles = StyleSheet.create({
 
 const spendStyles = StyleSheet.create({
     addNewBtn: {
-        marginTop: 10 , marginLeft: '15%', 
-        borderRadius: 20, width: '70%', 
+        marginTop: 10 , marginLeft: 5, 
+        borderRadius: 20, width: '36%', 
         backgroundColor: 'rgb(49,90,158)'
+    },
+    editBtn: {
+        marginTop: 10 , marginLeft: 5, 
+        borderRadius: 20, width: '25%', 
+        backgroundColor: 'rgb(49,90,158)'
+    },
+    deleteBtn: {
+        marginTop: 10 , marginLeft: 5, 
+        borderRadius: 20, width: '25%', 
+        backgroundColor: 'rgb(255,0,0)'
     },
 })
 
@@ -93,18 +103,6 @@ const modalStyles = StyleSheet.create({
     "create_btn_text": {
         padding: 10, 
         textAlign: 'center', fontSize: 20, color: 'rgb(255,255,255)'
-    },
-})
-
-const cardStyles = StyleSheet.create({
-    container: { flex: 1, },
-    content: { padding: 4, },
-    card: { 
-        margin: 10, 
-        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 1,
-    },
-    cardImg: {
-        width: '100%', height: 200,
     },
 })
 
@@ -158,8 +156,6 @@ class MapContainer extends Component {
 class SpendingContainer extends Component {
     
     render() {
-        
-
         let numSpends = this.props.spendings.length>0 ? 
             this.props.spendings.length > 1 ?
                 <Text style={styles.spendInfo}>{`${this.props.spendings.length} spendings`}</Text> :
@@ -175,7 +171,7 @@ class SpendingContainer extends Component {
 }
 
 /**
- * MODAL
+ * NEWSPEND MODAL
  */
 class NewSpendModal extends Component {
     constructor() {
@@ -466,24 +462,20 @@ export default class LocationDetail extends Component {
 
     _getLocDetails = () => {
         this._getToken().then(token=>{
-            console.log("details= ",token)
             const locId = this.props.navigation.getParam('locId', null)
             if (!locId) {
                 this.props.navigation.goBack()
             }
-            //*
             fetch(serverURL+'/api/locations/'+locId,{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, },
             }).then(res=>{
                 if (res.status===200) {
                   res.json().then(data=>{
-                    //console.log(data)
                     this.setState({ locDetails: data })
                   })
                 }
             }).catch(err=>{ console.log(err) })
-            //*/
         }).catch(error=>{
             console.log("get token error:",error)
         })
@@ -539,7 +531,6 @@ export default class LocationDetail extends Component {
             selectOnDelete: this.state.locDetails.spendings[index], 
             modalDelete: true,
         })
-        //this.setModalDelete(true)
     }
 
     _onEditSpending = (index) => {
@@ -547,22 +538,16 @@ export default class LocationDetail extends Component {
             selectOnEdit: this.state.locDetails.spendings[index], 
             modalEdit: true,
         })
-        //this.setModalDelete(true)
     }
 
     _removeSpending = (data) => {
         let filteredSpendings = this.state.locDetails.spendings.filter(spend=>{
             return (spend.id!==data.id)
         })
-        //this.setState({ trips: filteredTrips, })
-        //*
         this.setState(prevState=>({
-            locDetails: {
-                ...prevState.locDetails, spendings: filteredSpendings,
-            },
+            locDetails: { ...prevState.locDetails, spendings: filteredSpendings, },
             modalDelete: false,
         }))
-        //*/
     }
 
     _editSpending = (data) => {
@@ -570,7 +555,7 @@ export default class LocationDetail extends Component {
         this.state.locDetails.spendings.map(spend=>{
             let origSpend= spend
             if (spend.id===data.id) {
-                origSpend.name= data.name
+                origSpend.name= data.name 
                 origSpend.date= data.date
                 origSpend.amount= data.amount
                 origSpend.currency= data.currency
@@ -593,42 +578,6 @@ export default class LocationDetail extends Component {
                 return allSpendings.push({key: index.toString(), spend: spend})
             })
         }
-        /*
-        if (this.state.locDetails.spendings) {
-            this.state.locDetails.spendings.map((spend,index)=>{
-                return allSpendings.push(
-                    <Card style={cardStyles.card} key={index}>
-                      <Card.Content>
-                        
-                        <Title style={{fontSize: 24, marginBottom: 5}}>
-                            {spend.name}
-                        </Title>
-                        <Paragraph style={{fontSize: 20}}>
-                            {spend.currency+' '+spend.amount}
-                        </Paragraph>
-                        <Paragraph style={{fontSize: 16}}>
-                          Date: {spend.date}
-                        </Paragraph>
-                      </Card.Content>
-
-                      <Card.Actions>
-                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                          <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
-                            >
-                            <Text>Edit</Text>
-                            </Button>
-                            <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(255,0,0)' }} icon="delete" mode="contained"
-                              onPress={()=>this._onDeleteSpending(index)}>
-                            <Text>Delete</Text>
-                          </Button>
-                        </View>
-                      </Card.Actions>
-    
-                    </Card>
-                )
-            })
-        }
-        //*/
 
         return(
     <React.Fragment>
@@ -637,10 +586,20 @@ export default class LocationDetail extends Component {
                 geocode={this.state.locDetails.geocode} />
         </View>
         
-        <View style={{margin: 10, }}>
+        <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
             <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
-                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
+                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     + Expenses
+                </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={spendStyles.editBtn} >
+                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
+                    Edit
+                </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={spendStyles.deleteBtn} >
+                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
+                    DELETE
                 </Text>
             </TouchableOpacity>
         </View>
@@ -658,16 +617,15 @@ export default class LocationDetail extends Component {
                 return(
                 <View style={styles.rowFront}>
                     
-                    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {spend.name}
                       </Text>
-                      <Text>{spend.currency+' '+spend.amount}</Text>
+                        <Text>{spend.currency+' '+spend.amount}</Text>
+                        <Text>{spend.category}</Text>
                     </View>
-                      <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
-                        
-                        <Text>Date: {spend.date}</Text> 
-                    
+                    <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
+                      <Text>Date: {spend.date}</Text> 
                     </View>
                 </View >)
             }}
@@ -722,7 +680,9 @@ export default class LocationDetail extends Component {
     }
 }
 
-
+/**
+ * DELETESPEND MODAL
+ */
 class DeleteSpendModal extends Component {
 
     _cancelDelete = () => {
@@ -730,11 +690,8 @@ class DeleteSpendModal extends Component {
     }
 
     _deleteSpending = () => {
-        console.log("to delete spending")
         _getToken().then(token=>{
-            //console.log(token);console.log(this.props.selectOnDelete.id)
-            //*
-            fetch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
+            etch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}`, },
             }).then(res=>{
@@ -742,7 +699,6 @@ class DeleteSpendModal extends Component {
                     this.props.removeSpending(data)
                 })
             })
-            //*/
         }) 
     }
 
