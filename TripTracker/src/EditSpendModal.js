@@ -4,6 +4,7 @@ import { AsyncStorage, StyleSheet, View, Text, ScrollView,
 import { Button, TextInput, } from  'react-native-paper';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import CalendarPicker from 'react-native-calendar-picker';
 
 import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
 
@@ -47,6 +48,13 @@ const currencyList = currencyInfo
 const catLabels = Categories.map(cat=>{ return cat.label })
 
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
+
+function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
+
+function dateToString(selectedDate) {
+    let date= new Date(selectedDate)
+    return `${date.getFullYear()}-${padZero(date.getMonth()+1)}-${padZero(date.getDate())}`
+}
 
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
@@ -140,6 +148,12 @@ export default class EditSpendModal extends Component {
 
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
+    onDateChange = (date, type) => {
+        console.log(type)
+        console.log(date)
+        this.setState({ date: dateToString(date),})
+    }
+
     resizeSelector = (name) => {
         if (this.state[name]) {
             this.setState({
@@ -221,7 +235,22 @@ export default class EditSpendModal extends Component {
     <ScrollView>
       <KeyboardAwareScrollView style={{marginBottom: 100}}>
         
-        <View style={modalStyles.datepicker}>
+      <View >
+        <CalendarPicker
+          startFromMonday={true}
+          allowRangeSelection={false}
+          todayBackgroundColor="#f2e6ff"
+          selectedDayColor="#7300e6"
+          selectedDayTextColor="#FFFFFF"
+          onDateChange={this.onDateChange}
+        />
+ 
+        <View>
+          <Text>SELECTED DATE:{ this.state.date }</Text>
+        </View>
+      </View>
+
+        {/* <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
             <ModalDatePicker startDate={new Date(this.state.date)}
                 renderDate={({ year, month, day, date }) => {
@@ -239,7 +268,7 @@ export default class EditSpendModal extends Component {
                     }
                 }}
             />
-        </View>
+        </View> */}
 
         <TextInput label='What did you spend on?' mode="outlined" 
             onChangeText={text => this.setState({ name: text })}

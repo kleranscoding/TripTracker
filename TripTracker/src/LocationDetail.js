@@ -7,6 +7,7 @@ import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
+import CalendarPicker from 'react-native-calendar-picker';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -131,6 +132,10 @@ function createTimeStamp(timeRequired) {
     return timestamp;
 }
 
+function dateToString(selectedDate) {
+    let date= new Date(selectedDate)
+    return `${date.getFullYear()}-${padZero(date.getMonth()+1)}-${padZero(date.getDate())}`
+}
 
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
@@ -280,6 +285,12 @@ class NewSpendModal extends Component {
 
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
+    onDateChange = (date, type) => {
+        console.log(type)
+        console.log(date)
+        this.setState({ date: dateToString(date),})
+    }
+
     resizeSelector = (name) => {
         if (this.state[name]) {
             this.setState({
@@ -360,7 +371,22 @@ class NewSpendModal extends Component {
       <ScrollView >
       <KeyboardAwareScrollView style={{marginBottom: 100}}>
         
-        <View style={modalStyles.datepicker}>
+        <View >
+            <CalendarPicker
+            startFromMonday={true}
+            allowRangeSelection={false}
+            todayBackgroundColor="#f2e6ff"
+            selectedDayColor="#7300e6"
+            selectedDayTextColor="#FFFFFF"
+            onDateChange={this.onDateChange}
+            />
+    
+            <View>
+            <Text>SELECTED DATE:{ this.state.date }</Text>
+            </View>
+        </View>
+
+        {/* <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
@@ -378,7 +404,7 @@ class NewSpendModal extends Component {
                     }
                 }}
             />
-        </View>
+        </View> */}
 
         <TextInput label='What did you spend on?' mode="outlined" 
             onChangeText={text => this.setState({ name: text })}
@@ -606,7 +632,7 @@ export default class LocationDetail extends Component {
         </View>
         
         <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-            <TouchableOpacity style={spendStyles.deleteBtn} >
+            {/* <TouchableOpacity style={spendStyles.deleteBtn} >
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     DELETE
                 </Text>
@@ -616,7 +642,7 @@ export default class LocationDetail extends Component {
                     Edit
                 </Text>
             </TouchableOpacity>
-            
+             */}
             <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     + Expenses
@@ -632,21 +658,30 @@ export default class LocationDetail extends Component {
         <SwipeListView
             useFlatList
             data={allSpendings}
+            friction={5}
+            tension={10}
             renderItem={ (data, rowMap) => {
                 let spend = data.item.spend
                 return(
                 <View style={styles.rowFront}>
                     
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <View style={{flex: 1, flexDirection: 'column'}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {spend.name}
                       </Text>
-                        <Text>{spend.currency+' '+spend.amount}</Text>
+                      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                        <Text>on {spend.date}</Text>
                         <Text>{spend.category}</Text>
+                      </View>
                     </View>
                     <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
-                      <Text>Date: {spend.date}</Text> 
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {spend.currency+' '+spend.amount}
+                      </Text>
                     </View>
+                  </View>
+                    
                 </View >)
             }}
             renderHiddenItem={ (data, rowMap) => {
@@ -711,7 +746,7 @@ class DeleteSpendModal extends Component {
 
     _deleteSpending = () => {
         _getToken().then(token=>{
-            etch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
+            fetch(serverURL+'/api/spendings/delete/'+this.props.selectOnDelete.id,{
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}`, },
             }).then(res=>{

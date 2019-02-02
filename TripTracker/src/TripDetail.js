@@ -234,7 +234,7 @@ class NewLocModal extends Component {
         if (type === 'END_DATE') {
           this.setState({ dateEnd: dateToString(date),})
         } else {
-          this.setState({ dateStart: dateToString(date),})
+          this.setState({ dateStart: dateToString(date),dateEnd: ''})
         }
     }
 
@@ -289,8 +289,6 @@ class NewLocModal extends Component {
         <CalendarPicker
           startFromMonday={true}
           allowRangeSelection={true}
-          //minDate={minDate}
-          //maxDate={maxDate}
           todayBackgroundColor="#f2e6ff"
           selectedDayColor="#7300e6"
           selectedDayTextColor="#FFFFFF"
@@ -298,8 +296,8 @@ class NewLocModal extends Component {
         />
  
         <View>
-          <Text>SELECTED START DATE:{ this.state.dateStart ? this.state.dateStart.toString() : '' }</Text>
-          <Text>SELECTED END DATE:{ this.state.dateEnd ? this.state.dateEnd.toString() : '' }</Text>
+          <Text>SELECTED START DATE:{ this.state.dateStart }</Text>
+          <Text>SELECTED END DATE:{ this.state.dateEnd }</Text>
         </View>
       </View>
 
@@ -534,7 +532,7 @@ class TripList extends Component {
         <View style={{backgroundColor: 'rgb(255,255,255)'}}>
             
             <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-              <TouchableOpacity style={locStyles.deleteBtn} >
+              {/* <TouchableOpacity style={locStyles.deleteBtn} >
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                         DELETE
                     </Text>
@@ -543,7 +541,7 @@ class TripList extends Component {
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 18}}>
                         + Location

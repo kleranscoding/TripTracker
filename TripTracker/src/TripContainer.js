@@ -200,8 +200,6 @@ class NewTripModal extends Component {
         })
     }
 
-    setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
-
     onFocus = () => { this.setState({errTripTitle: false}) }
 
     onBlur = (evt) => {
@@ -215,11 +213,9 @@ class NewTripModal extends Component {
         if (type === 'END_DATE') {
           this.setState({ dateEnd: dateToString(date),})
         } else {
-          this.setState({ dateStart: dateToString(date),})
+          this.setState({ dateStart: dateToString(date),dateEnd: ''})
         }
     }
-
-    updateDate = (name,date) => { this.setState({ [name]: date }) }
 
     render() {
         return (
@@ -247,8 +243,6 @@ class NewTripModal extends Component {
         <CalendarPicker
           startFromMonday={true}
           allowRangeSelection={true}
-          //minDate={minDate}
-          //maxDate={maxDate}
           todayBackgroundColor="#f2e6ff"
           selectedDayColor="#7300e6"
           selectedDayTextColor="#FFFFFF"
@@ -256,47 +250,11 @@ class NewTripModal extends Component {
         />
  
         <View>
-          <Text>SELECTED START DATE:{ this.state.dateStart ? this.state.dateStart.toString() : '' }</Text>
-          <Text>SELECTED END DATE:{ this.state.dateEnd ? this.state.dateEnd.toString() : '' }</Text>
+          <Text>SELECTED START DATE:{ this.state.dateStart }</Text>
+          <Text>SELECTED END DATE:{ this.state.dateEnd }</Text>
         </View>
       </View>
         
-        {/* <View style={modalStyles.datepicker}>
-            <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
-            <ModalDatePicker startDate={new Date()}
-                renderDate={({ year, month, day, date }) => {
-                if (!date) {
-                    return (<Text style={{fontSize: 18}}>Click here to select a start date</Text>)
-                }
-                let selectedDate= `${year}-${month}-${day}`
-                return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                }}
-                onDateChanged={({ year, month, day, date }) => {
-                    if (date) {
-                        this.updateDate("dateStart",`${year}-${month}-${day}`)
-                    }
-                }}
-            />
-        </View>
-    
-        <View style={modalStyles.datepicker}>
-            <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
-            <ModalDatePicker startDate={new Date()}
-                renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Click here to select an end date"
-                    if (date) { 
-                        selectedDate = `${year}-${month}-${day}` 
-                    }
-                    return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                }}
-                onDateChanged={({ year, month, day, date }) => {
-                    if (date) {
-                        this.updateDate("dateEnd",`${year}-${month}-${day}`)
-                    }
-                }}
-            />
-        </View> */}
-
         <TouchableOpacity onPress={this.submitTripInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Create Trip
