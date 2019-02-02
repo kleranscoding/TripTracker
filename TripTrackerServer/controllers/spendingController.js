@@ -33,7 +33,7 @@ function verifyToken(token) {
     return decoded;
 }
 
-// create new expenditure
+// create new expense
 router.post('/new',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
@@ -71,7 +71,52 @@ router.post('/new',(req,res)=>{
 });
 
 
-// delete new expenditure
+// edit expense
+router.put('/edit/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Spending.findById(req.params.id).populate({
+        path: 'location', populate: {path: 'trip'}
+    }).then(spend=>{
+        if (!spend) {
+            return res.status(NOTFOUND).json({"success": false, "message": "spending not found"});
+        }
+        if (spend.location.trip.traveler.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+        } else {
+
+            db.Spending.findByIdAndUpdate(req.params.id,{$set: req.body},{new: true},function(err,editedObj){
+                if (err) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+                } else {
+                    if (!editedObj) {
+                        return res.status(INTERNAL_ERR).json({"success": false, "message": "spending not found"});
+                    }
+                    return res.json({
+                        "id": editedObj.id,
+                        "name": editedObj.name, "date": editedObj.date, "category": editedObj.category,
+                        "currency": editedObj.currency, "amount": editedObj.amount, "note": editedObj.note, 
+                    });
+                }
+            });
+            
+        }
+    })
+});
+
+
+// delete new expense
 router.delete('/delete/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
         return res.status(FORBIDDEN).json({
@@ -96,7 +141,7 @@ router.delete('/delete/:id',(req,res)=>{
             return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
         }
         db.Spending.findByIdAndRemove(req.params.id).then(deleteSpend=>{
-            console.log(req.params.id, spend._id, req.params.id===spend._id.toString())
+            
             return res.json({
                 "id": deleteSpend._id, "name": deleteSpend.name, 
                 "date": deleteSpend.date, "currency": deleteSpend.currency,

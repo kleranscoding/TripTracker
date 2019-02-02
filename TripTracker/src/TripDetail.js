@@ -431,6 +431,10 @@ class TripList extends Component {
         }) 
     }
 
+    onPress = (index) => {
+        console.log(index)
+    }
+
     resizeImg = () => {
         if (this.state.resize) {
             this.setState({

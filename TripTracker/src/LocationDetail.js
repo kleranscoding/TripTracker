@@ -14,6 +14,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
 
+import EditSpendModal from './EditSpendModal';
 
 /**
  * STYLESHEETS
@@ -116,6 +117,9 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+const catLabels = Categories.map(cat=>{ return cat.label })
+const currencyList = currencyInfo
+
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
@@ -184,6 +188,7 @@ class NewSpendModal extends Component {
             name: '', category: '', date: '',
             amount: '', currency: 'USD', note: '',
             catLabels: Categories.map(cat=>{ return cat.label }),
+            catLabel: '',
             currencyList: currencyInfo,
             resizeCurr: false, resizeCat: false,
         }
@@ -253,17 +258,11 @@ class NewSpendModal extends Component {
 
     selectCategory = (index) => {
         
-        let catLabels= this.state.catLabels
-        if (this.state.catIndex===index) return
-        if (this.state.catIndex!==null) {
-            catLabels[this.state.catIndex]= catLabels[this.state.catIndex].replace(selectText,"")
-        }
-        catLabels[index]= catLabels[index]+selectText
         this.setState({ 
             catIndex: index,
             category: Categories[index].label,
             resizeCat: false,
-            catLabels 
+            catLabel: catLabels[index]+selectText
         })
     }
 
@@ -329,7 +328,7 @@ class NewSpendModal extends Component {
             )
         })
         // create currency picker group
-        let currencyGrp = this.state.currencyList.map((currency,index)=>{
+        let currencyGrp = currencyList.map((currency,index)=>{
             return (<Picker.Item itemStyle={{ color: "rgb(255,255,255)", fontSize:16 }}
                 key={index} label={currency[1]+" ("+currency[0]+")"} value={currency[0]} />)
         })
@@ -347,10 +346,9 @@ class NewSpendModal extends Component {
             New Expense Info
         </Text>
       </View>
-
-      <ScrollView>
-        
-      <KeyboardAwareScrollView style={{marginBottom: 50}}>
+      
+      <ScrollView >
+      <KeyboardAwareScrollView style={{marginBottom: 100}}>
         
         <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
@@ -394,10 +392,10 @@ class NewSpendModal extends Component {
                 </Picker>}
           </View>
           <View style={{width: this.state.resizeCurr? '100%' : '50%'}}>
-          <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
-            onChangeText={text => this.setState({ amount: text })}
-            style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
-        </View>
+            <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
+              onChangeText={text => this.setState({ amount: text })}
+              style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
+          </View>
         </View>
         
         
@@ -419,14 +417,12 @@ class NewSpendModal extends Component {
     
         <TouchableOpacity onPress={this.submitSpendInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
-                Add Expenditure
+                Add Expense
             </Text>
         </TouchableOpacity>
 
       </KeyboardAwareScrollView>
-
-      </ScrollView>
-        
+    </ScrollView>    
     </React.Fragment>
         )
     }
@@ -444,7 +440,7 @@ export default class LocationDetail extends Component {
             selectOnDelete: {}, selectOnEdit: {},
             locDetails: props.navigation.getParam("location"),
             resize: false,
-            modalVisible: false, modalDelete: false,
+            modalVisible: false, modalDelete: false, modalEdit: false,
             imgView: styles.imgView, imgSize: styles.imgSmall,
         }
     }
@@ -495,9 +491,22 @@ export default class LocationDetail extends Component {
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
 
+
+    setModal = (visible,modalType,selectOnType) => {
+        this.setState({
+            [modalType]: visible, [selectOnType]: {},
+        })
+    }
+
     setModalDelete = (visible) => { 
         this.setState({
             modalDelete: visible, selectOnDelete: {},
+        }) 
+    }
+
+    setModalEdit = (visible) => { 
+        this.setState({
+            modalEdit: visible, selectOnEdit: {},
         }) 
     }
 
@@ -533,6 +542,14 @@ export default class LocationDetail extends Component {
         //this.setModalDelete(true)
     }
 
+    _onEditSpending = (index) => {
+        this.setState({
+            selectOnEdit: this.state.locDetails.spendings[index], 
+            modalEdit: true,
+        })
+        //this.setModalDelete(true)
+    }
+
     _removeSpending = (data) => {
         let filteredSpendings = this.state.locDetails.spendings.filter(spend=>{
             return (spend.id!==data.id)
@@ -546,6 +563,26 @@ export default class LocationDetail extends Component {
             modalDelete: false,
         }))
         //*/
+    }
+
+    _editSpending = (data) => {
+        let filteredSpendings = []
+        this.state.locDetails.spendings.map(spend=>{
+            let origSpend= spend
+            if (spend.id===data.id) {
+                origSpend.name= data.name
+                origSpend.date= data.date
+                origSpend.amount= data.amount
+                origSpend.currency= data.currency
+                origSpend.category= data.category
+                origSpend.note= data.note
+            }
+            return filteredSpendings.push(origSpend)
+        })
+        this.setState(prevState=>({
+            locDetails: { ...prevState.locDetails, spendings: filteredSpendings, },
+            modalEdit: false,
+        }))
     }
 
     render() {
@@ -639,7 +676,7 @@ export default class LocationDetail extends Component {
                 return(
                 <View style={styles.rowBack}>
                     <Button style={{borderRadius: 5 }} 
-                        onPress={()=>this.onPress(index)}>
+                        onPress={()=>this._onEditSpending(index)}>
                         <Text>Edit</Text>
                     </Button>
                     <Button style={{borderRadius: 5,  }} 
@@ -668,6 +705,16 @@ export default class LocationDetail extends Component {
             <DeleteSpendModal selectOnDelete={this.state.selectOnDelete} 
                 setModalDelete={this.setModalDelete}
                 removeSpending={this._removeSpending} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalEdit}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalEdit","selectOnEdit")
+            }}>
+            <EditSpendModal selectOnEdit={this.state.selectOnEdit} 
+                setModalEdit={this.setModal}
+                editSpending={this._editSpending} />
         </Modal>
 
     </React.Fragment>

@@ -52,8 +52,8 @@ function verifyToken(token) {
 
 // profile route
 router.get('/profile',(req,res)=>{
-    
-    if (req.headers.authorization===undefined) {
+    let auth = req.headers.authorization;
+    if (auth===undefined || auth===null) {
         return res.status(FORBIDDEN).json({
             "success": false, "message": "forbidden"
         });
