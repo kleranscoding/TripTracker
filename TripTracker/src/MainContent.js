@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Profile from './Profile';
 import TripScreen from './TripContainer';
-import Logout from './screens/Logout';
 
 
 const styles = StyleSheet.create({
@@ -62,17 +61,6 @@ const MainContentStack = createBottomTabNavigator({
             title: {fontSize: 20}
         }),
     },
-    /*
-    Logout: {
-        screen: Logout,
-        navigationOptions: () => ({
-            tabBarIcon: () => (
-              <Ionicons name="ios-exit" size={28} color="rgb(36,152,219)" />
-            ),
-            title: {fontSize: 20}
-        }),
-    },
-    //*/
 },
 {
     initialRouteName: 'Trips',

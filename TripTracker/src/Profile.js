@@ -42,6 +42,8 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+_getToken = async() => { return await AsyncStorage.getItem(tokenName) }
+
 class MapContainer extends Component {
   
   constructor(props) {
@@ -102,10 +104,8 @@ export default class Profile extends Component {
       this.setState({ geolocation });
     }
 
-    _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
-
     _getProfileInfo = () => {
-      this._getToken().then(token=>{
+      _getToken().then(token=>{
         //console.log("profile: ",token)
         fetch(serverURL+'/api/users/profile',{
           method: 'GET',

@@ -351,6 +351,10 @@ class TripList extends Component {
 
     constructor(props) {
         super(props)
+        this.focusListener = this.props.navigation.addListener('didFocus',payload => {
+            console.debug('didFocus', payload);
+            this._getTripDetails()
+          })
         this.state = { 
             locations: [],
             tripDetails: {},
@@ -376,14 +380,17 @@ class TripList extends Component {
     }
 
     componentDidMount = () => {
-        this._getTripDetails()
+        console.log("did mounted")
+        //this._getTripDetails()
     }
+
+    componentWillUnmount = () => { this.focusListener.remove() }
 
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     _getTripDetails = () => {
-        this._getToken().then(token=>{
-            console.log("details= ",token)
+        _getToken().then(token=>{
+            console.log("trip details= ",token)
             const tripId = this.props.navigation.getParam('tripId', null)
             if (!tripId) { this.props.navigation.goBack() }
             fetch(serverURL+'/api/trips/'+tripId,{
@@ -393,6 +400,7 @@ class TripList extends Component {
                 if (res.status===200) {
                   res.json().then(data=>{
                     //console.log(data)
+                    console.log("done getting trip details data")
                     this.setState({ tripDetails: data })
                   })
                 }
