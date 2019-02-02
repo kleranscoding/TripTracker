@@ -34,7 +34,7 @@ function verifyToken(token) {
     return decoded;
 }
 
-//*
+
 // get location details
 router.get('/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -82,7 +82,7 @@ router.get('/:id',(req,res)=>{
         }
     });
 });
-//*/
+
 
 // create new location
 router.post('/new',(req,res)=>{
@@ -112,7 +112,7 @@ router.post('/new',(req,res)=>{
             let newLoc = {
                 "location": req.body.location, 
                 "startDate": req.body.startDate, "endDate": req.body.endDate,
-                "formateAddress": req.body.formatAddr,
+                "formatAddress": req.body.formatAddr,
                 "geocode": {
                     "lat": req.body.geocode.lat, 
                     "lng": req.body.geocode.lng,
@@ -127,17 +127,58 @@ router.post('/new',(req,res)=>{
                 return res.json({
                     "id": loc._id, "location": loc.location, 
                     "startDate": loc.startDate, "endDate": loc.endDate,
-                    "formateAddress": req.body.formatAddress,
+                    "formatAddress": req.body.formatAddress,
                     "geocode": loc.geocode, "image": loc.image,
                 })
             });
         }
     });
-    
-    //*/
 });
 
-//*
+
+// edit location
+router.put('/edit/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Location.findById(req.params.id).populate('trip').then(loc=>{
+        if (!loc) {
+            return res.status(NOTFOUND).json({"success": false, "message": "location not found"});
+        }
+        if (loc.trip.traveler.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+        } else {
+            db.Location.findByIdAndUpdate(req.params.id,{$set: req.body},{new: true},function(err,editedObj){
+                if (err) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+                } else {
+                    if (!editedObj) {
+                        return res.status(INTERNAL_ERR).json({"success": false, "message": "location not found"});
+                    }
+
+                    return res.json({
+                        "id": editedObj.id,
+                        "location": editedObj.location, "startDate": editedObj.startDate, "endDate": editedObj.endDate,
+                        "formatAddress": editedObj.formatAddress, "geocode": editedObj.geocode 
+                    });
+                }
+            });
+            
+        }
+    })
+});
+
+
 // delete location by id
 router.delete('/delete/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {
@@ -181,6 +222,5 @@ router.delete('/delete/:id',(req,res)=>{
     });
     //return res.status(INTERNAL_ERR).json({"success": false, "message": "under construction"});
 });
-//*/
 
 module.exports = router;

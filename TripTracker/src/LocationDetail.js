@@ -7,12 +7,11 @@ import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import ModalDatePicker from 'react-native-datepicker-modal';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
-import { GOOGLAPI } from '../envAPI.js';
 
 import EditSpendModal from './EditSpendModal';
 
@@ -58,17 +57,17 @@ const styles = StyleSheet.create({
 
 const spendStyles = StyleSheet.create({
     addNewBtn: {
-        marginTop: 10 , marginLeft: 5, 
+        marginTop: 10, marginLeft: 5, 
         borderRadius: 20, width: '36%', 
         backgroundColor: 'rgb(49,90,158)'
     },
     editBtn: {
-        marginTop: 10 , marginLeft: 5, 
+        marginTop: 10, marginLeft: 5, 
         borderRadius: 20, width: '25%', 
         backgroundColor: 'rgb(49,90,158)'
     },
     deleteBtn: {
-        marginTop: 10 , marginLeft: 5, 
+        marginTop: 10, marginLeft: 5, 
         borderRadius: 20, width: '25%', 
         backgroundColor: 'rgb(255,0,0)'
     },
@@ -120,6 +119,19 @@ const currencyList = currencyInfo
 
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
+function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
+
+function createTimeStamp(timeRequired) {
+    let today = new Date();
+    let timestamp = `${today.getFullYear()}-${padZero(today.getMonth()+1)}-${padZero(today.getDate())}`
+    if (timeRequired) {
+        //console.log(today.getHours(),today.getMinutes())
+        timestamp = `${timestamp}T${padZero(today.getHours())}:${padZero(today.getMinutes())}:${padZero(today.getSeconds())}`
+    }
+    return timestamp;
+}
+
+
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
 /**
@@ -137,11 +149,15 @@ class MapContainer extends Component {
             },
         }
     }
+
+    onRegionChange = (region) => { this.setState({ region }) }
     
     render() {
+        console.log(this.props.geocode)
+        console.log(this.state.region)
         return(
             <MapView style={{marginLeft: 15, marginRight: 15, height: 150, }} 
-                initialRegion = {this.state.region} >
+                initialRegion={this.state.region} >
                 <Marker
                     coordinate={this.state.region}
                     title={this.props.location} />
@@ -189,8 +205,6 @@ class NewSpendModal extends Component {
             resizeCurr: false, resizeCat: false,
         }
     }
-    
-    _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     submitSpendInfo = () => {
         let errDate= true, errName= true, errAmt= true, errCat= true
@@ -222,7 +236,7 @@ class NewSpendModal extends Component {
         }
         //console.log(this.state.date);console.log(this.state.name);console.log(this.state.amount);console.log(this.state.currency);console.log(this.state.category);console.log(this.state.note || 'empty string')
         //*
-        this._getToken().then(token=>{
+        _getToken().then(token=>{
             
             fetch(serverURL+'/api/spendings/new',{
                 method: 'POST',
@@ -353,6 +367,8 @@ class NewSpendModal extends Component {
                     let selectedDate = "Click here to select a date"
                     if (date) { 
                         selectedDate = `${year}-${month}-${day}` 
+                    } else {
+                        selectedDate= createTimeStamp(false)
                     }
                     return <Text style={{fontSize: 18}}>{selectedDate}</Text>
                 }}
@@ -437,6 +453,7 @@ export default class LocationDetail extends Component {
             locDetails: props.navigation.getParam("location"),
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
+            modalEditLoc: false,
             imgView: styles.imgView, imgSize: styles.imgSmall,
         }
     }
@@ -461,7 +478,7 @@ export default class LocationDetail extends Component {
     _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     _getLocDetails = () => {
-        this._getToken().then(token=>{
+        _getToken().then(token=>{
             const locId = this.props.navigation.getParam('locId', null)
             if (!locId) {
                 this.props.navigation.goBack()
@@ -570,8 +587,9 @@ export default class LocationDetail extends Component {
         }))
     }
 
-    render() {
 
+    render() {
+        
         let allSpendings = []
         if (this.state.locDetails.spendings) {
             this.state.locDetails.spendings.map((spend,index)=>{
@@ -582,24 +600,26 @@ export default class LocationDetail extends Component {
         return(
     <React.Fragment>
         <View >
+            <Text>{this.state.locDetails.location}</Text>
             <MapContainer location={this.state.locDetails.location} 
                 geocode={this.state.locDetails.geocode} />
         </View>
         
         <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-            <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
+            <TouchableOpacity style={spendStyles.deleteBtn} >
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
-                    + Expenses
+                    DELETE
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={spendStyles.editBtn} >
+            <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this.setModal(true,"modalEditLoc","")}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={spendStyles.deleteBtn} >
+            
+            <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
-                    DELETE
+                    + Expenses
                 </Text>
             </TouchableOpacity>
         </View>

@@ -13,6 +13,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
 
+import EditLocModal from './EditLocModal';
  
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     locInfo: {
         marginTop: 5,
         textAlign: 'center',
-        fontSize: 20, fontFamily: 'Avenir',
+        fontSize: 16, fontFamily: 'Avenir',
     },
     rowFront: {
 		alignItems: 'flex-start',
@@ -59,9 +60,19 @@ const styles = StyleSheet.create({
 
 const locStyles = StyleSheet.create({
     addNewBtn: {
-        marginTop: 10 , marginLeft: '25%', 
-        borderRadius: 20, width: '50%', 
+        marginTop: 10, marginLeft: 5, 
+        borderRadius: 20, width: '36%', 
         backgroundColor: 'rgb(49,90,158)'
+    },
+    editBtn: {
+        marginTop: 10, marginLeft: 5, 
+        borderRadius: 20, width: '25%', 
+        backgroundColor: 'rgb(49,90,158)'
+    },
+    deleteBtn: {
+        marginTop: 10, marginLeft: 5, 
+        borderRadius: 20, width: '25%', 
+        backgroundColor: 'rgb(255,0,0)'
     },
 })
 
@@ -96,28 +107,24 @@ const modalStyles = StyleSheet.create({
     },
 })
 
-const cardStyles = StyleSheet.create({
-    container: { flex: 1, },
-    content: { padding: 4, },
-    card: { 
-        margin: 10, 
-        borderColor: 'rgba(192,192,192,0.75)', borderWidth: 2, borderRadius: 10,
-    },
-    cardIndiv: {
-        fontSize: 20, fontFamily: 'Avenir',
-        padding: 10, textAlign: 'left',
-    },
-    cardImg: {
-        width: '100%', height: 200,
-    },
-})
-
-
 /**
  * FUNCTIONS
  */
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
+function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
+
+function createTimeStamp(timeRequired) {
+    let today = new Date();
+    let timestamp = `${today.getFullYear()}-${padZero(today.getMonth()+1)}-${padZero(today.getDate())}`
+    if (timeRequired) {
+        //console.log(today.getHours(),today.getMinutes())
+        timestamp = `${timestamp}T${padZero(today.getHours())}:${padZero(today.getMinutes())}:${padZero(today.getSeconds())}`
+    }
+    return timestamp;
+}
+
+_getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
 /**
  * LOCATION CONTAINER
@@ -132,13 +139,10 @@ class LocationContainer extends Component {
     }
     
     componentDidMount = () => {
-        //console.log("didmount");console.log(this.props.locations)
         this.setState({ locations: this.props.locations})
     }
 
     render() {
-        //console.log("render");console.log(this.state.locations)
-        //let numLocs = null
         let numLocs = this.props.locations.length>0 ? 
             this.props.locations.length > 1 ?
                 <Text style={styles.locInfo}>{`${this.props.locations.length} locations found`}</Text> :
@@ -204,7 +208,7 @@ class NewLocModal extends Component {
             return
         }
         
-        this._getToken().then(token=>{
+        _getToken().then(token=>{
             
             fetch(serverURL+'/api/locations/new',{
                 method: 'POST',
@@ -238,17 +242,7 @@ class NewLocModal extends Component {
     render() {
         return (
     <React.Fragment>
-      {/* <View style={modalStyles.modalHeader}>
-        <TouchableHighlight onPress={()=>this.props.setModalVisible(false)}>
-          <Text style={modalStyles.closeModalText}>
-            Close &times;
-          </Text>
-        </TouchableHighlight>
-        <Text style={modalStyles.newLocGreeting}>
-            New Location Info
-        </Text>
-      </View> */}
-
+      
       <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
         <Appbar.Content title="New Location Info" titleStyle={styles.contentTitle} />
         <Button onPress={()=>this.props.setModalVisible(false)}
@@ -262,26 +256,48 @@ class NewLocModal extends Component {
       <GooglePlacesAutocomplete 
         ref="location" query={{ key: GOOGLAPI, types: ['geocode', 'cities'] }}
         style={{margin: 20, borderRadius: 5, fontSize: 18, }}
-        placeholder='Enter Location' minLength={2} autoFocus={false} returnKeyType={'next'}
-        fetchDetails={true} currentLocation={true} debounce={200} 
+        placeholder='Enter Location' minLength={2} autoFocus={false} returnKeyType={'search'}
+        fetchDetails={true} currentLocation={false} debounce={200} 
+        listViewDisplayed='auto'
         renderDescription={row => row.description} 
         onPress={(data, details = null) => { 
             //console.log(data.description);console.log(details["formatted_address"]);console.log(details.geometry.location)
             this.location= data.description
             this.formatAddr= details["formatted_address"]
             this.geocode= details.geometry.location
-        }}/>
+        }}
+        styles={{
+            textInputContainer: {
+              width: '100%', backgroundColor: 'rgba(0,0,0,0)', 
+            },
+            description: {
+              fontWeight: 'bold', 
+            },
+            predefinedPlacesDescription: {
+              color: '#1faadb', 
+            },
+            listView: {
+                borderWidth: 1, borderColor: 'silver',
+            },
+            container: {
+                borderWidth: 1, borderColor: 'silver',
+            }
+          }}
+
+        />
 
         <View style={{margin: 25 }}>
             {/* <View style={modalStyles.datepicker}> */}
                 <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
                 <ModalDatePicker startDate={new Date()}
                     renderDate={({ year, month, day, date }) => {
-                    if (!date) {
-                        return (<Text style={{fontSize: 18}}>Click here to select a start date</Text>)
-                    }
-                    let selectedDate= `${year}-${month}-${day}`
-                    return <Text style={{fontSize: 18}}>{selectedDate}</Text>
+                        let selectedDate = "Click here to select a start date"
+                        if (date) { 
+                            selectedDate = `${year}-${month}-${day}` 
+                        } else {
+
+                        }
+                        return <Text style={{fontSize: 18}}>{selectedDate}</Text>
                     }}
                     onDateChanged={({ year, month, day, date }) => {
                         if (date) {
@@ -362,7 +378,8 @@ class TripList extends Component {
             locations: [],
             tripDetails: {},
             resize: false,
-            modalVisible: false, modalDelete: false,
+            modalVisible: false, modalDelete: false, modalEdit: false,
+            modalEditLoc: false,
             selectOnDelete: {}, selectOnEdit: {},
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
         }
@@ -423,6 +440,18 @@ class TripList extends Component {
         })
     }
 
+    setModal = (visible) => { 
+        this.setState({
+            modalDelete: visible, selectOnDelete: {},
+        }) 
+    }
+
+    setModal = (visible,modalType,selectOnType) => {
+        this.setState({
+            [modalType]: visible, [selectOnType]: {},
+        })
+    }
+
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
 
     setModalDelete = (visible) => { 
@@ -470,6 +499,36 @@ class TripList extends Component {
         }))
     }
 
+    _onEditLoc = (index) => {
+        this.setState({
+            selectOnEdit: this.state.tripDetails.locations[index], 
+            modalEditLoc: true,
+        })
+    }
+
+    _editLoc = (data) => {
+        let filteredLocs = []
+        //*
+        this.state.tripDetails.locations.map(loc=>{
+            let origLoc= loc
+            if (loc.id===data.id) {
+                origLoc.location= data.location
+                origLoc.geocode= data.geocode
+                origLoc.formatAddress= data.formatAddress
+                origLoc.startDate= data.startDate
+                origLoc.endDate= data.endDate
+            }
+            return filteredLocs.push(origLoc)
+        })
+        //*/
+        //console.log(locDetails)
+        this.setState(prevState=>({
+            tripDetails: { ...prevState.tripDetails, locations: filteredLocs, },
+            modalEditLoc: false, 
+        }))
+    }
+
+    
     render() {
         
         let allLocs = []
@@ -478,40 +537,8 @@ class TripList extends Component {
                 return allLocs.push({ loc: loc ,key: index.toString() })
             })  
         }
-        /*
-        let locFlatList= (
-        <FlatList data={allLocs}
-            renderItem={({item, separators}) => (
-            <Card style={cardStyles.card}>
-              <Card.Content>
-                <TouchableOpacity 
-                    onPress={()=>this.toLocDetails(parseInt(item.key))}
-                    onShowUnderlay={separators.highlight} onHideUnderlay={separators.unhighlight}>
-                  <Text style={cardStyles.cardIndiv}>{item.locItem.location}</Text>  
-                </TouchableOpacity>
-              </Card.Content>
-              <Card.Actions style={{ margin: 10 }}>
-                <View style={{flexDirection: 'row', }}>
-                    <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(81, 148, 255)' }} icon="more" mode="contained"
-                      onPress={()=>this.toLocDetails(parseInt(item.key))}>
-                    <Text>Details</Text>
-                    </Button>
-                    <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
-                    >
-                    <Text>Edit</Text>
-                    </Button>
-                    <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(255,0,0)' }} icon="delete" mode="contained"
-                      onPress={()=>this._onDeleteLoc(parseInt(item.key))}>
-                    <Text>Delete</Text>
-                    </Button>
-                </View>
-              </Card.Actions>
-            </Card>
-        )}/>)
-        //*/
         
         return (
-
     <React.Fragment>
 
       <ImageBackground source={{uri: serverURL+'/'+this.state.tripDetails.image}} style={{width: '100%', height: '100%'}}>
@@ -526,12 +553,23 @@ class TripList extends Component {
         </View>
 
         <View style={{backgroundColor: 'rgb(255,255,255)'}}>
-            <View style={{margin: 15, }}>
-                <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
-                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 20}}>
+            
+            <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
+              <TouchableOpacity style={locStyles.deleteBtn} >
+                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
+                        DELETE
+                    </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={locStyles.editBtn} >
+                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
+                    Edit
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
+                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 18}}>
                         + Location
                     </Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
         
             <Searchbar style={{margin: 15}}
@@ -547,7 +585,7 @@ class TripList extends Component {
             style={{backgroundColor: 'rgb(255,255,255)'}}
             useFlatList
             data={allLocs}
-            disableRightSwipe={true}
+            
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), loc = data.item.loc
                 return(
@@ -556,9 +594,9 @@ class TripList extends Component {
                     
                     <View style={{flexDirection: 'column', alignItems: 'center'}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
-                        {loc.location}
+                        {loc.location.split(",")[0]+' ...'}
                       </Text>
-                      <Text>Date: {loc.startDate}</Text> 
+                      <Text>Date: {loc.startDate} to {loc.endDate}</Text> 
                     </View>
 
                 </TouchableHighlight>)
@@ -567,14 +605,17 @@ class TripList extends Component {
                 let index = parseInt(data.item.key)
                 return(
                 <View style={styles.rowBack}>
-                    <Text />
+                    <Button style={{borderRadius: 5 }} 
+                        onPress={()=>this._onEditLoc(index)}>
+                        <Text>Edit</Text>
+                    </Button>
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteLoc(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>
             )}}
-            
+            leftOpenValue={80}
             rightOpenValue={-80}
         />
 
@@ -594,6 +635,16 @@ class TripList extends Component {
             <DeleteLocModal selectOnDelete={this.state.selectOnDelete} 
                 setModalDelete={this.setModalDelete}
                 removeLoc={this._removeLoc} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalEditLoc}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalEditLoc","")
+            }}>
+            <EditLocModal selectOnEdit={this.state.selectOnEdit} 
+                setModalEdit={this.setModal}
+                editLoc={this._editLoc} />
         </Modal>
 
         </ImageBackground>

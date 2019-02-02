@@ -6,6 +6,7 @@ import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar, Touchable
 import { Ionicons } from '@expo/vector-icons';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import CalendarPicker from 'react-native-calendar-picker';
 
 import { serverURL, tokenName, regexWhitespace, regexWhitespaceOnly } from './config/envConst';
 import TripDetail from './TripDetail'
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: 'silver',
 		borderBottomWidth: 1,
 		justifyContent: 'center',
-        height: 75,
+        height: 100,
         padding: 10,
 	},
 	rowBack: {
@@ -113,6 +114,23 @@ function getDaysDiffText(startDateText,endDateText) {
     return dayDiff+' day'
 }
 
+function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
+
+function createTimeStamp(timeRequired) {
+    let today = new Date();
+    let timestamp = `${today.getFullYear()}-${padZero(today.getMonth()+1)}-${padZero(today.getDate())}`
+    if (timeRequired) {
+        //console.log(today.getHours(),today.getMinutes())
+        timestamp = `${timestamp}T${padZero(today.getHours())}:${padZero(today.getMinutes())}:${padZero(today.getSeconds())}`
+    }
+    return timestamp;
+}
+
+function dateToString(selectedDate) {
+    let date= new Date(selectedDate)
+    return `${date.getFullYear()}-${padZero(date.getMonth()+1)}-${padZero(date.getDate())}`
+}
+
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
 /**
@@ -134,22 +152,25 @@ class NewTripModal extends Component {
         let tripTitle = this.state.tripTitle
         let startDate = this.state.dateStart, endDate = this.state.dateEnd
         let errTitle= true, errDateStart= true, errDateEnd= true
+        let errMsgTitle='', errMsgDate= ''
         console.log(tripTitle, startDate, endDate)
         if (!tripTitle || validateWhtieSpaceOnly(tripTitle) ) {
+            errMsgTitle= '\n- Please enter a title'
             this.setState({errTripTitle: true})
         } else {
             errTitle= false
         }
         if (!(startDate && endDate)) {
-            Alert.alert("Please pick a date")
-        } else if (startDate.localeCompare(endDate)>0) {
-            Alert.alert("Invalid dates")
+            errMsgDate= "\n- Please select start and end date"
         } else {
             errDateStart= false
             errDateEnd= false
         }
         console.log(errTitle, errDateStart, errDateEnd)
-        if (errTitle || errDateStart || errDateEnd) return
+        if (errTitle || errDateStart || errDateEnd) {
+            Alert.alert("Hang On!"+errMsgTitle+errMsgDate)
+            return
+        }
 
         this._getToken().then(token=>{
             
@@ -190,23 +211,20 @@ class NewTripModal extends Component {
         }
     }
 
+    onDateChange = (date, type) => {
+        if (type === 'END_DATE') {
+          this.setState({ dateEnd: dateToString(date),})
+        } else {
+          this.setState({ dateStart: dateToString(date),})
+        }
+      }
+
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
     render() {
         return (
     <React.Fragment>
-      {/* <View style={modalStyles.modalHeader}>
-        <Button icon="close" style={{backgroundColor: 'white'}}
-            onPress={()=>this.props.setModalVisible(false)}>
-          <Text style={modalStyles.closeModalText}>
-            Close
-          </Text>
-        </Button>
-        <Text style={modalStyles.newTripGreeting}>
-            New Trip Info
-        </Text>
-      </View> */}
-
+      
       <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
         <Appbar.Content title="New Trip Info" titleStyle={styles.contentTitle} />
         <Button onPress={()=>this.props.setModalVisible(false)}
@@ -223,8 +241,27 @@ class NewTripModal extends Component {
             style={{margin: 20, borderRadius: 5, backgroundColor: 'rgb(255,255,255)' }} 
             error={this.state.errTripTitle}
         />
+
+
+      <View >
+        <CalendarPicker
+          startFromMonday={true}
+          allowRangeSelection={true}
+          //minDate={minDate}
+          //maxDate={maxDate}
+          todayBackgroundColor="#f2e6ff"
+          selectedDayColor="#7300e6"
+          selectedDayTextColor="#FFFFFF"
+          onDateChange={this.onDateChange}
+        />
+ 
+        <View>
+          <Text>SELECTED START DATE:{ this.state.dateStart ? this.state.dateStart.toString() : '' }</Text>
+          <Text>SELECTED END DATE:{ this.state.dateEnd ? this.state.dateEnd.toString() : '' }</Text>
+        </View>
+      </View>
         
-        <View style={modalStyles.datepicker}>
+        {/* <View style={modalStyles.datepicker}>
             <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
             <ModalDatePicker startDate={new Date()}
                 renderDate={({ year, month, day, date }) => {
@@ -258,7 +295,7 @@ class NewTripModal extends Component {
                     }
                 }}
             />
-        </View>
+        </View> */}
 
         <TouchableOpacity onPress={this.submitTripInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
@@ -299,10 +336,6 @@ class TripContainer extends Component {
     }
 
     componentDidMount = () => { 
-        // this.props.navigation.addListener('didFocus',payload => {
-        //     console.debug('didFocus', payload);
-        //     this._getTripInfo()
-        // })
         this._getTripInfo() 
     }
 
@@ -315,7 +348,6 @@ class TripContainer extends Component {
 
     _getTripInfo = () => {
         this._getToken().then(token=>{
-            //*
             fetch(serverURL+'/api/users/profile',{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -333,7 +365,6 @@ class TripContainer extends Component {
                 }
                 
             }).catch(err=>{ console.log(err) })
-            //*/
         }).catch(error=>{
             console.log("get token error:",error)
         })
@@ -367,8 +398,6 @@ class TripContainer extends Component {
         })
     }
 
-   
-
     deleteTrip = (index) => {
         console.log(this.state.trips[index])
         let tripId = this.state.trips[index].id
@@ -398,13 +427,10 @@ class TripContainer extends Component {
         let filteredTrips = this.state.trips.filter(trip=>{
             return (trip.id!==data.id)
         })
-        //this.setState({ trips: filteredTrips, })
-        //*
         this.setState({
             trips: filteredTrips,
             modalDelete: false,
         })
-        //*/
     }
 
     render() {
@@ -417,65 +443,6 @@ class TripContainer extends Component {
         this.state.trips.map((trip,index)=>{
             return allTrips.push({key: index.toString(), trip: trip})
         })
-        /*
-        let allTrips = []
-        this.state.trips.map((trip,index)=>{
-            return allTrips.push(
-                <Card style={cardStyles.card} key={index}>
-                  <Card.Content>
-                    <TouchableOpacity onPress={()=>this.toTripDetails(index)}>
-                    <Title style={{fontSize: 24, marginBottom: 5, fontFamily: 'Avenir'}}>
-                        {trip.title.toUpperCase()}
-                    </Title>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <Card.Cover source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
-                    
-                      <View style={{margin: 10}}>
-                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
-                            Duration: 
-                            <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+getDaysDiffText(trip.startDate,trip.endDate)}
-                            </Text>
-                        </Paragraph>
-                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
-                            From: 
-                            <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+trip.startDate}
-                            </Text> 
-                        </Paragraph>
-                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
-                            Till: 
-                            <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+trip.endDate}
-                            </Text> 
-                        </Paragraph>
-                      </View>
-                    
-                    </View>
-                    </TouchableOpacity>
-                  </Card.Content>
-
-                  <Card.Actions style={{ margin: 10 }}>
-                    <View style={{flexDirection: 'row', }}>
-                      <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(81, 148, 255)' }} icon="more" mode="contained"
-                        onPress={()=>this.toTripDetails(index)}>
-                        <Text>Details</Text>
-                      </Button>
-                      <Button style={{margin: 5, borderRadius: 5 }} icon="edit" mode="contained"
-                        onPress={()=>this.onPress(index)}>
-                        <Text>Edit</Text>
-                      </Button>
-                      <Button style={{margin: 5, borderRadius: 5, backgroundColor: 'rgb(255,0,0)' }} icon="delete" mode="contained"
-                        onPress={()=>this._onDeleteTrip(index)}>
-                        <Text>Delete</Text>
-                      </Button>
-                    </View>
-                  </Card.Actions>
-
-                </Card>
-            )
-        })
-        //*/
         
         return (
     <React.Fragment>
@@ -499,19 +466,21 @@ class TripContainer extends Component {
         <SwipeListView
             useFlatList
             data={allTrips}
+            disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
                 return(
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>
-                    
+                  <View>
+                    <Text style={{fontSize: 20, fontFamily: 'Avenir', marginTop: 10}}>
+                        {trip.title.toUpperCase()}
+                      </Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Image source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
-                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
-                        {trip.title.toUpperCase()}
-                        </Text>
-                      <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
-                        <Paragraph style={{fontSize: 12, fontFamily: 'Avenir'}}>
+                      
+                      <View style={{marginLeft: 10, alignSelf: 'flex-end', flexDirection: 'column'}}>
+                        <Paragraph style={{fontSize: 12, fontFamily: 'Avenir', margin: 0}}>
                             Duration: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+getDaysDiffText(trip.startDate,trip.endDate)}
@@ -520,11 +489,9 @@ class TripContainer extends Component {
                         <Paragraph style={{fontSize: 12, fontFamily: 'Avenir'}}>
                             From: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+trip.startDate}
+                                {' '+trip.startDate+' '}
                             </Text> 
-                        </Paragraph>
-                        <Paragraph style={{fontSize: 12, fontFamily: 'Avenir'}}>
-                            Till: 
+                            to 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.endDate}
                             </Text> 
@@ -532,6 +499,7 @@ class TripContainer extends Component {
                       </View>
                     
                     </View>
+                  </View>  
                 </TouchableHighlight >)
             }}
             renderHiddenItem={ (data, rowMap) => {
@@ -548,7 +516,7 @@ class TripContainer extends Component {
                     </Button>
                 </View>
             )}}
-            leftOpenValue={80}
+
             rightOpenValue={-80}
         />
 

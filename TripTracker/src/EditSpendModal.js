@@ -10,7 +10,6 @@ import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } f
 /**
  * STYLESHEETS
  */
-
 const modalStyles = StyleSheet.create({
     newLocGreeting: {
         textAlign: 'center', 
@@ -215,7 +214,7 @@ export default class EditSpendModal extends Component {
           </Text>
         </TouchableHighlight>
         <Text style={modalStyles.newLocGreeting}>
-            New Expense Info
+            Edit Expense Info
         </Text>
       </View>
 
