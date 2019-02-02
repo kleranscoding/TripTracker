@@ -90,7 +90,9 @@ export default class Profile extends Component {
       this._getLocationAsync()
     }
 
-    componentDidMount = () => {  this._getProfileInfo() }
+    componentDidMount = () => {  
+      //this._getProfileInfo() 
+    }
 
     componentWillUnmount = () => { this.focusListener.remove() }
     
@@ -106,7 +108,7 @@ export default class Profile extends Component {
 
     _getProfileInfo = () => {
       _getToken().then(token=>{
-        //console.log("profile: ",token)
+        console.log("profile: ",token)
         fetch(serverURL+'/api/users/profile',{
           method: 'GET',
           headers: { 'Authorization': `Bearer ${token}` }

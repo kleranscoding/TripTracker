@@ -275,7 +275,10 @@ class TripContainer extends Component {
 
     constructor(props) {
         super(props)
-        
+        this.focusListener = this.props.navigation.addListener('didFocus',payload => {
+            console.debug('didFocus', payload);
+            this._getTripInfo() 
+          })
         this.state= {
             trips: [], selectOnDelete: {},
             modalVisible: false, modalDelete: false,
@@ -294,10 +297,10 @@ class TripContainer extends Component {
     }
 
     componentDidMount = () => { 
-        this._getTripInfo() 
+        //this._getTripInfo() 
     }
 
-    _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
+    componentWillUnmount = () => { this.focusListener.remove() }
 
     _signOutAsync = async () => {
         await AsyncStorage.removeItem(tokenName)
@@ -305,7 +308,8 @@ class TripContainer extends Component {
     }
 
     _getTripInfo = () => {
-        this._getToken().then(token=>{
+        _getToken().then(token=>{
+            console.log("trip container= "+token)
             fetch(serverURL+'/api/users/profile',{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
