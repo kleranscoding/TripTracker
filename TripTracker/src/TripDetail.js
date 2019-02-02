@@ -6,7 +6,7 @@ import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
-import ModalDatePicker from 'react-native-datepicker-modal';
+import CalendarPicker from 'react-native-calendar-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -114,14 +114,9 @@ function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
 function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
 
-function createTimeStamp(timeRequired) {
-    let today = new Date();
-    let timestamp = `${today.getFullYear()}-${padZero(today.getMonth()+1)}-${padZero(today.getDate())}`
-    if (timeRequired) {
-        //console.log(today.getHours(),today.getMinutes())
-        timestamp = `${timestamp}T${padZero(today.getHours())}:${padZero(today.getMinutes())}:${padZero(today.getSeconds())}`
-    }
-    return timestamp;
+function dateToString(selectedDate) {
+    let date= new Date(selectedDate)
+    return `${date.getFullYear()}-${padZero(date.getMonth()+1)}-${padZero(date.getDate())}`
 }
 
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
@@ -190,21 +185,21 @@ class NewLocModal extends Component {
         let errMsgLoc= '', errDates= '' 
         //console.log(location);console.log(formatAddr);console.log(geocode);console.log(startDate, endDate)
         if (!location || validateWhtieSpaceOnly(location) ) {
-            errMsgLoc = '- Please enter a location'
+            errMsgLoc = '\n- Please enter a location'
         } else {
             errLoc= false
         }
         if (!(startDate && endDate)) {
-            errDates = "- Please select dates"
+            errDates = "\n- Please select dates"
         } else if (startDate.localeCompare(endDate)>0) {
-            errDates = "- Dates are invalid"
+            errDates = "\n- Dates are invalid"
         } else {
             errDateStart= false
             errDateEnd= false
         }
         console.log(errLoc, errDateStart, errDateEnd)
         if (errLoc || errDateStart || errDateEnd) {
-            Alert.alert("Hang on!\n"+errMsgLoc+'\n'+errDates)
+            Alert.alert("Hang on!"+errMsgLoc+errDates)
             return
         }
         
@@ -235,9 +230,13 @@ class NewLocModal extends Component {
         })
     }
 
-    setDate = (newDate)=> { this.setState({chosenDate: newDate}); }
-
-    updateDate = (name,date) => { this.setState({ [name]: date }) }
+    onDateChange = (date, type) => {
+        if (type === 'END_DATE') {
+          this.setState({ dateEnd: dateToString(date),})
+        } else {
+          this.setState({ dateStart: dateToString(date),})
+        }
+    }
 
     render() {
         return (
@@ -286,44 +285,24 @@ class NewLocModal extends Component {
 
         />
 
-        <View style={{margin: 25 }}>
-            {/* <View style={modalStyles.datepicker}> */}
-                <Text style={{fontSize: 18, margin: 10}}>Start Date: </Text>
-                <ModalDatePicker startDate={new Date()}
-                    renderDate={({ year, month, day, date }) => {
-                        let selectedDate = "Click here to select a start date"
-                        if (date) { 
-                            selectedDate = `${year}-${month}-${day}` 
-                        } else {
-
-                        }
-                        return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                    }}
-                    onDateChanged={({ year, month, day, date }) => {
-                        if (date) {
-                            this.updateDate("dateStart",`${year}-${month}-${day}`)
-                        }
-                    }}
-                />
-            {/* </View> */}
-            {/* <View style={modalStyles.datepicker}> */}
-                <Text style={{fontSize: 18, margin: 10}}>End Date: </Text>
-                <ModalDatePicker startDate={new Date()}
-                    renderDate={({ year, month, day, date }) => {
-                        let selectedDate = "Click here to select an end date"
-                        if (date) { 
-                            selectedDate = `${year}-${month}-${day}` 
-                        }
-                        return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                    }}
-                    onDateChanged={({ year, month, day, date }) => {
-                        if (date) {
-                            this.updateDate("dateEnd",`${year}-${month}-${day}`)
-                        }
-                    }}
-                />
-            {/* </View> */}
+        <View >
+        <CalendarPicker
+          startFromMonday={true}
+          allowRangeSelection={true}
+          //minDate={minDate}
+          //maxDate={maxDate}
+          todayBackgroundColor="#f2e6ff"
+          selectedDayColor="#7300e6"
+          selectedDayTextColor="#FFFFFF"
+          onDateChange={this.onDateChange}
+        />
+ 
+        <View>
+          <Text>SELECTED START DATE:{ this.state.dateStart ? this.state.dateStart.toString() : '' }</Text>
+          <Text>SELECTED END DATE:{ this.state.dateEnd ? this.state.dateEnd.toString() : '' }</Text>
         </View>
+      </View>
+
         
 
         <TouchableOpacity onPress={this.submitLocInfo} style={modalStyles["create_btn"]}>

@@ -217,7 +217,7 @@ class NewTripModal extends Component {
         } else {
           this.setState({ dateStart: dateToString(date),})
         }
-      }
+    }
 
     updateDate = (name,date) => { this.setState({ [name]: date }) }
 
