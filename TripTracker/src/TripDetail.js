@@ -14,7 +14,7 @@ import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
 
 import EditTripModal from './EditTripModal';
-
+import EditAvatarModal from './EditAvatarModal';
  
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -353,14 +353,15 @@ class TripList extends Component {
     constructor(props) {
         super(props)
         this.focusListener = this.props.navigation.addListener('didFocus',payload => {
-            console.debug('didFocus', payload);
+            //console.debug('didFocus', payload);
             this._getTripDetails()
           })
         this.state = { 
             tripDetails: {}, locations: [],
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
-            modalEditLoc: false, modalEditTrip: false,
+            modalEditLoc: false, modalEditTrip: false, 
+            modalTripImg: false,
             selectOnDelete: {}, selectOnEdit: {},
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
         }
@@ -496,7 +497,7 @@ class TripList extends Component {
         tripDetails.title= data.title
         tripDetails.startDate= data.startDate
         tripDetails.endDate= data.endDate
-        console.log(tripDetails)
+        //console.log(tripDetails)
         this.setState({
             tripDetails,
             modalEditTrip: false, 
@@ -504,12 +505,25 @@ class TripList extends Component {
         this.props.navigation.setParams({
             title: tripDetails.title
         })
-        console.log(this.props.navigation)
+        //console.log(this.props.navigation)
+    }
+
+    updateImage = (data,target) => {
+        let tripDetails = this.state.tripDetails
+        tripDetails.image= data.image
+        this.setState(prevState=>({
+            tripDetails, [target]: false,
+        }))
     }
 
     
     render() {
         
+        const defaultImageSetting= {
+            "target": "modalTripImg", "image": "images/default_trip.jpg", 
+            "route": `trips/${this.state.tripDetails.id}/image`,
+        }
+
         let allLocs = []
         if (this.state.tripDetails.locations) {
             this.state.tripDetails.locations.map((loc,index)=>{
@@ -534,11 +548,14 @@ class TripList extends Component {
         <View style={{backgroundColor: 'rgb(255,255,255)'}}>
             
             <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-              {/* <TouchableOpacity style={locStyles.deleteBtn} >
+              {/* <TouchableOpacity style={locStyles.deleteBtn} onPress={this.setModal()}>
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                         DELETE
                     </Text>
               </TouchableOpacity> */}
+              <Button onPress={()=>this.setState({modalTripImg: true})}>
+                Edit Trip photo
+              </Button>
               <TouchableOpacity style={locStyles.editBtn} onPress={()=>this._onEditTrip()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
@@ -628,6 +645,17 @@ class TripList extends Component {
             <EditTripModal selectOnEdit={this.state.selectOnEdit} 
                 setModalEdit={this.setModal}
                 editTrip={this._editTrip} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalTripImg}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalTripImg","")
+            }}>
+            <EditAvatarModal setting={defaultImageSetting}
+              currentImage={this.state.tripDetails.image}
+              setModal={this.setModal} 
+              updateImage={this.updateImage} />
         </Modal>
 
         </ImageBackground>

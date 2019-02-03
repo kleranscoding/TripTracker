@@ -78,7 +78,7 @@ export default class Profile extends Component {
     constructor(props) {
       super(props)
       this.focusListener = this.props.navigation.addListener('didFocus',payload => {
-        console.debug('didFocus', payload);
+        //console.debug('didFocus', payload);
         this._getProfileInfo()
       })
       this.state = {
