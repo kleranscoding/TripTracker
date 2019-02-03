@@ -117,6 +117,48 @@ router.post('/new',(req,res)=>{
     });
 });
 
+
+// edit trip
+router.put('/edit/:id',(req,res)=>{
+    if (req.headers.authorization===undefined) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+    
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Trip.findById(req.params.id).then(trip=>{
+        if (!trip) {
+            return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
+        }
+        if (trip.traveler.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
+        } else {
+            db.Trip.findByIdAndUpdate(req.params.id,{$set: req.body},{new: true},function(err,editedObj){
+                if (err) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+                } else {
+                    if (!editedObj) {
+                        return res.status(INTERNAL_ERR).json({"success": false, "message": "trip not found"});
+                    }
+                    return res.json({
+                        "id": editedObj.id,
+                        "title": editedObj.title, "startDate": editedObj.startDate, "endDate": editedObj.endDate,
+                        "isFav": editedObj.isFav, "image": editedObj.image, 
+                    });
+                }
+            });
+            
+        }
+    })
+});
+
 // delete trip by id
 router.delete('/delete/:id',(req,res)=>{
     if (req.headers.authorization===undefined) {

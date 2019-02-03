@@ -13,7 +13,8 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
 import { GOOGLAPI } from '../envAPI.js';
 
-import EditLocModal from './EditLocModal';
+import EditTripModal from './EditTripModal';
+
  
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -360,7 +361,7 @@ class TripList extends Component {
             tripDetails: {},
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
-            modalEditLoc: false,
+            modalEditLoc: false, modalEditTrip: false,
             selectOnDelete: {}, selectOnEdit: {},
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
         }
@@ -421,7 +422,7 @@ class TripList extends Component {
     toLocDetails = (index) => {
         //console.log(this.state.tripDetails.locations[index])
         this.props.navigation.navigate('LocationDetail',{
-            locId: this.state.tripDetails.locations[index].id, location: this.state.tripDetails.locations[index],
+            locId: this.state.tripDetails.locations[index].id, locDetails: this.state.tripDetails.locations[index],
         })
     }
 
@@ -484,33 +485,24 @@ class TripList extends Component {
         }))
     }
 
-    _onEditLoc = (index) => {
+    _onEditTrip = () => {
         this.setState({
-            selectOnEdit: this.state.tripDetails.locations[index], 
-            modalEditLoc: true,
+            selectOnEdit: this.state.tripDetails, 
+            modalEditTrip: true,
         })
     }
 
-    _editLoc = (data) => {
-        let filteredLocs = []
-        //*
-        this.state.tripDetails.locations.map(loc=>{
-            let origLoc= loc
-            if (loc.id===data.id) {
-                origLoc.location= data.location
-                origLoc.geocode= data.geocode
-                origLoc.formatAddress= data.formatAddress
-                origLoc.startDate= data.startDate
-                origLoc.endDate= data.endDate
-            }
-            return filteredLocs.push(origLoc)
+    _editTrip = (data) => {
+        let tripDetails = this.state.tripDetails
+        tripDetails.title= data.title
+        tripDetails.startDate= data.startDate
+        tripDetails.endDate= data.endDate
+        console.log(tripDetails)
+        this.setState({
+            tripDetails,
+            modalEditTrip: false, 
         })
-        //*/
-        //console.log(locDetails)
-        this.setState(prevState=>({
-            tripDetails: { ...prevState.tripDetails, locations: filteredLocs, },
-            modalEditLoc: false, 
-        }))
+        console.log(this.props.navigation)
     }
 
     
@@ -544,12 +536,12 @@ class TripList extends Component {
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                         DELETE
                     </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={locStyles.editBtn} >
+              </TouchableOpacity> */}
+              <TouchableOpacity style={locStyles.editBtn} onPress={()=>this._onEditTrip()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
               <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 18}}>
                         + Location
@@ -570,7 +562,7 @@ class TripList extends Component {
             style={{backgroundColor: 'rgb(255,255,255)'}}
             useFlatList
             data={allLocs}
-            
+            disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), loc = data.item.loc
                 return(
@@ -590,17 +582,18 @@ class TripList extends Component {
                 let index = parseInt(data.item.key)
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} 
+                    {/* <Button style={{borderRadius: 5 }} 
                         onPress={()=>this._onEditLoc(index)}>
                         <Text>Edit</Text>
-                    </Button>
+                    </Button> */}
+                    <Text />
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteLoc(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>
             )}}
-            leftOpenValue={80}
+            //leftOpenValue={80}
             rightOpenValue={-80}
         />
 
@@ -622,14 +615,14 @@ class TripList extends Component {
                 removeLoc={this._removeLoc} />
         </Modal>
 
-        <Modal animationType="slide" transparent={false} visible={this.state.modalEditLoc}
+        <Modal animationType="slide" transparent={false} visible={this.state.modalEditTrip}
           onRequestClose={() => {
               Alert.alert('Modal has been closed.')
-              this.setModal(false,"modalEditLoc","")
+              this.setModal(false,"modalEditTrip","")
             }}>
-            <EditLocModal selectOnEdit={this.state.selectOnEdit} 
+            <EditTripModal selectOnEdit={this.state.selectOnEdit} 
                 setModalEdit={this.setModal}
-                editLoc={this._editLoc} />
+                editTrip={this._editTrip} />
         </Modal>
 
         </ImageBackground>

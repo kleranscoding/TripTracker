@@ -118,6 +118,7 @@ export default class Profile extends Component {
               this.setState({
                 username: data.username, email: data.email, image: data.image, trips: data.trips,
               })
+              console.log("done getting profile details...")
             })
           }
         }).catch(err=>{ console.log(err) })

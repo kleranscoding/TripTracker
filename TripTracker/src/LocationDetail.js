@@ -15,6 +15,8 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
 
 import EditSpendModal from './EditSpendModal';
+import EditLocModal from './EditLocModal';
+
 
 /**
  * STYLESHEETS
@@ -474,9 +476,13 @@ export default class LocationDetail extends Component {
 
     constructor(props) {
         super(props)
+        this.focusListener = this.props.navigation.addListener('didFocus',payload => {
+            console.debug('didFocus', payload);
+            this._getLocDetails()
+        })
         this.state = { 
             selectOnDelete: {}, selectOnEdit: {},
-            locDetails: props.navigation.getParam("location"),
+            locDetails: props.navigation.getParam("locDetails"),
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
             modalEditLoc: false,
@@ -486,7 +492,7 @@ export default class LocationDetail extends Component {
 
     static navigationOptions =({navigation})=> {
         return {
-            title: navigation.getParam('location').location,
+            title: navigation.getParam('locDetails').location,
             headerTintColor: '#fafafa',
             headerTitleStyle: {
                 fontSize: 24, fontFamily: 'Avenir',
@@ -498,10 +504,8 @@ export default class LocationDetail extends Component {
     }
 
     componentDidMount = () => {
-        this._getLocDetails()
+        //this._getLocDetails()
     }
-
-    _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
     _getLocDetails = () => {
         _getToken().then(token=>{
@@ -509,6 +513,7 @@ export default class LocationDetail extends Component {
             if (!locId) {
                 this.props.navigation.goBack()
             }
+            console.log("loc details= ",token)
             fetch(serverURL+'/api/locations/'+locId,{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, },
@@ -516,6 +521,7 @@ export default class LocationDetail extends Component {
                 if (res.status===200) {
                   res.json().then(data=>{
                     this.setState({ locDetails: data })
+                    console.log("done getting loc details")
                   })
                 }
             }).catch(err=>{ console.log(err) })
@@ -613,6 +619,31 @@ export default class LocationDetail extends Component {
         }))
     }
 
+    _onEditLoc = () => {
+        this.setState({
+            selectOnEdit: this.state.locDetails, 
+            modalEditLoc: true,
+        })
+    }
+
+    _editLoc = (data) => {
+        let locDetails = this.state.locDetails
+        locDetails.location= data.location
+        locDetails.geocode= data.geocode
+        locDetails.formatAddress= data.formatAddress
+        locDetails.startDate= data.startDate
+        locDetails.endDate= data.endDate
+        console.log(locDetails)
+        this.setState({
+            locDetails,
+            modalEditLoc: false, 
+        })
+        console.log(this.props.navigation)
+        this.props.navigation.navigate('LocationDetail',{
+            locId: locDetails.id, locDetails: locDetails,
+        })
+    }
+
 
     render() {
         
@@ -636,13 +667,12 @@ export default class LocationDetail extends Component {
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     DELETE
                 </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this.setModal(true,"modalEditLoc","")}>
+            </TouchableOpacity>*/}
+            <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this._onEditLoc()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
             </TouchableOpacity>
-             */}
             <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     + Expenses
@@ -728,6 +758,16 @@ export default class LocationDetail extends Component {
             <EditSpendModal selectOnEdit={this.state.selectOnEdit} 
                 setModalEdit={this.setModal}
                 editSpending={this._editSpending} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalEditLoc}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalEditLoc","")
+            }}>
+            <EditLocModal selectOnEdit={this.state.selectOnEdit} 
+                setModalEdit={this.setModal}
+                editLoc={this._editLoc} />
         </Modal>
 
     </React.Fragment>

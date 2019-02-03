@@ -155,7 +155,7 @@ export default class EditLocModal extends Component {
     <React.Fragment>
         
       <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-        <Appbar.Content title="New Location Info" titleStyle={styles.contentTitle} />
+        <Appbar.Content title="Edit Location Info" titleStyle={styles.contentTitle} />
         <Button onPress={()=>this.props.setModalEdit(false,"modalEditLoc","")}
             style={{alignItems: 'center', alignContent: 'flex-end'}}>
             <Text style={{color: "rgb(255,255,255)"}}>Close</Text>

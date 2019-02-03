@@ -155,7 +155,7 @@ class NewTripModal extends Component {
         let errMsgTitle='', errMsgDate= ''
         console.log(tripTitle, startDate, endDate)
         if (!tripTitle || validateWhtieSpaceOnly(tripTitle) ) {
-            errMsgTitle= '\n- Please enter a title'
+            errMsgTitle= '\n- Please enter a trip name'
             this.setState({errTripTitle: true})
         } else {
             errTitle= false
@@ -300,7 +300,7 @@ class TripContainer extends Component {
         //this._getTripInfo() 
     }
 
-    componentWillUnmount = () => { this.focusListener.remove() }
+    //componentWillUnmount = () => { this.focusListener.remove() }
 
     _signOutAsync = async () => {
         await AsyncStorage.removeItem(tokenName)
@@ -317,6 +317,7 @@ class TripContainer extends Component {
                 if (res.status===200) {
                     res.json().then(data=>{
                         this.setState({ trips: data.trips, })
+                        console.log("done getting trips...")
                     })
                 } else {
                     res.json().then(data=>{
