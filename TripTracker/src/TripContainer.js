@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingLeft: 15,
+		paddingLeft: 5,
     },
 })
 
@@ -491,7 +491,7 @@ class TripContainer extends Component {
                     </Button>
                 </View>
             )}}
-            leftOpenValue={160}
+            leftOpenValue={140}
             rightOpenValue={-80}
         />
 
