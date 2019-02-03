@@ -9,7 +9,7 @@ import { Constants, Location, Permissions } from 'expo';
 
 import { serverURL, tokenName, imgHgtWdt } from './config/envConst';
 import Logout from './screens/Logout';
-import ImagePickerExample from './ImagePickerExample';
+import EditAvatarModal from './EditAvatarModal';
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -84,7 +84,7 @@ export default class Profile extends Component {
       this.state = {
         username: '', email: '', image: '', trips: [],
         modalExit: false, geolocation: null,
-        modalCamera: false,
+        modalAvatar: false,
       }
     }
 
@@ -106,6 +106,12 @@ export default class Profile extends Component {
       }
       let geolocation = await Location.getCurrentPositionAsync({});
       this.setState({ geolocation })
+    }
+
+    updateAvatar = (data) => {
+        this.setState({
+          image: data.image, modalAvatar: false,
+        })
     }
 
     _getProfileInfo = () => {
@@ -187,8 +193,8 @@ export default class Profile extends Component {
         
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
-          <Button onPress={()=>this.setState({modalCamera: true})}>
-            Open Camera
+          <Button onPress={()=>this.setState({modalAvatar: true})}>
+            Edit Avatar
           </Button>
         </ScrollView>
 
@@ -200,12 +206,12 @@ export default class Profile extends Component {
             <Logout setModalExit={this.setModalExit} navigation={this.props.navigation} />
         </Modal>
 
-        <Modal animationType="slide" transparent={false} visible={this.state.modalCamera}
+        <Modal animationType="slide" transparent={false} visible={this.state.modalAvatar}
           onRequestClose={() => {
               Alert.alert('Modal has been closed.')
-              this.setModalExit(false)
+              this.setModal(false,"modalAvatar","")
             }}>
-            <ImagePickerExample setModalCamera={this.setModal} />
+            <EditAvatarModal setModalAvatar={this.setModal} updateAvatar={this.updateAvatar} />
         </Modal>
         
     </React.Fragment>
