@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AsyncStorage, StyleSheet, View, Text, Image, 
+import { AsyncStorage, StyleSheet, View, Text, Image, Alert,
     ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button } from  'react-native-paper';
@@ -9,6 +9,7 @@ import { Constants, Location, Permissions } from 'expo';
 
 import { serverURL, tokenName, imgHgtWdt } from './config/envConst';
 import Logout from './screens/Logout';
+import ImagePickerExample from './ImagePickerExample';
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -61,7 +62,7 @@ class MapContainer extends Component {
 
   render() {
       return(
-        <MapView style={{margin: 25, height: '25%'}} 
+        <MapView style={{margin: 10, height: 250}} 
           initialRegion={this.state.region} >
           <Marker
             coordinate={this.state.region}
@@ -83,6 +84,7 @@ export default class Profile extends Component {
       this.state = {
         username: '', email: '', image: '', trips: [],
         modalExit: false, geolocation: null,
+        modalCamera: false,
       }
     }
 
@@ -94,16 +96,16 @@ export default class Profile extends Component {
       //this._getProfileInfo() 
     }
 
-    //componentWillUnmount = () => { this.focusListener.remove() }
+    componentWillUnmount = () => { this.focusListener.remove() }
     
     _getLocationAsync = async () => {
       let { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status !== 'granted') { 
         Alert.alert('Permission to access location was denied'); 
-        return; 
+        return
       }
       let geolocation = await Location.getCurrentPositionAsync({});
-      this.setState({ geolocation });
+      this.setState({ geolocation })
     }
 
     _getProfileInfo = () => {
@@ -131,6 +133,11 @@ export default class Profile extends Component {
       this.setState({ modalExit: visible})
     }
 
+    setModal = (visible,modalType,selectOnType) => {
+      this.setState({
+          [modalType]: visible, [selectOnType]: {},
+      })
+    }
 
     render() {
       
@@ -173,11 +180,16 @@ export default class Profile extends Component {
             <Text style={styles.profileInfo}>{this.state.email}</Text>
           </View> 
         </View>
-        { this.state.geolocation && <MapContainer username={this.state.username} geolocation={this.state.geolocation.coords} /> }
+
+         { this.state.geolocation && 
+            <MapContainer username={this.state.username} geolocation={this.state.geolocation.coords} /> }
+          
         
-      
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
+          <Button onPress={()=>this.setState({modalCamera: true})}>
+            Open Camera
+          </Button>
         </ScrollView>
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalExit}
@@ -186,6 +198,14 @@ export default class Profile extends Component {
               this.setModalExit(false)
             }}>
             <Logout setModalExit={this.setModalExit} navigation={this.props.navigation} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalCamera}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModalExit(false)
+            }}>
+            <ImagePickerExample setModalCamera={this.setModal} />
         </Modal>
         
     </React.Fragment>
