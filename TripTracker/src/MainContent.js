@@ -63,7 +63,7 @@ const MainContentStack = createBottomTabNavigator({
     },
 },
 {
-    initialRouteName: 'Trips',
+    initialRouteName: 'Profile',
     tabBarOptions: {
         activeTintColor: 'rgb(248,248,248)', 
         inactiveTintColor: 'rgb(143,154,186)',  

@@ -300,7 +300,7 @@ class TripContainer extends Component {
         //this._getTripInfo() 
     }
 
-    //componentWillUnmount = () => { this.focusListener.remove() }
+    componentWillUnmount = () => { this.focusListener.remove() }
 
     _signOutAsync = async () => {
         await AsyncStorage.removeItem(tokenName)

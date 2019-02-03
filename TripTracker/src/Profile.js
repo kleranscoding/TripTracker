@@ -94,7 +94,7 @@ export default class Profile extends Component {
       //this._getProfileInfo() 
     }
 
-    componentWillUnmount = () => { this.focusListener.remove() }
+    //componentWillUnmount = () => { this.focusListener.remove() }
     
     _getLocationAsync = async () => {
       let { status } = await Permissions.askAsync(Permissions.LOCATION);

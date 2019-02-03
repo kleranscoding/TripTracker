@@ -639,8 +639,8 @@ export default class LocationDetail extends Component {
             modalEditLoc: false, 
         })
         console.log(this.props.navigation)
-        this.props.navigation.navigate('LocationDetail',{
-            locId: locDetails.id, locDetails: locDetails,
+        this.props.navigation.setParams({
+            locDetails
         })
     }
 

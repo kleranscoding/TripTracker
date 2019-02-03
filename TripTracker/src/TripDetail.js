@@ -502,6 +502,9 @@ class TripList extends Component {
             tripDetails,
             modalEditTrip: false, 
         })
+        this.props.navigation.setParams({
+            title: tripDetails.title
+        })
         console.log(this.props.navigation)
     }
 
