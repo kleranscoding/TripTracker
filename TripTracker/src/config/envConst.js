@@ -1,5 +1,5 @@
 
-const index = 0+3
+const index = 0+1
 
 const urls = [
     "http://10.1.6.227:8001",
@@ -62,11 +62,11 @@ export const Categories = [
 export const CategoryPieChart = [
     {
         "label": "Accommadtions",
-        "color": "blue",
+        "color": "rgb(49,90,158)",
     },
     {
         "label": "Transportation",
-        "color": "green",
+        "color": "rgb(36,152,219)",
     },
     {
         "label": "Shopping",

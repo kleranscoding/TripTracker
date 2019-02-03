@@ -124,43 +124,48 @@ router.post('/avatar',upload.any(),(req,res)=>{
         decodedToken["success"]= false;
         return res.status(UNAUTH).json(decodedToken);
     }
-    if (req.files.length>0) { 
-        let image_path= req.files[0].path.replace("public/","")
-        db.User.findById(decodedToken.id).then(user=>{
-            if (!user) {
-                return res.status(UNAUTH).json({
-                    "success": false, "message": "user not found"
+
+    db.User.findById(decodedToken.id).then(user=>{
+        if (!user) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "user not found"
+            });
+        }
+        if (user._id.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "invalid user"
+            });
+        }
+        let image_path= defaultImg
+        if (req.files.length>0) { 
+            image_path= req.files[0].path.replace("public/","")
+        } else {
+            if (!req.body) {
+                return res.status(BAD_REQ).json({
+                    "success": false, "message": "no image uploaded"
                 });
             }
-            if (user._id.toString()!==decodedToken.id) {
-                return res.status(UNAUTH).json({
-                    "success": false, "message": "invalid user"
-                });
-            }
-            db.User.findByIdAndUpdate(user._id,{$set: {"image": image_path}},{new: true},function(err,editedObj){
-                if (err) {
-                    return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
-                } else {
-                    console.log(editedObj)
-                    if (!editedObj) {
-                        return res.status(INTERNAL_ERR).json({"success": false, "message": "user not found"});
-                    }
-                    console.log("no err",editedObj)
-                    return res.json({
-                        "username": editedObj.username, "email": editedObj.email, "image": editedObj.image, 
-                    });
+            image_path= req.body["defaultImage"]
+        }
+        db.User.findByIdAndUpdate(user._id,{$set: {"image": image_path}},{new: true},function(err,editedObj){
+            if (err) {
+                return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+            } else {
+                console.log(editedObj)
+                if (!editedObj) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "user not found"});
                 }
-            });
-        }).catch(err=>{
-            return res.status(INTERNAL_ERR).json({
-                "success": false, "message": "db error"
-            });
-        })
-    } else {
-        return res.status(BAD_REQ).json({
-            "success": false, "message": "no image uploaded"
+                console.log("no err",editedObj)
+                return res.json({
+                    "username": editedObj.username, "email": editedObj.email, "image": editedObj.image, 
+                });
+            }
         });
-    }
+    }).catch(err=>{
+        return res.status(INTERNAL_ERR).json({
+            "success": false, "message": "db error"
+        });
+    });
 });
 
 
