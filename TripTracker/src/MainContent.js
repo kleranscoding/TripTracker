@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Profile from './Profile';
 import TripScreen from './TripContainer';
-
+import Favorites from './Favorites';
 
 const styles = StyleSheet.create({
     appbarHeader:{
@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     },
 })
 
+/*
 class Favorites extends Component {
     render() {
         return(
@@ -32,6 +33,7 @@ class Favorites extends Component {
         )
     }
 }
+//*/
 
 const MainContentStack = createBottomTabNavigator({ 
     Profile: {

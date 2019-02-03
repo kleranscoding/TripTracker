@@ -357,8 +357,7 @@ class TripList extends Component {
             this._getTripDetails()
           })
         this.state = { 
-            locations: [],
-            tripDetails: {},
+            tripDetails: {}, locations: [],
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
             modalEditLoc: false, modalEditTrip: false,
@@ -572,11 +571,14 @@ class TripList extends Component {
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toLocDetails(index)}>
                     
-                    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                    <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {loc.location.split(",")[0]+' ...'}
                       </Text>
-                      <Text>Date: {loc.startDate} to {loc.endDate}</Text> 
+                      <Text>
+                          Date: {loc.startDate.split('-').join('/')+' '} 
+                            to {loc.endDate.split('-').join('/')}
+                      </Text> 
                     </View>
 
                 </TouchableHighlight>)

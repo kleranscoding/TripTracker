@@ -63,7 +63,6 @@ router.get('/profile',(req,res)=>{
     
     if (decodedToken.id===undefined) {
         decodedToken["success"]= false;
-        console.log(decodedToken)
         return res.status(UNAUTH).json(decodedToken);
     }
 
@@ -95,10 +94,10 @@ router.get('/profile',(req,res)=>{
             return res.status(INTERNAL_ERR).json({
                 "success": false, "message": "db error"
             });
-        })
-        
-    })
+        }); 
+    });
 })
+
 
 
 // register route
@@ -144,7 +143,56 @@ router.post('/register',(req,res)=>{
             });
         });
     });
-})
+});
+
+
+// get favorites
+router.get('/favorite',(req,res)=>{
+    console.log(req)
+    let auth = req.headers.authorization;
+    if (auth===undefined || auth===null) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+    
+    db.User.findById(decodedToken.id).then(user=>{
+        if (!user) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "user not found"
+            });
+        }
+        db.Trip.find({"traveler": decodedToken.id, "isFav": true}).then(trips=>{
+            let userTrips = [];
+            trips.map(trip=>{
+                userTrips.push({
+                    "id": trip._id, "title": trip.title,
+                    "startDate": trip.startDate, "endDate": trip.endDate,
+                    "isFav": trip.isFav, "image": trip.image,  
+                });
+            });
+            return res.json(userTrips);
+        }).catch(err=>{
+            console.log(err)
+            return res.status(INTERNAL_ERR).json({
+                "success": false, "message": "db error"
+            });
+        });
+        
+    }).catch(err=>{
+        console.log("some error")
+        console.log(err)
+    });
+});
+
+
 
 // login route
 router.post('/login',(req,res)=>{

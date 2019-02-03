@@ -388,26 +388,6 @@ class NewSpendModal extends Component {
             </View>
         </View>
 
-        {/* <View style={modalStyles.datepicker}>
-            <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
-            <ModalDatePicker startDate={new Date()}
-                renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Click here to select a date"
-                    if (date) { 
-                        selectedDate = `${year}-${month}-${day}` 
-                    } else {
-                        selectedDate= createTimeStamp(false)
-                    }
-                    return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                }}
-                onDateChanged={({ year, month, day, date }) => {
-                    if (date) {
-                        this.updateDate("date",`${year}-${month}-${day}`)
-                    }
-                }}
-            />
-        </View> */}
-
         <TextInput label='What did you spend on?' mode="outlined" 
             onChangeText={text => this.setState({ name: text })}
             style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
@@ -701,7 +681,7 @@ export default class LocationDetail extends Component {
                         {spend.name}
                       </Text>
                       <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
-                        <Text>on {spend.date}</Text>
+                        <Text>on {spend.date.split('-').join('/')}</Text>
                         <Text>{spend.category}</Text>
                       </View>
                     </View>

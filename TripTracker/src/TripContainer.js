@@ -100,11 +100,6 @@ const cardStyles = StyleSheet.create({
  */
 function validateWhtieSpaceOnly(text) { return regexWhitespaceOnly.test(text) }
 
-function getDaysDiff(startDateText,endDateText) {
-    var timeDiff = new Date(endDateText) - new Date(startDateText)
-    return Math.ceil(timeDiff / (1000 * 3600 * 24))+1
-}
-
 function getDaysDiffText(startDateText,endDateText) {
     var timeDiff = new Date(endDateText) - new Date(startDateText)
     var dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))+1
@@ -115,16 +110,6 @@ function getDaysDiffText(startDateText,endDateText) {
 }
 
 function padZero(num) { return (num>=0 && num<=9)? `0${num}`:`${num}`; }
-
-function createTimeStamp(timeRequired) {
-    let today = new Date();
-    let timestamp = `${today.getFullYear()}-${padZero(today.getMonth()+1)}-${padZero(today.getDate())}`
-    if (timeRequired) {
-        //console.log(today.getHours(),today.getMinutes())
-        timestamp = `${timestamp}T${padZero(today.getHours())}:${padZero(today.getMinutes())}:${padZero(today.getSeconds())}`
-    }
-    return timestamp;
-}
 
 function dateToString(selectedDate) {
     let date= new Date(selectedDate)
@@ -280,7 +265,7 @@ class TripContainer extends Component {
             this._getTripInfo() 
           })
         this.state= {
-            trips: [], selectOnDelete: {},
+            selectOnDelete: {}, selectOnEdit: {}, trips: [],
             modalVisible: false, modalDelete: false,
         }
     }
@@ -344,8 +329,34 @@ class TripContainer extends Component {
 
     setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
     
-    onPress = (index) => {
+    favToggle = (index) => {
         console.log(this.state.trips[index])
+        _getToken().then(token=>{
+            
+            fetch(serverURL+'/api/trips/edit/'+this.state.trips[index].id,{
+                method: 'PUT',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "isFav": !this.state.trips[index].isFav, 
+                }),
+            }).then(res=>{
+                if (res.status===200) {
+                    res.json().then(data=>{
+                        console.log("edit trips isFav: ")
+                        console.log(data)
+                        let filteredTrips = this.state.trips
+                        filteredTrips[index].isFav = data.isFav
+                        this.setState({ trips: filteredTrips, })
+                    })
+                }
+            }).catch(err=>{ console.log(err) })
+        }).catch(error=>{
+            console.log("get token error:",error)
+        })
     }
 
     toTripDetails = (index) => {
@@ -415,9 +426,9 @@ class TripContainer extends Component {
           
           {numTrips}          
           
-          <Button style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 15}} icon="add" mode="contained"
+          <Button style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 20}} icon="add" mode="contained"
             onPress={()=>this.setModalVisible(true)}>
-            <Text style={{textAlign: 'center', padding: 5, color: 'rgb(255,255,255)', fontSize: 14}}>
+            <Text style={{textAlign: 'center', color: 'rgb(255,255,255)', fontSize: 14}}>
               Trip
             </Text>  
           </Button>
@@ -429,7 +440,7 @@ class TripContainer extends Component {
         <SwipeListView
             useFlatList
             data={allTrips}
-            disableRightSwipe={true}
+            //disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
                 return(
@@ -443,20 +454,20 @@ class TripContainer extends Component {
                       <Image source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                       
                       <View style={{marginLeft: 10, alignSelf: 'flex-end', flexDirection: 'column'}}>
-                        <Paragraph style={{fontSize: 12, fontFamily: 'Avenir', margin: 0}}>
+                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir', margin: 0}}>
                             Duration: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+getDaysDiffText(trip.startDate,trip.endDate)}
                             </Text>
                         </Paragraph>
-                        <Paragraph style={{fontSize: 12, fontFamily: 'Avenir'}}>
+                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir'}}>
                             From: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+trip.startDate+' '}
+                                {' '+trip.startDate.split('-').join('/')+' '}
                             </Text> 
                             to 
                             <Text style={{color: 'rgb(49,90,158)'}}>
-                                {' '+trip.endDate}
+                                {' '+trip.endDate.split('-').join('/')}
                             </Text> 
                         </Paragraph>
                       </View>
@@ -467,19 +478,20 @@ class TripContainer extends Component {
             }}
             renderHiddenItem={ (data, rowMap) => {
                 let index = parseInt(data.item.key)
+                let isFav = data.item.trip.isFav
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} 
-                        onPress={()=>this.onPress(index)}>
-                        <Text>Edit</Text>
+                    <Button style={{borderRadius: 5 }} icon={isFav? 'star': ''}
+                        onPress={()=>this.favToggle(index)}>
+                        <Text>{isFav? 'Remove':'Add to favorite'}</Text>
                     </Button>
-                    <Button style={{borderRadius: 5,  }} 
+                    <Button style={{borderRadius: 5, }} 
                         onPress={()=>this._onDeleteTrip(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>
             )}}
-
+            leftOpenValue={160}
             rightOpenValue={-80}
         />
 
