@@ -58,3 +58,30 @@ export const Categories = [
         "icon": "receipt",
     },
 ]
+
+export const CategoryPieChart = [
+    {
+        "label": "Accommadtions",
+        "color": "blue",
+    },
+    {
+        "label": "Transportation",
+        "color": "green",
+    },
+    {
+        "label": "Shopping",
+        "color": "red",
+    },
+    {
+        "label": "Food",
+        "color": "yellow",
+    },
+    {
+        "label": "Tickets",
+        "color": "orange",
+    }, 
+    {
+        "label": "Misc.",
+        "color": "grey",
+    },
+]

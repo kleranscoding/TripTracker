@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { AsyncStorage, StyleSheet, View, Text, 
+import { AsyncStorage, StyleSheet, View, Text, ScrollView, StatusBar, 
     TouchableHighlight, Modal, Alert, TouchableOpacity, Dimensions, } from 'react-native';
 import { Appbar, Button, TextInput, Card, Title, Paragraph  } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-import { Categories, serverURL, tokenName, regexWhitespaceOnly, currencyInfo } from './config/envConst';
+import { serverURL, tokenName, regexWhitespaceOnly, 
+    Categories, CategoryPieChart, currencyInfo } from './config/envConst';
 
 import EditSpendModal from './EditSpendModal';
 import EditLocModal from './EditLocModal';
@@ -195,7 +195,7 @@ export default class LocationDetail extends Component {
             typeFlatList: true, 
             selectOnDelete: {}, selectOnEdit: {},
             locDetails: props.navigation.getParam("locDetails"),
-            resize: false,
+            resize: false, showChart: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
             modalEditLoc: false,
             imgView: styles.imgView, imgSize: styles.imgSmall,
@@ -368,6 +368,7 @@ export default class LocationDetail extends Component {
                 allSpendings.push({key: index.toString(), spend: spend})
             })
         }
+        console.log(spendingCat)
         // convert object to SectionList
         let sectionSpendings= []
         for (let key in spendingCat) {
@@ -378,8 +379,13 @@ export default class LocationDetail extends Component {
     <React.Fragment>
         <View >
             <Text>{this.state.locDetails.location}</Text>
-            <MapContainer location={this.state.locDetails.location} 
-                geocode={this.state.locDetails.geocode} />
+            {allSpendings.length>0 && <Button onPress={()=>{this.setState({showChart: !this.state.showChart})}}>
+                show Graph
+            </Button>}
+            {/* <MapContainer location={this.state.locDetails.location} 
+                geocode={this.state.locDetails.geocode} /> */}
+                {this.state.showChart &&  <PieChart2 spendingCat={spendingCat}/> }
+            
         </View>
         
         <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
@@ -404,6 +410,8 @@ export default class LocationDetail extends Component {
         {this.state.locDetails.spendings!==undefined?
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
         </View>
+
+        
 
         {!this.state.typeFlatList && 
         <SwipeListView
@@ -594,5 +602,40 @@ class DeleteSpendModal extends Component {
 
             </React.Fragment>
         )
+    }
+}
+
+import PureChart from 'react-native-pure-chart';
+
+class PieChart2 extends Component {
+    render() {
+        let sampleData = [], sampleData2= []
+        CategoryPieChart.map(catOpt=>{
+            let catArr = this.props.spendingCat[catOpt.label]
+            let val = 0.0
+            catArr.map(spend=>{ 
+                console.log(spend.data)
+                val+= spend.data.amount 
+            })
+
+            sampleData.push({
+                'value': val, 'label': catOpt.label, 'color': catOpt.color
+            })
+            sampleData2.push({
+                'y': val, 'x': catOpt.label, 
+            })
+            
+        })
+        
+        console.log(sampleData)
+        
+        return (
+            <View>
+                <PureChart data={sampleData} type='pie' />
+            
+            </View>
+            
+        )
+        //return <Text>Bang!</Text>
     }
 }
