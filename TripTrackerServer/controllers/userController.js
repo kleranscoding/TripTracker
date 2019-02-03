@@ -25,11 +25,11 @@ let multerStorage = multer.diskStorage({
     filename: ( req, file, cb )=> {
         cb( null, "avatar_"+file.originalname);
     }
-})
+});
 const upload = multer({
     storage: multerStorage,
     limits: { fileSize: maxFileSize }
-})
+});
 
 /* /////////////// HELPER FUNCTIONS /////////////// */
 

@@ -11,22 +11,19 @@ const cameraRollOption = {
     aspect: [4, 3],
 }
 
-const defaultConstant = {
-  'profile': {"image": "images/default_profile.jpg", "route": "users/avatar"},
-  'location': {"image": "images/default_trip.jpg", "route": "trips/"},
-}
-
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
 export default class EditAvatarModal extends React.Component {
-  state = {
-    image: null,
-    uploading: false,
-    cameraPermission: null,
-    cameraRollPermission: null,
-    type: Camera.Constants.Type.back, 
-    useDefault: false,
-    defaultSetting: defaultConstant['profile']
+  constructor(props) {
+    super(props)
+    this.state = {
+      image: null,
+      uploading: false,
+      cameraPermission: null,
+      cameraRollPermission: null,
+      type: Camera.Constants.Type.back, 
+      useDefault: false,
+    }
   }
 
   _pickImage = async () => {
@@ -56,17 +53,9 @@ export default class EditAvatarModal extends React.Component {
     }
   }
 
-  submitImage = async() => {
-      if (!this.state.image && !this.state.useDefault) {
-        Alert.alert("Hang On!\n- Please select a photo")
-        return
-      }
-      this._uploadImage(this.state.image)
-  }
-
   _sendRequest = async(formData) => {
     _getToken().then(token=>{
-      fetch(serverURL+'/api/'+this.state.defaultSetting.route, {
+      fetch(serverURL+'/api/'+this.props.setting.route, {
           method: 'POST',
           body: formData,
           headers: {
@@ -77,8 +66,7 @@ export default class EditAvatarModal extends React.Component {
       }).then(res=>{
         if (res.status===200) {
           res.json().then(data=>{
-            this.props.updateAvatar(data)
-            console.log("done editing avatar...")
+            this.props.updateImage(data,this.props.setting.target)
           })
         }
       }).catch(err=>{ console.log(err) })
@@ -90,7 +78,13 @@ export default class EditAvatarModal extends React.Component {
   _useDefault = () => {
     //console.log("default")
     this.setState({
-      image: this.state.defaultSetting.image, useDefault: true,
+      image: this.props.setting.image, useDefault: true,
+    })
+  }
+
+  _resetImage = () => {
+    this.setState({
+      image: this.props.currentImage, useDefault: true,
     })
   }
 
@@ -109,21 +103,44 @@ export default class EditAvatarModal extends React.Component {
     this._sendRequest(formData)
   }
 
+
+  submitImage = async() => {
+    if (!this.state.image && !this.state.useDefault) {
+      Alert.alert("Hang On!\n- no photo selected")
+      return
+    }
+    if (this.state.image===this.props.currentImage) {
+      this.props.setModal(false,this.props.setting.target,"")
+      return
+    }
+    this._uploadImage(this.state.image)
+  }
+
+
   render() {
     return (
     <React.Fragment>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button onPress={()=>this.props.setModalAvatar(false,"modalAvatar","")}
+          <Button onPress={()=>this.props.setModal(false,this.props.setting.target,"")}
                 style={{ fontSize: 18, marginBottom: 10, color: 'white', alignSelf: 'flex-end' }}>
                 {' '}&times; Close{' '}
           </Button>
-          
+          {this.state.image ?
+          <Image style={{ width: 200, height: 200 }}
+            source={{ uri: this.state.useDefault? serverURL+'/'+this.state.image: this.state.image }} />:
+          <Image style={{ width: 200, height: 200 }}
+            source={{ uri: serverURL+'/'+this.props.currentImage }} />
+          }
           <Button onPress={this._pickImage}>Pick an image from camera roll</Button>
           <Button onPress={this._snapPhoto}>Take a picture with camera</Button>
-          <Button onPress={this._useDefault}>Use default</Button>
-          {this.state.image && <Image source={{ uri: this.state.useDefault? serverURL+'/'+this.state.image: this.state.image }} style={{ width: 200, height: 200 }} />}
+          
           <View style={{flexDirection: 'row'}}>
-            <Button onPress={()=>this.props.setModalAvatar(false,"modalAvatar","")}>
+            <Button onPress={this._useDefault}>Use default</Button>
+            <Button onPress={this._resetImage}>Reset</Button>
+          </View>
+        
+          <View style={{flexDirection: 'row'}}>
+            <Button onPress={()=>this.props.setModal(false,this.props.setting.target,"")}>
               Cancel
             </Button>
             <Button onPress={this.submitImage}>Upload image</Button>

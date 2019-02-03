@@ -20,7 +20,16 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-
+let multerStorage = multer.diskStorage({
+    destination: 'public/uploads/',
+    filename: ( req, file, cb )=> {
+        cb( null, "trip_"+file.originalname);
+    }
+});
+const upload = multer({
+    storage: multerStorage,
+    limits: { fileSize: maxFileSize }
+});
 
 
 function verifyToken(token) {
@@ -82,6 +91,70 @@ router.get('/:id',(req,res)=>{
         }
     });
 });
+
+
+
+// edit trip image
+router.post('/:id/image',upload.any(),(req,res)=>{
+    let auth = req.headers.authorization;
+    if (auth===undefined || auth===null) {
+        return res.status(FORBIDDEN).json({
+            "success": false, "message": "forbidden"
+        });
+    }
+    let userToken = req.headers.authorization.split(" ")[1];
+    let decodedToken = verifyToken(userToken);
+
+    if (decodedToken.id===undefined) {
+        decodedToken["success"]= false;
+        return res.status(UNAUTH).json(decodedToken);
+    }
+
+    db.Trip.findById(req.params.id).then(trip=>{
+        if (!trip) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "trip not found"
+            });
+        }
+        if (trip.traveler.toString()!==decodedToken.id) {
+            return res.status(UNAUTH).json({
+                "success": false, "message": "invalid user"
+            });
+        }
+        let image_path= defaultImg
+        if (req.files.length>0) { 
+            image_path= req.files[0].path.replace("public/","")
+        } else {
+            if (!req.body) {
+                return res.status(BAD_REQ).json({
+                    "success": false, "message": "no image uploaded"
+                });
+            }
+            image_path= req.body["defaultImage"]
+        }
+        db.Trip.findByIdAndUpdate(req.params.id,{$set: {"image": image_path}},{new: true},function(err,editedObj){
+            if (err) {
+                return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
+            } else {
+                console.log(editedObj)
+                if (!editedObj) {
+                    return res.status(INTERNAL_ERR).json({"success": false, "message": "trip not found"});
+                }
+                console.log("no err",editedObj)
+                return res.json({
+                    "id": editedObj._id,
+                    "title": editedObj.title, "startDate": editedObj.startDate, "endDate": editedObj.endDate,
+                    "isFav": editedObj.isFav, "image": editedObj.image, 
+                });
+            }
+        });
+    }).catch(err=>{
+        return res.status(INTERNAL_ERR).json({
+            "success": false, "message": "db error"
+        });
+    });
+});
+
 
 
 // create new trip

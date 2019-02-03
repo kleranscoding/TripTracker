@@ -108,9 +108,9 @@ export default class Profile extends Component {
       this.setState({ geolocation })
     }
 
-    updateAvatar = (data) => {
+    updateImage = (data,target) => {
         this.setState({
-          image: data.image, modalAvatar: false,
+          image: data.image, [target]: false,
         })
     }
 
@@ -146,7 +146,10 @@ export default class Profile extends Component {
     }
 
     render() {
-      
+        const defaultImageSetting= {
+          "target": "modalAvatar", "image": "images/default_profile.jpg", "route": "users/avatar"
+        }
+        // get for number of trips
         let numTrips = this.state.trips.length>0 ? 
             <React.Fragment>
               <Button onPress={()=>this.props.navigation.navigate('Trips')}
@@ -211,7 +214,10 @@ export default class Profile extends Component {
               Alert.alert('Modal has been closed.')
               this.setModal(false,"modalAvatar","")
             }}>
-            <EditAvatarModal setModalAvatar={this.setModal} updateAvatar={this.updateAvatar} />
+            <EditAvatarModal setting={defaultImageSetting}
+              currentImage={this.state.image}
+              setModal={this.setModal} 
+              updateImage={this.updateImage} />
         </Modal>
         
     </React.Fragment>
