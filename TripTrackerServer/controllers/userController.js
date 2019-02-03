@@ -148,7 +148,6 @@ router.post('/register',(req,res)=>{
 
 // get favorites
 router.get('/favorite',(req,res)=>{
-    console.log(req)
     let auth = req.headers.authorization;
     if (auth===undefined || auth===null) {
         return res.status(FORBIDDEN).json({

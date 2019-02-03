@@ -457,10 +457,11 @@ export default class LocationDetail extends Component {
     constructor(props) {
         super(props)
         this.focusListener = this.props.navigation.addListener('didFocus',payload => {
-            console.debug('didFocus', payload);
+            console.debug('didFocus');
             this._getLocDetails()
         })
         this.state = { 
+            typeFlatList: true, 
             selectOnDelete: {}, selectOnEdit: {},
             locDetails: props.navigation.getParam("locDetails"),
             resize: false,
@@ -493,7 +494,7 @@ export default class LocationDetail extends Component {
             if (!locId) {
                 this.props.navigation.goBack()
             }
-            console.log("loc details= ",token)
+            console.log("loc details= ")
             fetch(serverURL+'/api/locations/'+locId,{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, },
@@ -613,27 +614,37 @@ export default class LocationDetail extends Component {
         locDetails.formatAddress= data.formatAddress
         locDetails.startDate= data.startDate
         locDetails.endDate= data.endDate
-        console.log(locDetails)
+        //console.log(locDetails)
         this.setState({
             locDetails,
             modalEditLoc: false, 
         })
-        console.log(this.props.navigation)
-        this.props.navigation.setParams({
-            locDetails
-        })
+        //console.log(this.props.navigation)
+        this.props.navigation.setParams({ locDetails })
     }
+
+    toggleView = () => { this.setState({typeFlatList: !this.state.typeFlatList}) }
 
 
     render() {
-        
-        let allSpendings = []
+        let spendingCat= {}
+        catLabels.map(cat=>{ spendingCat[cat]= [] })
+        // convert spendings as FlatList
+        let allSpendings = [] 
         if (this.state.locDetails.spendings) {
             this.state.locDetails.spendings.map((spend,index)=>{
-                return allSpendings.push({key: index.toString(), spend: spend})
+                spendingCat[spend.category].push({
+                    'key': spendingCat[spend.category].length+1,'data':spend
+                })
+                allSpendings.push({key: index.toString(), spend: spend})
             })
         }
-
+        // convert object to SectionList
+        let sectionSpendings= []
+        for (let key in spendingCat) {
+            sectionSpendings.push({'title': key, 'data': spendingCat[key]})
+        }
+        //console.log(sectionSpendings)
         return(
     <React.Fragment>
         <View >
@@ -643,11 +654,11 @@ export default class LocationDetail extends Component {
         </View>
         
         <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-            {/* <TouchableOpacity style={spendStyles.deleteBtn} >
+            <TouchableOpacity style={spendStyles.deleteBtn} onPress={this.toggleView}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
-                    DELETE
+                    Change to {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
                 </Text>
-            </TouchableOpacity>*/}
+            </TouchableOpacity>
             <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this._onEditLoc()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
@@ -665,11 +676,58 @@ export default class LocationDetail extends Component {
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
         </View>
 
+        {!this.state.typeFlatList && 
         <SwipeListView
-            useFlatList
-            data={allSpendings}
-            friction={5}
-            tension={10}
+            useSectionList sections={sectionSpendings}
+            friction={5} tension={10}
+            renderItem={ (data, rowMap) => {
+                let spend = data.item.data
+                return(
+                <View style={styles.rowFront}>
+                    
+                  <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <View style={{flex: 1, flexDirection: 'column'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {spend.name}
+                      </Text>
+                      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                        <Text>on {spend.date.split('-').join('/')}</Text>
+                      </View>
+                    </View>
+                    <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {spend.currency+' '+spend.amount}
+                      </Text>
+                    </View>
+                  </View>
+                    
+                </View >)
+            }}
+            renderHiddenItem={ (data, rowMap) => {
+                //console.log(data)
+                let index = parseInt(data.index)
+                console.log(index)
+                return(
+                <View style={styles.rowBack}>
+                    <Button style={{borderRadius: 5 }} 
+                        onPress={()=>this._onEditSpending(index)}>
+                        <Text>Edit</Text>
+                    </Button>
+                    <Button style={{borderRadius: 5,  }} 
+                        onPress={()=>this._onDeleteSpending(index)}>
+                        <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
+                    </Button>
+                </View>)
+            }}
+            renderSectionHeader={({section}) => <Text>{section.title}</Text>}
+            leftOpenValue={80}
+            rightOpenValue={-80}
+        />}
+
+        {this.state.typeFlatList &&
+        <SwipeListView
+            useFlatList data={allSpendings}
+            friction={5} tension={10}
             renderItem={ (data, rowMap) => {
                 let spend = data.item.spend
                 return(
@@ -710,7 +768,7 @@ export default class LocationDetail extends Component {
             )}}
             leftOpenValue={80}
             rightOpenValue={-80}
-        />
+        />}
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
           onRequestClose={() => {

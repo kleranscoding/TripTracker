@@ -61,11 +61,11 @@ class MapContainer extends Component {
 
   render() {
       return(
-        <MapView style={{margin: 20, height: '30%'}} 
+        <MapView style={{margin: 25, height: '25%'}} 
           initialRegion={this.state.region} >
           <Marker
             coordinate={this.state.region}
-            title={this.props.geolocation? "You": "San Francisco"} 
+            title={this.props.geolocation? this.props.username: "San Francisco"} 
             description={this.props.geolocation? "You are here": "San Francisco"}  />
         </MapView>
       )
@@ -173,7 +173,7 @@ export default class Profile extends Component {
             <Text style={styles.profileInfo}>{this.state.email}</Text>
           </View> 
         </View>
-        { this.state.geolocation ? <MapContainer geolocation={this.state.geolocation.coords} /> : null}
+        { this.state.geolocation && <MapContainer username={this.state.username} geolocation={this.state.geolocation.coords} /> }
         
       
         <ScrollView style={{marginTop: 25}}>

@@ -149,7 +149,6 @@ export default class Favorites extends Component {
     setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
     
     favToggle = (index) => {
-        console.log(this.state.trips[index])
         _getToken().then(token=>{
             
             fetch(serverURL+'/api/trips/edit/'+this.state.trips[index].id,{
@@ -166,7 +165,6 @@ export default class Favorites extends Component {
                 if (res.status===200) {
                     res.json().then(data=>{
                         console.log("edit trips isFav: ")
-                        console.log(data)
                         let filteredTrips = this.state.trips.filter(trip=>{
                             return (trip.id!==data.id)
                         })
@@ -193,7 +191,7 @@ export default class Favorites extends Component {
     }
 
     deleteTrip = (index) => {
-        console.log(this.state.trips[index])
+        //console.log(this.state.trips[index])
         let tripId = this.state.trips[index].id
         this._getToken().then(token=>{
             fetch(serverURL+'/api/trips/delete/'+tripId,{
@@ -202,7 +200,6 @@ export default class Favorites extends Component {
             }).then(res=>{
                 if (res.status===200) {
                     res.json().then(data=>{
-                        console.log(data)
                         let filteredTrips = this.state.trips.filter(trip=>{
                             return (trip.id!==data.id)
                         })
@@ -230,14 +227,14 @@ export default class Favorites extends Component {
     render() {
 
         let numTrips = this.state.trips.length>1 ?
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} trips found`}</Text> : 
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} trip found`}</Text>
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trips found`}</Text> : 
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trip found`}</Text>
         
         let allTrips = []
         this.state.trips.map((trip,index)=>{
             return allTrips.push({key: index.toString(), trip: trip})
         })
-        console.log(allTrips)
+        //console.log(allTrips)
         
         return (
     <React.Fragment>
@@ -262,7 +259,7 @@ export default class Favorites extends Component {
         <SwipeListView
             useFlatList
             data={allTrips}
-            //disableRightSwipe={true}
+            disableLeftSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
                 return(
@@ -307,14 +304,15 @@ export default class Favorites extends Component {
                         onPress={()=>this.favToggle(index)}>
                         <Text>{isFav? 'Remove':'Add to favorite'}</Text>
                     </Button>
-                    <Button style={{borderRadius: 5, }} 
+                    <Text />
+                    {/* <Button style={{borderRadius: 5, }} 
                         onPress={()=>this._onDeleteTrip(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button>
+                    </Button> */}
                 </View>
             )}}
-            leftOpenValue={160}
-            rightOpenValue={-80}
+            leftOpenValue={120}
+            //rightOpenValue={-80}
         />
 
     </React.Fragment>
