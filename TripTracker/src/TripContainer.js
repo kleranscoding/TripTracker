@@ -453,14 +453,22 @@ class TripContainer extends Component {
 
     render() {
 
-        let numTrips = this.state.trips.length>1 ?
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} trips found`}</Text> : 
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} trip found`}</Text>
-        
         let allTrips = []
         this.state.trips.map((trip,index)=>{
             return allTrips.push({key: index.toString(), trip: trip})
         })
+        //*
+        if (!validateWhtieSpaceOnly(this.state.query) && allTrips.length>0) {
+            allTrips = allTrips.filter(item=>{
+                return item.trip.title.toLowerCase().indexOf(this.state.query)!==-1
+            })
+        }
+        //*/
+
+        let numTrips = allTrips.length>1 ?
+            <Text style={styles.tripInfo}>{`${allTrips.length} trips found`}</Text> : 
+            <Text style={styles.tripInfo}>{`${allTrips.length} trip found`}</Text>
+        
         
         return (
     <React.Fragment>
@@ -480,7 +488,7 @@ class TripContainer extends Component {
         
         <View style={{backgroundColor: 'rgb(42,121,188)', height: 45}}>
             <Searchbar placeholder="Search Trip" 
-                onChangeText={(text)=>{this.setState({query: text})}}
+                onChangeText={(text)=>{this.setState({query: text.toLowerCase()})}}
                 style={{margin: 2, borderRadius: 5, padding: 2, height: '90%'}} />
         </View>
         
@@ -490,7 +498,7 @@ class TripContainer extends Component {
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
                 let tripTitleLen= trip.title.length
-                console.log(tripTitleLen)
+                //console.log(tripTitleLen)
                 return(
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>

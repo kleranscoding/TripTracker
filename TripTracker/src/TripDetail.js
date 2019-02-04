@@ -366,6 +366,7 @@ class TripList extends Component {
             this._getTripDetails()
           })
         this.state = { 
+            queryLoc: '',
             tripDetails: {}, locations: [],
             resize: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
@@ -373,7 +374,6 @@ class TripList extends Component {
             modalTripImg: false,
             selectOnDelete: {}, selectOnEdit: {},
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
-
         }
     }
 
@@ -541,6 +541,12 @@ class TripList extends Component {
                 return allLocs.push({ loc: loc ,key: index.toString() })
             })  
         }
+        console.log(allLocs)
+        if (!validateWhtieSpaceOnly(this.state.queryLoc) ) {
+            allLocs = allLocs.filter(item=>{
+                return item.loc.location.toLowerCase().indexOf(this.state.queryLoc)!==-1
+            })
+        }
         
         return (
     <React.Fragment>
@@ -595,12 +601,14 @@ class TripList extends Component {
         </View>
 
         <ScrollView style={{backgroundColor: 'white'}}>
-            <Searchbar style={{marginTop: 5, marginBottom: 5, marginLeft: 15, marginRight: 15}}
+            <Searchbar onChangeText={(text)=>this.setState({queryLoc: text.toLowerCase()})}
+                style={{marginTop: 5, marginBottom: 5, marginLeft: 15, marginRight: 15}}
                 placeholder="Search Location" />
             
             <View style={{margin: 10}}>
             {this.state.tripDetails.locations!==undefined?
-                <LocationContainer locations={this.state.tripDetails.locations} />:null }
+                <LocationContainer locations={this.state.tripDetails.locations}
+                    locations={allLocs} />:null }
             </View>
 
         <SwipeListView
