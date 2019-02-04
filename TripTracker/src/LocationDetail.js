@@ -289,18 +289,25 @@ export default class LocationDetail extends Component {
         }))
     }
 
-    _onDeleteSpending = (index) => {
+    closeRow = (rowMap, rowKey) => {
+		if (rowMap[rowKey]) { rowMap[rowKey].closeRow() }
+    }
+
+
+    _onDeleteSpending = (index,rowMap) => {
         this.setState({
             selectOnDelete: this.state.locDetails.spendings[index], 
             modalDelete: true,
         })
+        this.closeRow(rowMap,index)
     }
 
-    _onEditSpending = (index) => {
+    _onEditSpending = (index,rowMap) => {
         this.setState({
             selectOnEdit: this.state.locDetails.spendings[index], 
             modalEdit: true,
         })
+        this.closeRow(rowMap,index)
     }
 
     _removeSpending = (data) => {
@@ -498,11 +505,11 @@ export default class LocationDetail extends Component {
                 return(
                 <View style={styles.rowBack}>
                     <Button style={{borderRadius: 5 }} 
-                        onPress={()=>this._onEditSpending(index)}>
+                        onPress={()=>this._onEditSpending(index,rowMap)}>
                         <Text>Edit</Text>
                     </Button>
                     <Button style={{borderRadius: 5,  }} 
-                        onPress={()=>this._onDeleteSpending(index)}>
+                        onPress={()=>this._onDeleteSpending(index,rowMap)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>

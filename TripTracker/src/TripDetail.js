@@ -495,11 +495,16 @@ class TripList extends Component {
         }
     }
 
-    _onDeleteLoc = (index) => {
+    closeRow = (rowMap, rowKey) => {
+		if (rowMap[rowKey]) { rowMap[rowKey].closeRow() }
+    }
+
+    _onDeleteLoc = (index,rowMap) => {
         this.setState({
             selectOnDelete: this.state.tripDetails.locations[index], 
             modalDelete: true,
         })
+        this.closeRow(rowMap,index)
     }
 
     _removeLoc = (data) => {
@@ -639,12 +644,11 @@ class TripList extends Component {
                     </Button> */}
                     <Text />
                     <Button style={{borderRadius: 5,  }} 
-                        onPress={()=>this._onDeleteLoc(index)}>
+                        onPress={()=>this._onDeleteLoc(index,rowMap)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
                     </Button>
                 </View>
             )}}
-            //leftOpenValue={80}
             rightOpenValue={-80}
         />
 
@@ -720,6 +724,7 @@ class DeleteLocModal extends Component {
 
     render() {
         return (
+            /*
             <React.Fragment>
                 <View style={modalStyles.modalHeader}>
                     <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
@@ -742,6 +747,40 @@ class DeleteLocModal extends Component {
                         <Button onPress={this._deleteLoc} 
                             style={{backgroundColor: 'red', borderRadius: 10, }}>
                             <Text style={{color: 'white'}}>Delete</Text>
+                        </Button>
+                    </View>
+                </View>
+
+            </React.Fragment>
+            //*/
+            <React.Fragment>
+                <View style={modalStyles.modalHeader}>
+                    <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
+                        <Text style={modalStyles.closeModalText}>
+                            Close &times;
+                        </Text>
+                    </TouchableHighlight>
+                    <Text style={modalStyles.newLocGreeting}>
+                        {'Warning: Deleting\n'+this.props.selectOnDelete.location}
+                    </Text>
+                </View>
+
+                <Text style={{fontSize: 24, textAlign: 'center', fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                    {'Are you sure you want to delete\n'+this.props.selectOnDelete.location}?
+                </Text>
+
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                    
+                    <View style={{flexDirection: 'row', justifyContent: 'center' }}>
+                        <Button onPress={this._cancelDelete} 
+                            style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+                        >
+                            <Text>Cancel</Text>
+                        </Button>
+                        <Button 
+                            onPress={this._deleteLoc} 
+                            style={{backgroundColor: 'red', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                            <Text style={{color: 'white'}}>DELETE</Text>
                         </Button>
                     </View>
                 </View>
