@@ -205,7 +205,7 @@ export default class EditTripModal extends Component {
             />
         </View>}
 
-        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100, marginBottom: 100}}>
             <Button onPress={()=>this.props.setModalEdit(false,"modalEditTrip","")} 
                 style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
             >

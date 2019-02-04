@@ -74,7 +74,9 @@ export default class EditLocModal extends Component {
         this.formatAddr= props.selectOnEdit.formatAddr
         this.geocode = props.selectOnEdit.geocode
         this.state = {
-            dateStart: props.selectOnEdit.startDate, dateEnd: props.selectOnEdit.endDate,
+            dateStart: props.selectOnEdit.startDate, 
+            dateEnd: props.selectOnEdit.endDate,
+            openCalendar: false,
         }
     }
 
@@ -162,7 +164,7 @@ export default class EditLocModal extends Component {
         </Button> 
       </Appbar.Header>
 
-      <ScrollView>
+      <KeyboardAwareScrollView>
         
         <GooglePlacesAutocomplete 
         ref="location" query={{ key: GOOGLAPI, types: ['geocode', 'cities'] }}
@@ -179,7 +181,8 @@ export default class EditLocModal extends Component {
             this.geocode= details.geometry.location
         }}/>
 
-      <View >
+
+      {/* <View >
         <CalendarPicker
           startFromMonday={true}
           allowRangeSelection={true}
@@ -193,15 +196,60 @@ export default class EditLocModal extends Component {
           <Text>SELECTED START DATE:{ this.state.dateStart || 'no selection' }</Text>
           <Text>SELECTED END DATE:{ this.state.dateEnd || 'no selection' }</Text>
         </View>
-      </View>
+      </View> */}
 
-        <TouchableOpacity onPress={this.submitEditLocInfo} style={modalStyles["create_btn"]}>
-            <Text style={modalStyles["create_btn_text"]}>
-                Update Location
+        <View style={{margin: 10}}>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                START DATE:{' '+this.state.dateStart }
+            </Text>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                END DATE:{ ' '+this.state.dateEnd }
+            </Text>
+        </View>
+
+        <TouchableOpacity style={{
+                width:'50%', marginLeft: 10, backgroundColor: 'rgb(36,152,219)',
+                borderColor: 'silver', borderWidth: 1, borderRadius: 10, padding: 5
+            }}
+            onPress={()=>this.setState({openCalendar: !this.state.openCalendar})}>
+            <Text style={{
+                textAlign: 'center', fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)'}}
+            >
+                {this.state.openCalendar? 'Close ' : 'Open '} Calendar
             </Text>
         </TouchableOpacity>
         
-      </ScrollView>
+        {this.state.openCalendar && 
+        <View style={{borderColor: 'silver', borderWidth: 1, margin: 10, borderRadius: 10}}>
+            <CalendarPicker
+                startFromMonday={true}
+                allowRangeSelection={true}
+                todayBackgroundColor="rgb(49,90,158)"
+                selectedDayColor="rgb(49,90,158)"
+                selectedDayTextColor="rgb(255,255,255)"
+                onDateChange={this.onDateChange}
+            />
+        </View>}
+
+        {/* <TouchableOpacity onPress={this.submitEditLocInfo} style={modalStyles["create_btn"]}>
+            <Text style={modalStyles["create_btn_text"]}>
+                Update Location
+            </Text>
+        </TouchableOpacity> */}
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
+            <Button onPress={()=>this.props.setModalEdit(false,"modalEditLoc","")} 
+                style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this.submitLocInfo} 
+                style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                <Text style={{color: 'white'}}>Update Location</Text>
+            </Button>
+        </View>
+        
+      </KeyboardAwareScrollView>
         
     </React.Fragment>
         )

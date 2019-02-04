@@ -325,7 +325,7 @@ class NewLocModal extends Component {
                 Add Location
             </Text>
         </TouchableOpacity> */}
-        
+
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
             <Button onPress={()=>this.props.setModalVisible(false)} 
                 style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
@@ -387,7 +387,7 @@ class TripList extends Component {
         this.state = { 
             tripDetails: {}, locations: [],
             resize: false,
-            modalVisible: !false, modalDelete: false, modalEdit: false,
+            modalVisible: false, modalDelete: false, modalEdit: false,
             modalEditLoc: false, modalEditTrip: false, 
             modalTripImg: false,
             selectOnDelete: {}, selectOnEdit: {},
