@@ -170,12 +170,31 @@ class MapContainer extends Component {
         console.log(this.props.geocode)
         console.log(this.state.region)
         return(
-            <MapView style={{marginLeft: 15, marginRight: 15, height: 150, }} 
-                initialRegion={this.state.region} >
-                <Marker
-                    coordinate={this.state.region}
-                    title={this.props.location} />
-            </MapView>
+        <React.Fragment>
+            <View style={modalStyles.modalHeader}>
+                <TouchableHighlight onPress={()=>this.props.setModalMap(false,"modalMap","")}>
+                    <Text style={modalStyles.closeModalText}>
+                    Close &times;
+                    </Text>
+                </TouchableHighlight>
+                <Text style={modalStyles.newLocGreeting}>
+                    Map 
+                </Text>
+            </View>
+            <ScrollView>
+            <View style={{flex: 1, justifyContent: 'center'}}>
+                <Text style={{margin: 10, color: 'rgb(49,90,158)', fontSize: 18, fontFamily: 'Avenir'}}>
+                    {this.props.location}
+                </Text>
+                <MapView style={{margin: 15, height: 400}} 
+                    initialRegion={this.state.region} >
+                    <Marker
+                        coordinate={this.state.region}
+                        title={this.props.location} />
+                </MapView>
+            </View>
+            </ScrollView>
+        </React.Fragment>
         )
     }
 }
@@ -409,21 +428,33 @@ export default class LocationDetail extends Component {
         //console.log(sectionSpendings)
         return(
     <React.Fragment>
-        <View >
+        
             <View style={{margin: 10}}>
                 <Text style={{fontSize: 18, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
                     {this.state.locDetails.location}
                 </Text>
             </View>
-           
+        <View style={{margin: 10, flexDirection: 'row', justifyContent: 'center'}}>
             {allSpendings.length>0 && 
-                <Button onPress={()=>{this.setState({modalChart: true})}}>
-                    Show Expense Graph </Button>}
+                <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                    onPress={()=>{this.setState({modalChart: true})}}>
+                    <Text style={{
+                        textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                        fontSize: 18, fontFamily: 'Avenir', 
+                    }}>
+                        Expense Graph
+                    </Text>
+                </TouchableOpacity>}
 
-            {/* <MapContainer location={this.state.locDetails.location} 
-                geocode={this.state.locDetails.geocode} /> */}
-                {//this.state.showChart &&  <PieChart2 spendingCat={spendingCat}/> 
-            }
+            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                onPress={()=>{this.setState({modalMap: true})}}>
+                <Text style={{
+                    textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    fontSize: 18, fontFamily: 'Avenir', 
+                }}>
+                    Open Map
+                </Text>
+            </TouchableOpacity>
             
         </View>
         
@@ -449,8 +480,6 @@ export default class LocationDetail extends Component {
           {this.state.locDetails.spendings!==undefined?
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
         </View>
-
-        
 
         {!this.state.typeFlatList && 
         <SwipeListView
@@ -639,7 +668,16 @@ export default class LocationDetail extends Component {
               this.setModal(false,"modalChart","")
             }}>
             <PieChartModal spendingCat={spendingCat} setModalChart={this.setModal} />
-            
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalMap}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalMap","")
+            }}>
+            <MapContainer location={this.state.locDetails.location} 
+                geocode={this.state.locDetails.geocode} 
+                setModalMap={this.setModal}/>
         </Modal>
 
     </React.Fragment>

@@ -243,7 +243,7 @@ export default class EditLocModal extends Component {
             >
                 <Text>Cancel</Text>
             </Button>
-            <Button onPress={this.submitLocInfo} 
+            <Button onPress={this.submitEditLocInfo} 
                 style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
                 <Text style={{color: 'white'}}>Update Location</Text>
             </Button>
