@@ -331,7 +331,7 @@ class TripContainer extends Component {
 
     _getTripInfo = () => {
         _getToken().then(token=>{
-            console.log("trip container= "+token)
+            console.log("trip container= ")
             fetch(serverURL+'/api/users/profile',{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }

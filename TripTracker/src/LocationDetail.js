@@ -439,27 +439,29 @@ export default class LocationDetail extends Component {
             
         </View>
         
-        <View style={{flexDirection: 'row', alignContent: 'center'}}>
+        <View style={{flexDirection: 'row', alignContent: 'flex-end'}}>
             {/* <TouchableOpacity style={spendStyles.deleteBtn} onPress={this.toggleView}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Change to {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
                 </Text>
             </TouchableOpacity> */}
-            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 5, borderRadius: 10}}
+            
+            {/* <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 5, borderRadius: 10}}
                 onPress={this.toggleView}>
                 <Text style={{
                     textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
-                    fontSize: 14, fontFamily: 'Avenir', 
+                    fontSize: 16, fontFamily: 'Avenir', 
                 }}>
                     {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
                 </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+
             {/* <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this._onEditLoc()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
             </TouchableOpacity> */}
-            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 5, borderRadius: 10}}
                 onPress={()=>this._onEditLoc()}>
                 <Text style={{
                     textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
@@ -493,6 +495,8 @@ export default class LocationDetail extends Component {
         <SwipeListView
             useSectionList sections={sectionSpendings}
             friction={5} tension={10}
+            disableRightSwipe={true}
+            disableLefttSwipe={true}
             renderItem={ (data, rowMap) => {
                 let spend = data.item.data
                 return(
@@ -771,7 +775,7 @@ class DeleteSpendModal extends Component {
                             <Text>Cancel</Text>
                         </Button>
                         <Button 
-                            onPress={this._deleteLoc} 
+                            onPress={this._deleteSpending} 
                             style={{backgroundColor: 'red', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
                             <Text style={{color: 'white'}}>DELETE</Text>
                         </Button>

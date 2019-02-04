@@ -116,7 +116,7 @@ export default class Profile extends Component {
 
     _getProfileInfo = () => {
       _getToken().then(token=>{
-        console.log("profile: ",token)
+        console.log("profile: ")
         fetch(serverURL+'/api/users/profile',{
           method: 'GET',
           headers: { 'Authorization': `Bearer ${token}` }

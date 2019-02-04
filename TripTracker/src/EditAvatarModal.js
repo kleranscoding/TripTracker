@@ -184,10 +184,10 @@ export default class EditAvatarModal extends React.Component {
           </Button>
         </View>
 
-        <View style={{flexDirection: 'column', justifyContent: 'space-between', width: '50%'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'center', }}>
           <Button icon="photo" onPress={this._pickImage} 
             style={{
-              height: 50, margin: 10, padding: 5, alignSelf: 'center', 
+              margin: 5, padding: 5, alignSelf: 'center', 
               backgroundColor: 'rgb(214, 245, 245)', borderRadius: 15
             }}
             >
@@ -197,7 +197,7 @@ export default class EditAvatarModal extends React.Component {
           </Button>
           <Button icon="camera" onPress={this._snapPhoto} 
             style={{
-              height: 50, margin: 10, padding: 5, alignSelf: 'center', 
+              margin: 5, padding: 5, alignSelf: 'center', 
               backgroundColor: 'rgb(214, 245, 245)', borderRadius: 15
             }}
             >
