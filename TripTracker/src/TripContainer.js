@@ -138,10 +138,12 @@ class NewTripModal extends Component {
         let startDate = this.state.dateStart, endDate = this.state.dateEnd
         let errTitle= true, errDateStart= true, errDateEnd= true
         let errMsgTitle='', errMsgDate= ''
-        console.log(tripTitle, startDate, endDate)
         if (!tripTitle || validateWhtieSpaceOnly(tripTitle) ) {
             errMsgTitle= '\n- Please enter a trip name'
             this.setState({errTripTitle: true})
+        } else if (tripTitle.length>100) { 
+            errMsgTitle= '\n- Trip name should have 100 or less characters'
+            errTitle+='\n(Count: '+tripTitle.length+')'
         } else {
             errTitle= false
         }
@@ -151,7 +153,7 @@ class NewTripModal extends Component {
             errDateStart= false
             errDateEnd= false
         }
-        console.log(errTitle, errDateStart, errDateEnd)
+        //console.log(errTitle, errDateStart, errDateEnd)
         if (errTitle || errDateStart || errDateEnd) {
             Alert.alert("Hang On!"+errMsgTitle+errMsgDate)
             return
@@ -443,6 +445,8 @@ class TripContainer extends Component {
             //disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
+                let tripTitleLen= trip.title.length
+                console.log(tripTitleLen)
                 return(
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>

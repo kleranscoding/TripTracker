@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { AsyncStorage, StyleSheet, View, Text, ScrollView, Modal, Alert, Image, 
-    TouchableHighlight, TouchableWithoutFeedback, TouchableOpacity, } from 'react-native';
-import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar, TouchableRipple } from  'react-native-paper';
+import { AsyncStorage, StyleSheet, View, Text, Image, TouchableHighlight, TouchableOpacity, } from 'react-native';
+import { Appbar, Button, Paragraph, } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -34,12 +32,12 @@ const styles = StyleSheet.create({
 		borderBottomColor: 'silver',
 		borderBottomWidth: 1,
 		justifyContent: 'center',
-        height: 100,
-        padding: 10,
+        height: 125,
+        padding: 5,
 	},
 	rowBack: {
 		alignItems: 'center',
-		backgroundColor: 'transparent',
+        backgroundColor: 'transparent', 
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -55,7 +53,7 @@ const cardStyles = StyleSheet.create({
         borderColor: 'rgba(192,192,192,0.75)', borderWidth: 2,
     },
     cardImg: {
-        width: 50, height: 50,
+        height: 75, width: 100, 
     },
 })
 
@@ -112,14 +110,14 @@ export default class Favorites extends Component {
 
     _getFavTripInfo = () => {
         _getToken().then(token=>{
-            console.log("fav trip container= "+token)
+            
             fetch(serverURL+'/api/users/favorite',{
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res=>{
                 if (res.status===200) {
                     res.json().then(data=>{
-                        console.log(data)
+                        //console.log(data)
                         this.setState({ trips: data, })
                         console.log("done getting fav trips...")
                     })
@@ -137,17 +135,6 @@ export default class Favorites extends Component {
         })
     }
 
-    addTrips = (trip) => {
-        let trips = this.state.trips
-        trips.push(trip)
-        this.setState({ trips })
-    }
-
-
-    setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
-
-    setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
-    
     favToggle = (index) => {
         _getToken().then(token=>{
             
@@ -183,45 +170,8 @@ export default class Favorites extends Component {
         })
     }
 
-    _onDeleteTrip = (index) => {
-        this.setState({
-            selectOnDelete: this.state.trips[index], 
-            modalDelete: true,
-        })
-    }
-
-    deleteTrip = (index) => {
-        //console.log(this.state.trips[index])
-        let tripId = this.state.trips[index].id
-        this._getToken().then(token=>{
-            fetch(serverURL+'/api/trips/delete/'+tripId,{
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            }).then(res=>{
-                if (res.status===200) {
-                    res.json().then(data=>{
-                        let filteredTrips = this.state.trips.filter(trip=>{
-                            return (trip.id!==data.id)
-                        })
-                        this.setState({ trips: filteredTrips, })
-                    })
-                } 
-                    
-            }).catch(err=>{ console.log(err) })
-
-        }).catch(error=>{
-            console.log("get token error:",error)
-        })
-    }
-
-    _removeTrip = (data) => {
-        let filteredTrips = this.state.trips.filter(trip=>{
-            return (trip.id!==data.id)
-        })
-        this.setState({
-            trips: filteredTrips,
-            modalDelete: false,
-        })
+    closeRow = (rowMap, rowKey) => {
+		if (rowMap[rowKey]) { rowMap[rowKey].closeRow() }
     }
 
     render() {
@@ -236,6 +186,7 @@ export default class Favorites extends Component {
         this.state.trips.map((trip,index)=>{
             return allTrips.push({key: index.toString(), trip: trip})
         })
+        
         //console.log(allTrips)
         
         return (
@@ -250,12 +201,6 @@ export default class Favorites extends Component {
           
           {this.state.trips && numTrips}          
           
-          <Button style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 20}} icon="add" mode="contained"
-            onPress={()=>this.setModalVisible(true)}>
-            <Text style={{textAlign: 'center', color: 'rgb(255,255,255)', fontSize: 14}}>
-              Trip
-            </Text>  
-          </Button>
         </View>
 
         <SwipeListView
@@ -264,29 +209,32 @@ export default class Favorites extends Component {
             disableLeftSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
+                let tripTitleLen= trip.title.length
                 return(
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>
                   <View>
-                    <Text style={{fontSize: 20, fontFamily: 'Avenir', marginTop: 10}}>
+                    <Text style={{fontSize: tripTitleLen>=50? 12 : tripTitleLen>=25? 16 : 20, fontFamily: 'Avenir', marginTop: 10}}>
                         {trip.title.toUpperCase()}
                       </Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Image source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                       
                       <View style={{marginLeft: 10, alignSelf: 'flex-end', flexDirection: 'column'}}>
-                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir', margin: 0}}>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir', margin: 0}}>
                             Duration: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+getDaysDiffText(trip.startDate,trip.endDate)}
                             </Text>
                         </Paragraph>
-                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir'}}>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
                             From: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.startDate.split('-').join('/')+' '}
                             </Text> 
-                            to 
+                        </Paragraph>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            to: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.endDate.split('-').join('/')}
                             </Text> 
@@ -302,19 +250,21 @@ export default class Favorites extends Component {
                 let isFav = data.item.trip.isFav
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} icon={isFav? 'star': ''}
-                        onPress={()=>this.favToggle(index)}>
-                        <Text>{isFav? 'Remove':'Add to favorite'}</Text>
-                    </Button>
-                    <Text />
-                    {/* <Button style={{borderRadius: 5, }} 
-                        onPress={()=>this._onDeleteTrip(index)}>
-                        <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button> */}
+                  <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this.favToggle(index)}
+                  >
+                    <View style={{flexDirection: 'column', }}>
+                        <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                            Remove
+                        </Text>
+                        <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                            Favorite
+                        </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <Text />
                 </View>
             )}}
-            leftOpenValue={120}
-            //rightOpenValue={-80}
+            leftOpenValue={100}
         />
 
     </React.Fragment>

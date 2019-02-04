@@ -18,23 +18,6 @@ const styles = StyleSheet.create({
     },
 })
 
-/*
-class Favorites extends Component {
-    render() {
-        return(
-        <React.Fragment>
-            <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-                <Appbar.Content title="Favorites" titleStyle={styles.contentTitle} />
-            </Appbar.Header>
-            <View style={{flex: 1, justifyContent: 'center'}}>
-                <Text style={{textAlign: 'center'}}> Under Construction </Text>
-            </View>
-        </React.Fragment>
-        )
-    }
-}
-//*/
-
 const MainContentStack = createBottomTabNavigator({ 
     Profile: {
         screen: Profile,
@@ -65,7 +48,7 @@ const MainContentStack = createBottomTabNavigator({
     },
 },
 {
-    initialRouteName: 'Profile',
+    initialRouteName: 'Favorites',
     tabBarOptions: {
         activeTintColor: 'rgb(248,248,248)', 
         inactiveTintColor: 'rgb(143,154,186)',  
