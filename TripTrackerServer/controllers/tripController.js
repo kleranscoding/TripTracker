@@ -64,7 +64,6 @@ router.get('/:id',(req,res)=>{
         if (!trip) {
             return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
         } else {
-            console.log(trip.traveler.toString(),decodedToken.id)
             // check if same owner
             if (trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
@@ -136,11 +135,9 @@ router.post('/:id/image',upload.any(),(req,res)=>{
             if (err) {
                 return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
             } else {
-                console.log(editedObj)
                 if (!editedObj) {
                     return res.status(INTERNAL_ERR).json({"success": false, "message": "trip not found"});
                 }
-                console.log("no err",editedObj)
                 return res.json({
                     "id": editedObj._id,
                     "title": editedObj.title, "startDate": editedObj.startDate, "endDate": editedObj.endDate,
@@ -248,12 +245,10 @@ router.delete('/delete/:id',(req,res)=>{
         return res.status(UNAUTH).json(decodedToken);
     }
 
-    console.log(req.params.id)
     db.Trip.findById(req.params.id).then(trip=>{
         if (!trip) {
             return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
         } else {
-            console.log(trip.traveler.toString(),decodedToken.id)
             // check if same owner
             if (trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});

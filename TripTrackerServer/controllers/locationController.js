@@ -55,7 +55,6 @@ router.get('/:id',(req,res)=>{
         if (!loc) {
             return res.status(NOTFOUND).json({"success": false, "message": "location not found"});
         } else {
-            console.log(loc.trip.traveler.toString(),decodedToken.id,loc.trip.traveler.toString()===decodedToken.id)
             // check if same owner
             if (loc.trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});
@@ -98,8 +97,6 @@ router.post('/new',(req,res)=>{
         decodedToken["success"]= false;
         return res.status(UNAUTH).json(decodedToken);
     }
-
-    console.log(req.body)
 
     db.Trip.findById(req.body.tripId).then(trip=>{
         if (!trip) {
@@ -195,12 +192,11 @@ router.delete('/delete/:id',(req,res)=>{
         return res.status(UNAUTH).json(decodedToken);
     }
 
-    console.log(req.params.id)
     db.Location.findById(req.params.id).populate('trip').then(loc=>{
         if (!loc) {
             return res.status(NOTFOUND).json({"success": false, "message": "trip not found"});
         } else {
-            console.log(loc.trip.traveler.toString(),decodedToken.id,loc.trip.traveler.toString()===decodedToken.id)
+            //console.log(loc.trip.traveler.toString(),decodedToken.id,loc.trip.traveler.toString()===decodedToken.id)
             // check if same owner
             if (loc.trip.traveler.toString()!==decodedToken.id) {
                 return res.status(UNAUTH).json({"success": false, "message": "unauthorized action"});

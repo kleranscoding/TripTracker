@@ -583,7 +583,7 @@ class TripList extends Component {
             {/* </View> */}
 
               <TouchableOpacity //style={locStyles.addNewBtn} 
-                style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                style={{backgroundColor: 'rgb(49,90,158)', margin: 10, borderRadius: 20}}
                 onPress={()=>this.setModalVisible(true)}>
                     <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
                         fontSize: 18, fontFamily: 'Avenir',

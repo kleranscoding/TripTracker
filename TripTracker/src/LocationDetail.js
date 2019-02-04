@@ -35,27 +35,8 @@ const styles = StyleSheet.create({
     spendInfo: {
         marginTop: 5,
         textAlign: 'center',
-        fontSize: 20, fontFamily: 'Avenir',
+        fontSize: 16, fontFamily: 'Avenir',
     },
-    /*
-    rowFront: {
-		alignItems: 'flex-start',
-		backgroundColor: 'rgb(255,255,255)',
-		borderBottomColor: 'silver',
-		borderBottomWidth: 1,
-		justifyContent: 'center',
-        height: 75,
-        padding: 10,
-	},
-	rowBack: {
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingLeft: 15,
-    },
-    //*/
     rowFront: {
         alignItems: 'flex-start',
         justifyContent: 'center',
@@ -429,27 +410,27 @@ export default class LocationDetail extends Component {
         return(
     <React.Fragment>
         
-            <View style={{margin: 10}}>
+            <View style={{marginLeft: 15, marginRight: 15, marginTop: 15, marginBottom: 10}}>
                 <Text style={{fontSize: 18, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
                     {this.state.locDetails.location}
                 </Text>
             </View>
-        <View style={{margin: 10, flexDirection: 'row', justifyContent: 'center'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
             {allSpendings.length>0 && 
-                <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                <TouchableOpacity style={{ margin: 10, borderRadius: 10}}
                     onPress={()=>{this.setState({modalChart: true})}}>
                     <Text style={{
-                        textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                        textAlign: 'center', padding: 10, color: 'rgb(36,152,219)', 
                         fontSize: 18, fontFamily: 'Avenir', 
                     }}>
                         Expense Graph
                     </Text>
                 </TouchableOpacity>}
 
-            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+            <TouchableOpacity style={{backgroundColor: '', margin: 10, borderRadius: 10}}
                 onPress={()=>{this.setState({modalMap: true})}}>
                 <Text style={{
-                    textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    textAlign: 'center', padding: 10, color: 'rgb(36,152,219)', 
                     fontSize: 18, fontFamily: 'Avenir', 
                 }}>
                     Open Map
@@ -458,22 +439,49 @@ export default class LocationDetail extends Component {
             
         </View>
         
-        <View style={{margin: 10, flexDirection: 'row', }}>
-            <TouchableOpacity style={spendStyles.deleteBtn} onPress={this.toggleView}>
+        <View style={{flexDirection: 'row', alignContent: 'center'}}>
+            {/* <TouchableOpacity style={spendStyles.deleteBtn} onPress={this.toggleView}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Change to {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
                 </Text>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 5, borderRadius: 10}}
+                onPress={this.toggleView}>
+                <Text style={{
+                    textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    fontSize: 14, fontFamily: 'Avenir', 
+                }}>
+                    {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
+                </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this._onEditLoc()}>
+            {/* <TouchableOpacity style={spendStyles.editBtn} onPress={()=>this._onEditLoc()}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Edit
                 </Text>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                onPress={()=>this._onEditLoc()}>
+                <Text style={{
+                    textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    fontSize: 16, fontFamily: 'Avenir', 
+                }}>
+                    Edit Location
+                </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
+            {/* <TouchableOpacity style={spendStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     + Expenses
                 </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <TouchableOpacity //style={locStyles.addNewBtn} 
+                style={{backgroundColor: 'rgb(49,90,158)', margin: 5, borderRadius: 20}}
+                onPress={()=>this.setModalVisible(true)}>
+                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                        fontSize: 16, fontFamily: 'Avenir',
+                    }}>
+                        + Expense
+                    </Text>
+              </TouchableOpacity>
         </View>
 
         <View style={{margin: 5}}>
@@ -821,6 +829,7 @@ class PieChartModal extends Component {
 
         return (
         <React.Fragment>
+            
             <View style={modalStyles.modalHeader}>
                 <TouchableHighlight onPress={()=>this.props.setModalChart(false,"modalChart","")}>
                     <Text style={modalStyles.closeModalText}>
@@ -831,13 +840,16 @@ class PieChartModal extends Component {
                     Expense Summary
                 </Text>
             </View>
+            
             <View style={{justifyContent: 'center', alignSelf: 'center'}}>
                 <PureChart data={sampleData} type='pie' />
             </View>
-            <View style={{flex: 1, justifyContent: 'center', alignSelf: 'center'}}>
-                {spendInfo}
-            </View>
             
+            <View style={{flex: 1, justifyContent: 'center', alignSelf: 'center', marginTop: 20}}>
+                <ScrollView>
+                    {spendInfo}
+                </ScrollView>
+            </View>
 
         </React.Fragment>
         )

@@ -151,7 +151,7 @@ router.post('/avatar',upload.any(),(req,res)=>{
             if (err) {
                 return res.status(INTERNAL_ERR).json({"success": false, "message": "db error"});
             } else {
-                console.log(editedObj)
+                //console.log(editedObj)
                 if (!editedObj) {
                     return res.status(INTERNAL_ERR).json({"success": false, "message": "user not found"});
                 }
