@@ -79,7 +79,7 @@ export default class Favorites extends Component {
     constructor(props) {
         super(props)
         this.focusListener = this.props.navigation.addListener('didFocus',payload => {
-            console.debug('didFocus', payload);
+            //console.debug('didFocus', payload);
             this._getFavTripInfo() 
           })
         this.state= {
@@ -227,8 +227,10 @@ export default class Favorites extends Component {
     render() {
 
         let numTrips = this.state.trips.length>1 ?
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trips found`}</Text> : 
-            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trip found`}</Text>
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trips`}</Text> : 
+            this.state.trips.length>0 ?
+            <Text style={styles.tripInfo}>{`${this.state.trips.length} favorite trip`}</Text>:
+            <Text style={styles.tripInfo}>You don't have any favorite trip</Text>
         
         let allTrips = []
         this.state.trips.map((trip,index)=>{
@@ -246,7 +248,7 @@ export default class Favorites extends Component {
         <View style={{justifyContent: 'space-between', padding: 10, flexDirection: 'row',
             borderBottomWidth: 1, borderBottomColor: 'silver', }}>
           
-          {numTrips}          
+          {this.state.trips && numTrips}          
           
           <Button style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 20}} icon="add" mode="contained"
             onPress={()=>this.setModalVisible(true)}>

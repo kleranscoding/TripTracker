@@ -156,7 +156,10 @@ export default class Profile extends Component {
                 style={{borderRadius: 20, width: '50%', marginLeft: '25%', backgroundColor: 'rgb(49,90,158)'}}>
                 <Text style={{color: 'rgb(255,255,255)'}}>
                   { this.state.trips.length>1 ? 
-                    `You have ${this.state.trips.length} trips` : `You have ${this.state.trips.length} trip` 
+                    `You have ${this.state.trips.length} trips` : 
+                    this.state.trips.length>0 ? 
+                    `You have ${this.state.trips.length} trip`:
+                     'You don\'t have any trip'
                   }
                 </Text>
               </Button>
@@ -182,7 +185,9 @@ export default class Profile extends Component {
         </Appbar.Header>
         
         <View style={styles.profileInfoWrapper}>
-          <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
+          <TouchableOpacity onPress={()=>this.setState({modalAvatar: true})}>
+            <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
+          </TouchableOpacity>
                     
           <View style={{justifyContent: 'center', margin: 10, }}>
             <Text style={styles.profileInfo}>{this.state.username}</Text>
@@ -193,12 +198,11 @@ export default class Profile extends Component {
          { this.state.geolocation && 
             <MapContainer username={this.state.username} geolocation={this.state.geolocation.coords} /> }
           
-        
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
-          <Button onPress={()=>this.setState({modalAvatar: true})}>
+          {/* <Button onPress={()=>this.setState({modalAvatar: true})}>
             Edit Avatar
-          </Button>
+          </Button> */}
         </ScrollView>
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalExit}

@@ -1,15 +1,42 @@
 import React from 'react';
-import { AsyncStorage, View, Image, Alert, CameraRoll } from 'react-native';
-import { Button } from 'react-native-paper';
+import { AsyncStorage, Text, View, Image, Alert, CameraRoll, StyleSheet } from 'react-native';
+import { Appbar, Button } from 'react-native-paper';
 import { Camera, Permissions, ImagePicker, } from 'expo';
 
 import { serverURL, tokenName, } from './config/envConst';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
+/**
+ * STYLESHEETS
+ */
+const styles = StyleSheet.create({
+  appbarHeader:{
+      backgroundColor: 'rgb(36,152,219)',
+  },
+  contentTitle: {
+      fontSize: 24, fontFamily: 'Avenir',
+  },
+  modalBtnCancel: {
+    backgroundColor: 'rgb(255,255,255)',
+    borderRadius: 25,
+    margin: 20,
+  },
+  modalBtnConfirm: {
+      backgroundColor: 'rgb(49,90,158)',
+      borderRadius: 25,
+      margin: 20,
+  },
+})
+
+/**
+ * CONSTANTS AND FUNCTIONS
+ */
 const cameraRollOption = {
     allowsEditing: true,
     aspect: [4, 3],
 }
+
 
 _getToken = async() => { return await AsyncStorage.getItem(tokenName) }
 
@@ -120,34 +147,79 @@ export default class EditAvatarModal extends React.Component {
   render() {
     return (
     <React.Fragment>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button onPress={()=>this.props.setModal(false,this.props.setting.target,"")}
-                style={{ fontSize: 18, marginBottom: 10, color: 'white', alignSelf: 'flex-end' }}>
-                {' '}&times; Close{' '}
-          </Button>
-          {this.state.image ?
-          <Image style={{ width: 200, height: 200 }}
-            source={{ uri: this.state.useDefault? serverURL+'/'+this.state.image: this.state.image }} />:
-          <Image style={{ width: 200, height: 200 }}
-            source={{ uri: serverURL+'/'+this.props.currentImage }} />
-          }
-          <Button onPress={this._pickImage}>Pick an image from camera roll</Button>
-          <Button onPress={this._snapPhoto}>Take a picture with camera</Button>
-          
-          <View style={{flexDirection: 'row'}}>
-            <Button onPress={this._useDefault}>Use default</Button>
-            <Button onPress={this._resetImage}>Reset</Button>
-          </View>
+
+      <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
+        <Appbar.Content title="Edit Image" titleStyle={styles.contentTitle} />
+        <Button onPress={()=>this.props.setModal(false,this.props.setting.target,"")}
+            style={{alignItems: 'center', alignContent: 'flex-end'}}>
+            <Text style={{color: "rgb(255,255,255)"}}>Close</Text>
+        </Button> 
+      </Appbar.Header>
         
-          <View style={{flexDirection: 'row'}}>
-            <Button onPress={()=>this.props.setModal(false,this.props.setting.target,"")}>
-              Cancel
-            </Button>
-            <Button onPress={this.submitImage}>Upload image</Button>
-          </View>
-          
+        <View style={{alignSelf: 'center'}}>
+          {this.state.image ?
+            <Image style={{ width: 250, height: 250 }}
+              source={{ uri: this.state.useDefault? serverURL+'/'+this.state.image: this.state.image }} />:
+            <Image style={{ width: 250, height: 250 }}
+              source={{ uri: serverURL+'/'+this.props.currentImage }} />
+          }
         </View>
-       
+
+        <View style={{flexDirection: 'row', justifyContent:'center'}}>
+          <Button onPress={this._useDefault} 
+            style={{
+              alignSelf: 'flex-start', margin: 15, 
+              borderColor: 'silver', borderWidth: 1, borderRadius: 15
+            }}
+          >
+            <Text>Use default</Text>
+          </Button>
+          <Button onPress={this._resetImage} 
+            style={{
+              alignSelf: 'flex-end', margin: 15, 
+              borderColor: 'silver', borderWidth: 1, borderRadius: 15
+            }}
+          >
+            <Text>Reset</Text>
+          </Button>
+        </View>
+
+        <View style={{flexDirection: 'column', justifyContent: 'space-between', width: '50%'}}>
+          <Button icon="photo" onPress={this._pickImage} 
+            style={{
+              height: 50, margin: 10, padding: 5, alignSelf: 'center', 
+              backgroundColor: 'rgb(214, 245, 245)', borderRadius: 15
+            }}
+            >
+            <Text style={{color: 'rgb(36,152,219)', fontSize: 14 }}>
+              FROM PHOTOS
+            </Text>
+          </Button>
+          <Button icon="camera" onPress={this._snapPhoto} 
+            style={{
+              height: 50, margin: 10, padding: 5, alignSelf: 'center', 
+              backgroundColor: 'rgb(214, 245, 245)', borderRadius: 15
+            }}
+            >
+            <Text style={{color: 'rgb(36,152,219)', fontSize: 14 }}>
+              WITH CAMERA
+            </Text>
+          </Button>
+        </View>
+      
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgb(36,152,219)' }}>  
+        
+          <View style={{flexDirection: 'row', }}>
+            <Button style={styles.modalBtnCancel}
+              onPress={()=>this.props.setModal(false,this.props.setting.target,"")}>
+              <Text style={{color: 'rgb(36,152,219)', fontSize: 18}}>Cancel</Text>
+            </Button>
+            <Button style={styles.modalBtnConfirm} onPress={this.submitImage}>
+              <Text style={{color: 'white', fontSize: 18}}>Upload Image</Text>
+            </Button>
+          </View>
+        </View>
+
     </React.Fragment>
       )
     

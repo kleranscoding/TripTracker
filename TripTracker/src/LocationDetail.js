@@ -187,10 +187,12 @@ export default class LocationDetail extends Component {
 
     constructor(props) {
         super(props)
+        /*
         this.focusListener = this.props.navigation.addListener('didFocus',payload => {
-            console.debug('didFocus');
+            //console.debug('didFocus');
             this._getLocDetails()
         })
+        //*/
         this.state = { 
             typeFlatList: true, 
             selectOnDelete: {}, selectOnEdit: {},
@@ -215,7 +217,9 @@ export default class LocationDetail extends Component {
         }
     }
 
-    componentDidMount = () => { }//this._getLocDetails() }
+    componentDidMount = () => { this._getLocDetails() }
+
+    //componentWillUnmount = () => { this.focusListener.remove() }
 
     _getLocDetails = () => {
         _getToken().then(token=>{
