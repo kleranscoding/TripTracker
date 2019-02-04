@@ -37,14 +37,13 @@ const styles = StyleSheet.create({
         height: 250, 
     },
     locInfo: {
-        marginTop: 5,
         textAlign: 'center',
-        fontSize: 16, fontFamily: 'Avenir',
+        fontSize: 14, fontFamily: 'Avenir',
     },
     rowFront: {
         alignItems: 'flex-start',
         justifyContent: 'center',
-        height: 125,
+        height: 100,
         padding: 5,
 		backgroundColor: 'rgb(255,255,255)',
 		borderBottomColor: 'silver', borderBottomWidth: 1,
@@ -558,7 +557,7 @@ class TripList extends Component {
         </View>
         
         
-          <View style={{backgroundColor: 'rgb(255,255,255)'}}>
+        <View style={{backgroundColor: 'rgb(255,255,255)'}}>
             
             <View style={{margin: 10, flexDirection: 'row', justifyContent: 'center'}}>
             
@@ -614,15 +613,20 @@ class TripList extends Component {
                 return(
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toLocDetails(index)}>
-                    
-                    <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
-                        {loc.location.split(",")[0]+' ...'}
+                    <View style={{flexDirection: 'column', alignItems: 'flex-start', paddingLeft: 5, paddingRight: 5}}>
+                      <Text style={{fontSize: 16, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {loc.location.length<=50? loc.location : loc.location.substring(0,50)+' ...' }
                       </Text>
-                      <Text>
-                          Date: {loc.startDate.split('-').join('/')+' '} 
-                            to {loc.endDate.split('-').join('/')}
-                      </Text> 
+                      <View style={{flexDirection: 'row'}}>
+                        <Text>From: </Text>
+                        <Text style={{color: 'rgb(49,90,158)'}}>
+                            {loc.startDate.split('-').join('/')+' '}
+                        </Text>
+                        <Text> to </Text> 
+                        <Text style={{color: 'rgb(49,90,158)'}}>
+                            {loc.endDate.split('-').join('/')}
+                        </Text>
+                      </View>
                     </View>
 
                 </TouchableHighlight>)
