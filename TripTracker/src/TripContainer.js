@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, Modal, Alert, Image, 
-    TouchableHighlight, TouchableWithoutFeedback, TouchableOpacity, } from 'react-native';
+    TouchableHighlight, TouchableOpacity, } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar, TouchableRipple } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,7 +8,7 @@ import ModalDatePicker from 'react-native-datepicker-modal';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import CalendarPicker from 'react-native-calendar-picker';
 
-import { serverURL, tokenName, regexWhitespace, regexWhitespaceOnly } from './config/envConst';
+import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
 import TripDetail from './TripDetail'
 import LocationDetail from './LocationDetail';
 
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
 		borderBottomColor: 'silver',
 		borderBottomWidth: 1,
 		justifyContent: 'center',
-        height: 100,
-        padding: 10,
+        height: 125,
+        padding: 5,
 	},
 	rowBack: {
 		alignItems: 'center',
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingLeft: 5,
+		//paddingLeft: 10,
     },
 })
 
@@ -90,7 +90,7 @@ const cardStyles = StyleSheet.create({
         borderColor: 'rgba(192,192,192,0.75)', borderWidth: 2,
     },
     cardImg: {
-        width: 50, height: 50,
+        height: 75, width: 100,
     },
 })
 
@@ -451,25 +451,27 @@ class TripContainer extends Component {
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>
                   <View>
-                    <Text style={{fontSize: 20, fontFamily: 'Avenir', marginTop: 10}}>
+                    <Text style={{fontSize: tripTitleLen>=50? 12 : tripTitleLen>=25? 16 : 20, fontFamily: 'Avenir', marginTop: 10}}>
                         {trip.title.toUpperCase()}
                       </Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Image source={{ uri: serverURL+'/'+trip.image }} style={cardStyles.cardImg} />
                       
                       <View style={{marginLeft: 10, alignSelf: 'flex-end', flexDirection: 'column'}}>
-                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir', margin: 0}}>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir', margin: 0}}>
                             Duration: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+getDaysDiffText(trip.startDate,trip.endDate)}
                             </Text>
                         </Paragraph>
-                        <Paragraph style={{fontSize: 14, fontFamily: 'Avenir'}}>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
                             From: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.startDate.split('-').join('/')+' '}
                             </Text> 
-                            to 
+                        </Paragraph>
+                        <Paragraph style={{fontSize: 16, fontFamily: 'Avenir'}}>
+                            to: 
                             <Text style={{color: 'rgb(49,90,158)'}}>
                                 {' '+trip.endDate.split('-').join('/')}
                             </Text> 
