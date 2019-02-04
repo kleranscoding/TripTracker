@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16, fontFamily: 'Avenir',
     },
+    /*
     rowFront: {
 		alignItems: 'flex-start',
 		backgroundColor: 'rgb(255,255,255)',
@@ -57,6 +58,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingLeft: 15,
+    },
+    //*/
+    rowFront: {
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        height: 125,
+        padding: 5,
+		backgroundColor: 'rgb(255,255,255)',
+		borderBottomColor: 'silver', borderBottomWidth: 1,
+	},
+	rowBack: {
+        flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+        paddingLeft: 10,
+        borderBottomColor: 'silver', borderBottomWidth: 1,
     },
 })
 
@@ -638,18 +657,24 @@ class TripList extends Component {
                 let index = parseInt(data.item.key)
                 return(
                 <View style={styles.rowBack}>
-                    {/* <Button style={{borderRadius: 5 }} 
-                        onPress={()=>this._onEditLoc(index)}>
-                        <Text>Edit</Text>
-                    </Button> */}
-                    <Text />
+
+                    {/* <Text />
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteLoc(index,rowMap)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button>
+                    </Button> */}
+                    <Text />
+                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} 
+                        onPress={()=>this._onDeleteLoc(index,rowMap)}>
+                        <View style={{flexDirection: 'column', }}>
+                            <Text style={{color: 'rgb(255,255,255)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                DELETE
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
             )}}
-            rightOpenValue={-80}
+            rightOpenValue={-100}
         />
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}

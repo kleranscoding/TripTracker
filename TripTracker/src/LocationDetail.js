@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20, fontFamily: 'Avenir',
     },
+    /*
     rowFront: {
 		alignItems: 'flex-start',
 		backgroundColor: 'rgb(255,255,255)',
@@ -52,6 +53,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingLeft: 15,
+    },
+    //*/
+    rowFront: {
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        height: 125,
+        padding: 5,
+		backgroundColor: 'rgb(255,255,255)',
+		borderBottomColor: 'silver', borderBottomWidth: 1,
+	},
+	rowBack: {
+        flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+        paddingLeft: 10,
+        borderBottomColor: 'silver', borderBottomWidth: 1,
     },
 })
 
@@ -504,18 +523,36 @@ export default class LocationDetail extends Component {
                 let index = parseInt(data.item.key)
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} 
+                    {/* <Button style={{borderRadius: 5 }} 
                         onPress={()=>this._onEditSpending(index,rowMap)}>
                         <Text>Edit</Text>
                     </Button>
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteSpending(index,rowMap)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button>
+                    </Button> */}
+                    <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this._onEditSpending(index,rowMap)}>
+                        <View style={{flexDirection: 'column', marginLeft: 10}}>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir', textAlign: 'center'}}> 
+                                Edit
+                            </Text>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir', textAlign: 'center'}}> 
+                                Expense
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} 
+                        onPress={()=>this._onDeleteSpending(index,rowMap)}>
+                        <View style={{flexDirection: 'column', }}>
+                            <Text style={{color: 'rgb(255,255,255)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                DELETE
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
             )}}
-            leftOpenValue={80}
-            rightOpenValue={-80}
+            leftOpenValue={100}
+            rightOpenValue={-100}
         />}
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
@@ -585,6 +622,7 @@ class DeleteSpendModal extends Component {
 
     render() {
         return (
+            /*
             <React.Fragment>
                 <View style={modalStyles.modalHeader}>
                     <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
@@ -607,6 +645,40 @@ class DeleteSpendModal extends Component {
                         <Button onPress={this._deleteSpending} 
                             style={{backgroundColor: 'red', borderRadius: 10, }}>
                             <Text style={{color: 'white'}}>Delete</Text>
+                        </Button>
+                    </View>
+                </View>
+            </React.Fragment>
+            //*/
+
+            <React.Fragment>
+                <View style={modalStyles.modalHeader}>
+                    <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
+                        <Text style={modalStyles.closeModalText}>
+                            Close &times;
+                        </Text>
+                    </TouchableHighlight>
+                    <Text style={modalStyles.newLocGreeting}>
+                        {'Warning: Deleting\n'+this.props.selectOnDelete.name}
+                    </Text>
+                </View>
+
+                <Text style={{fontSize: 24, textAlign: 'center', fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                    {'Are you sure you want to delete\n'+this.props.selectOnDelete.name}?
+                </Text>
+
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                    
+                    <View style={{flexDirection: 'row', justifyContent: 'center' }}>
+                        <Button onPress={this._cancelDelete} 
+                            style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+                        >
+                            <Text>Cancel</Text>
+                        </Button>
+                        <Button 
+                            onPress={this._deleteLoc} 
+                            style={{backgroundColor: 'red', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                            <Text style={{color: 'white'}}>DELETE</Text>
                         </Button>
                     </View>
                 </View>
