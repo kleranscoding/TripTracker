@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         width: '100%', height: 200,
     },
     imgViewSmall: {
-        height: 100, 
+        height: 100,
     },
     imgView: {
         height: 250, 
@@ -41,25 +41,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16, fontFamily: 'Avenir',
     },
-    /*
-    rowFront: {
-		alignItems: 'flex-start',
-		backgroundColor: 'rgb(255,255,255)',
-		borderBottomColor: 'silver',
-		borderBottomWidth: 1,
-		justifyContent: 'center',
-        height: 100,
-        padding: 10,
-	},
-	rowBack: {
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingLeft: 15,
-    },
-    //*/
     rowFront: {
         alignItems: 'flex-start',
         justifyContent: 'center',
@@ -76,24 +57,6 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
         paddingLeft: 10,
         borderBottomColor: 'silver', borderBottomWidth: 1,
-    },
-})
-
-const locStyles = StyleSheet.create({
-    addNewBtn: {
-        marginTop: 10, marginLeft: 5, 
-        borderRadius: 20, width: '36%', 
-        backgroundColor: 'rgb(49,90,158)'
-    },
-    editBtn: {
-        marginTop: 10, marginLeft: 5, 
-        borderRadius: 20, width: '25%', 
-        backgroundColor: 'rgb(49,90,158)'
-    },
-    deleteBtn: {
-        marginTop: 10, marginLeft: 5, 
-        borderRadius: 20, width: '25%', 
-        backgroundColor: 'rgb(255,0,0)'
     },
 })
 
@@ -494,10 +457,6 @@ class TripList extends Component {
         }) 
     }
 
-    onPress = (index) => {
-        console.log(index)
-    }
-
     resizeImg = () => {
         if (this.state.resize) {
             this.setState({
@@ -590,45 +549,60 @@ class TripList extends Component {
       <ImageBackground source={{uri: serverURL+'/'+this.state.tripDetails.image}} style={{width: '100%', height: '100%'}}>
   
         <View style={this.state.imgView}>
-            <ScrollView style={{margin: 10, }}> 
-                <TouchableOpacity onPress={this.resizeImg}>
+            <View style={{margin: 10, }}> 
+                <TouchableOpacity onPress={this.resizeImg} style={{width: this.state.resize? '100%':'50%'}}>
                     <Image source={{uri: serverURL+'/'+this.state.tripDetails.image}} 
                         style={this.state.imgSize} />
                 </TouchableOpacity>  
-            </ScrollView>
+            </View>
         </View>
-
-        <View style={{backgroundColor: 'rgb(255,255,255)'}}>
+        
+        
+          <View style={{backgroundColor: 'rgb(255,255,255)'}}>
             
-            <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
-              {/* <TouchableOpacity style={locStyles.deleteBtn} onPress={this.setModal()}>
-                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
-                        DELETE
-                    </Text>
-              </TouchableOpacity> */}
-              <Button onPress={()=>this.setState({modalTripImg: true})}>
-                Edit Trip photo
-              </Button>
-              <TouchableOpacity style={locStyles.editBtn} onPress={()=>this._onEditTrip()}>
-                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
-                    Edit
+            <View style={{margin: 10, flexDirection: 'row', justifyContent: 'center'}}>
+            
+            {/* <View style={{flexDirection: 'row'}}> */}
+              <TouchableOpacity style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                onPress={()=>this.setState({modalTripImg: true})}>
+                <Text style={{
+                    textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    fontSize: 18, fontFamily: 'Avenir', 
+                }}>
+                    Edit Photo
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={locStyles.addNewBtn} onPress={()=>this.setModalVisible(true)}>
-                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 18}}>
+              <TouchableOpacity //style={locStyles.editBtn} 
+                style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                onPress={()=>this._onEditTrip()}>
+                <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                    fontSize: 18, fontFamily: 'Avenir',
+                }}>
+                    Edit Trip
+                </Text>
+              </TouchableOpacity>
+            {/* </View> */}
+
+              <TouchableOpacity //style={locStyles.addNewBtn} 
+                style={{backgroundColor: 'rgb(36,152,219)', margin: 10, borderRadius: 10}}
+                onPress={()=>this.setModalVisible(true)}>
+                    <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', 
+                        fontSize: 18, fontFamily: 'Avenir',
+                    }}>
                         + Location
                     </Text>
               </TouchableOpacity>
             </View>
-        
-            <Searchbar style={{margin: 15}}
+        </View>
+
+        <ScrollView style={{backgroundColor: 'white'}}>
+            <Searchbar style={{marginTop: 5, marginBottom: 5, marginLeft: 15, marginRight: 15}}
                 placeholder="Search Location" />
             
-            <View style={{margin: 5}}>
+            <View style={{margin: 10}}>
             {this.state.tripDetails.locations!==undefined?
                 <LocationContainer locations={this.state.tripDetails.locations} />:null }
             </View>
-        </View>
 
         <SwipeListView
             style={{backgroundColor: 'rgb(255,255,255)'}}
@@ -676,7 +650,7 @@ class TripList extends Component {
             )}}
             rightOpenValue={-100}
         />
-
+        </ScrollView>
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
           onRequestClose={() => {
               Alert.alert('Modal has been closed.')
