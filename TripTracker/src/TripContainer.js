@@ -33,21 +33,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(49,90,158)'
     },
     rowFront: {
-		alignItems: 'flex-start',
-		backgroundColor: 'rgb(255,255,255)',
-		borderBottomColor: 'silver',
-		borderBottomWidth: 1,
-		justifyContent: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
         height: 125,
         padding: 5,
+		backgroundColor: 'rgb(255,255,255)',
+		borderBottomColor: 'silver', borderBottomWidth: 1,
 	},
 	rowBack: {
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-		flex: 1,
+        flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		//paddingLeft: 10,
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+        paddingLeft: 10,
+        borderBottomColor: 'silver', borderBottomWidth: 1,
     },
 })
 
@@ -267,6 +267,7 @@ class TripContainer extends Component {
             this._getTripInfo() 
           })
         this.state= {
+            query: '',
             selectOnDelete: {}, selectOnEdit: {}, trips: [],
             modalVisible: false, modalDelete: false,
         }
@@ -331,8 +332,12 @@ class TripContainer extends Component {
 
     setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
     
-    favToggle = (index) => {
-        console.log(this.state.trips[index])
+    closeRow = (rowMap, rowKey) => {
+		if (rowMap[rowKey]) { rowMap[rowKey].closeRow() }
+    }
+
+    favToggle = (index,rowMap) => {
+        
         _getToken().then(token=>{
             
             fetch(serverURL+'/api/trips/edit/'+this.state.trips[index].id,{
@@ -349,10 +354,11 @@ class TripContainer extends Component {
                 if (res.status===200) {
                     res.json().then(data=>{
                         console.log("edit trips isFav: ")
-                        console.log(data)
+                        //console.log(data)
                         let filteredTrips = this.state.trips
                         filteredTrips[index].isFav = data.isFav
                         this.setState({ trips: filteredTrips, })
+                        this.closeRow(rowMap,index)
                     })
                 }
             }).catch(err=>{ console.log(err) })
@@ -375,7 +381,7 @@ class TripContainer extends Component {
     }
 
     deleteTrip = (index) => {
-        console.log(this.state.trips[index])
+        //console.log(this.state.trips[index])
         let tripId = this.state.trips[index].id
         this._getToken().then(token=>{
             fetch(serverURL+'/api/trips/delete/'+tripId,{
@@ -384,7 +390,7 @@ class TripContainer extends Component {
             }).then(res=>{
                 if (res.status===200) {
                     res.json().then(data=>{
-                        console.log(data)
+                        //console.log(data)
                         let filteredTrips = this.state.trips.filter(trip=>{
                             return (trip.id!==data.id)
                         })
@@ -423,7 +429,7 @@ class TripContainer extends Component {
         return (
     <React.Fragment>
         
-        <View style={{justifyContent: 'space-between', padding: 10, flexDirection: 'row',
+        <View style={{justifyContent: 'space-between', padding: 5, flexDirection: 'row',
             borderBottomWidth: 1, borderBottomColor: 'silver', }}>
           
           {numTrips}          
@@ -435,14 +441,16 @@ class TripContainer extends Component {
             </Text>  
           </Button>
         </View>
-
-        <Searchbar style={{margin: 15}}
-            placeholder="Search Trip" />
-
+        
+        <View style={{backgroundColor: 'rgb(42,121,188)', height: 40}}>
+            <Searchbar placeholder="Search Trip" 
+                onChangeText={(text)=>{this.setState({query: text})}}
+                style={{margin: 2, borderRadius: 5, padding: 2, height: '90%'}} />
+        </View>
+        
         <SwipeListView
             useFlatList
             data={allTrips}
-            //disableRightSwipe={true}
             renderItem={ (data, rowMap) => {
                 let index= parseInt(data.item.key), trip = data.item.trip
                 let tripTitleLen= trip.title.length
@@ -487,18 +495,36 @@ class TripContainer extends Component {
                 let isFav = data.item.trip.isFav
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} icon={isFav? 'star': ''}
+                    {/* <Button style={{borderRadius: 5 }} icon={isFav? 'star': ''}
                         onPress={()=>this.favToggle(index)}>
                         <Text>{isFav? 'Remove':'Add to favorite'}</Text>
                     </Button>
                     <Button style={{borderRadius: 5, }} 
                         onPress={()=>this._onDeleteTrip(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button>
+                    </Button> */}
+                    <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this.favToggle(index,rowMap)}>
+                        <View style={{flexDirection: 'column', marginLeft: 10}}>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                {isFav? 'Remove' : 'Add to'}
+                            </Text>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                Favorite
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} onPress={()=>this._onDeleteTrip(index)}>
+                        <View style={{flexDirection: 'column', }}>
+                            <Text style={{color: 'rgb(255,255,255)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                DELETE
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                    
                 </View>
             )}}
-            leftOpenValue={140}
-            rightOpenValue={-80}
+            leftOpenValue={100}
+            rightOpenValue={-100}
         />
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}

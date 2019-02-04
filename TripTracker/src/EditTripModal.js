@@ -88,7 +88,7 @@ export default class EditTripModal extends Component {
         if (!title || validateWhtieSpaceOnly(title) ) {
             errMsgTitle = '\n- Please enter a trip name'
         } else {
-            errLoc= false
+            errTitle= false
         }
         if (!(startDate && endDate)) {
             errDates = "\n- Please select start and end date"
@@ -99,7 +99,7 @@ export default class EditTripModal extends Component {
             errDateEnd= false
         }
         console.log(errTitle, errDateStart, errDateEnd)
-        if (errLoc || errDateStart || errDateEnd) {
+        if (errTitle || errDateStart || errDateEnd) {
             Alert.alert("Hang on!"+errMsgTitle+errMsgDates)
             return
         }

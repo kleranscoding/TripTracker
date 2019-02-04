@@ -27,21 +27,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(49,90,158)'
     },
     rowFront: {
-		alignItems: 'flex-start',
-		backgroundColor: 'rgb(255,255,255)',
-		borderBottomColor: 'silver',
-		borderBottomWidth: 1,
-		justifyContent: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
         height: 125,
         padding: 5,
+		backgroundColor: 'rgb(255,255,255)',
+        borderBottomColor: 'silver', borderBottomWidth: 1,
 	},
 	rowBack: {
-		alignItems: 'center',
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         backgroundColor: 'transparent', 
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingLeft: 10,
+        paddingLeft: 10,
+        borderBottomColor: 'silver', borderBottomWidth: 1,
     },
 })
 
@@ -196,7 +196,7 @@ export default class Favorites extends Component {
             <Appbar.Content title="Favorites" titleStyle={styles.contentTitle} />
         </Appbar.Header>
 
-        <View style={{justifyContent: 'space-between', padding: 10, flexDirection: 'row',
+        <View style={{justifyContent: 'space-between', padding: 5, flexDirection: 'row',
             borderBottomWidth: 1, borderBottomColor: 'silver', }}>
           
           {this.state.trips && numTrips}          
@@ -250,8 +250,7 @@ export default class Favorites extends Component {
                 let isFav = data.item.trip.isFav
                 return(
                 <View style={styles.rowBack}>
-                  <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this.favToggle(index)}
-                  >
+                  <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this.favToggle(index)}>
                     <View style={{flexDirection: 'column', }}>
                         <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
                             Remove
