@@ -702,7 +702,7 @@ class DeleteLocModal extends Component {
                         {'Warning: Deleting\n'+this.props.selectOnDelete.location}
                     </Text>
                 </View>
-                <View >
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center',}}>
                     <Text >
                         {'Are you sure you want to delete\n'+this.props.selectOnDelete.location}?
                     </Text>

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 const modalStyles = StyleSheet.create({
     newTripGreeting: {
         textAlign: 'center', 
-        fontSize: 24, fontFamily: 'Avenir', color: 'rgb(255,255,255)',
+        fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)',
     },
     closeModalText: {
         marginRight: 5, 
@@ -330,7 +330,9 @@ class TripContainer extends Component {
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
 
-    setModalDelete = (visible) => { this.setState({modalDelete: visible}) }
+    setModalDelete = (visible) => { 
+        this.setState({modalDelete: visible})
+    }
     
     closeRow = (rowMap, rowKey) => {
 		if (rowMap[rowKey]) { rowMap[rowKey].closeRow() }
@@ -373,11 +375,12 @@ class TripContainer extends Component {
         })
     }
 
-    _onDeleteTrip = (index) => {
+    _onDeleteTrip = (index,rowMap) => {
         this.setState({
             selectOnDelete: this.state.trips[index], 
             modalDelete: true,
         })
+        this.closeRow(rowMap,index)
     }
 
     deleteTrip = (index) => {
@@ -442,7 +445,7 @@ class TripContainer extends Component {
           </Button>
         </View>
         
-        <View style={{backgroundColor: 'rgb(42,121,188)', height: 40}}>
+        <View style={{backgroundColor: 'rgb(42,121,188)', height: 45}}>
             <Searchbar placeholder="Search Trip" 
                 onChangeText={(text)=>{this.setState({query: text})}}
                 style={{margin: 2, borderRadius: 5, padding: 2, height: '90%'}} />
@@ -513,7 +516,8 @@ class TripContainer extends Component {
                             </Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} onPress={()=>this._onDeleteTrip(index)}>
+                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} 
+                        onPress={()=>this._onDeleteTrip(index,rowMap)}>
                         <View style={{flexDirection: 'column', }}>
                             <Text style={{color: 'rgb(255,255,255)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
                                 DELETE
@@ -561,8 +565,7 @@ class DeleteTripModal extends Component {
     _deleteTrip = () => {
         console.log("to delete trip")
         _getToken().then(token=>{
-            console.log(token)
-            console.log(this.props.selectOnDelete.id)
+            //console.log(this.props.selectOnDelete.id)
             //*
             fetch(serverURL+'/api/trips/delete/'+this.props.selectOnDelete.id,{
                 method: 'DELETE',
@@ -581,26 +584,31 @@ class DeleteTripModal extends Component {
             <React.Fragment>
                 <View style={modalStyles.modalHeader}>
                     <TouchableHighlight onPress={()=>this.props.setModalDelete(false)}>
-                    <Text style={modalStyles.closeModalText}>
-                        Close &times;
-                    </Text>
+                        <Text style={modalStyles.closeModalText}>
+                            Close &times;
+                        </Text>
                     </TouchableHighlight>
-                    <Text style={modalStyles.newLocGreeting}>
+                    <Text style={modalStyles.newTripGreeting}>
                         {'Warning: Deleting\n'+this.props.selectOnDelete.title}
                     </Text>
                 </View>
-                <View >
-                    <Text >
-                        {'Are you sure you want to delete\n'+this.props.selectOnDelete.title}?
-                    </Text>
+
+                <Text style={{fontSize: 24, textAlign: 'center', fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                    {'Are you sure you want to delete\n'+this.props.selectOnDelete.title}?
+                </Text>
+
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                    
                     <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                        <Button onPress={this._cancelDelete} >
+                        <Button onPress={this._cancelDelete} 
+                            style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+                        >
                             <Text>Cancel</Text>
                         </Button>
                         <Button 
                             onPress={this._deleteTrip} 
-                            style={{backgroundColor: 'red', borderRadius: 10, }}>
-                            <Text style={{color: 'white'}}>Delete</Text>
+                            style={{backgroundColor: 'red', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                            <Text style={{color: 'white'}}>DELETE</Text>
                         </Button>
                     </View>
                 </View>
