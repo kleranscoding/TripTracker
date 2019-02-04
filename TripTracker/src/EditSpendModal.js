@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, 
-    TouchableHighlight, Alert, TouchableOpacity, Picker, Dimensions, } from 'react-native';
+    TouchableHighlight, Alert, TouchableOpacity, Picker, } from 'react-native';
 import { Button, TextInput, } from  'react-native-paper';
 import ModalDatePicker from 'react-native-datepicker-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -232,43 +232,37 @@ export default class EditSpendModal extends Component {
         </Text>
       </View>
 
-    <ScrollView>
-      <KeyboardAwareScrollView style={{marginBottom: 100}}>
+    <KeyboardAwareScrollView>
         
-      <View >
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={false}
-          todayBackgroundColor="#f2e6ff"
-          selectedDayColor="#7300e6"
-          selectedDayTextColor="#FFFFFF"
-          onDateChange={this.onDateChange}
-        />
- 
-        <View>
-          <Text>SELECTED DATE:{ this.state.date }</Text>
+        <View style={{margin: 10}}>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                DATE: {' '+this.state.date }
+            </Text>
         </View>
-      </View>
 
-        {/* <View style={modalStyles.datepicker}>
-            <Text style={{fontSize: 18, margin: 10}}>Date: </Text>
-            <ModalDatePicker startDate={new Date(this.state.date)}
-                renderDate={({ year, month, day, date }) => {
-                    let selectedDate = "Click here to select a date"
-                    if (date) { 
-                        selectedDate = `${year}-${month}-${day}` 
-                    } else {
-                        selectedDate = this.props.selectOnEdit.date
-                    }
-                    return <Text style={{fontSize: 18}}>{selectedDate}</Text>
-                }}
-                onDateChanged={({ year, month, day, date }) => {
-                    if (date) {
-                        this.updateDate("date",`${year}-${month}-${day}`)
-                    }
-                }}
+        <TouchableOpacity style={{
+                margin: 10, backgroundColor: 'rgb(36,152,219)',
+                borderColor: 'silver', borderWidth: 1, borderRadius: 10, padding: 5
+            }}
+            onPress={()=>this.setState({openCalendar: !this.state.openCalendar})}>
+            <Text style={{
+                textAlign: 'center', fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)'}}
+            >
+                {this.state.openCalendar? 'Close ' : 'Open '} Calendar
+            </Text>
+        </TouchableOpacity>
+        
+        {this.state.openCalendar && 
+        <View style={{borderColor: 'silver', borderWidth: 1, margin: 10, borderRadius: 10}}>
+            <CalendarPicker
+                startFromMonday={true}
+                todayBackgroundColor="rgb(49,90,158)"
+                selectedDayColor="rgb(49,90,158)"
+                selectedDayTextColor="rgb(255,255,255)"
+                onDateChange={this.onDateChange}
             />
-        </View> */}
+        </View>}
+        
 
         <TextInput label='What did you spend on?' mode="outlined" 
             onChangeText={text => this.setState({ name: text })}
@@ -276,7 +270,7 @@ export default class EditSpendModal extends Component {
             value={this.state.name}
             style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
         
-        <View style={{flexDirection: this.state.resizeCurr? 'column' : 'row', alignContent: 'center', }}>
+        {/* <View style={{flexDirection: this.state.resizeCurr? 'column' : 'row', alignContent: 'center', }}>
           <View style={{width: this.state.resizeCurr? '100%' : '40%', padding: 10, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 5}}>
             <TouchableOpacity onPress={()=>this.resizeSelector("resizeCurr")}>
                 <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
@@ -302,10 +296,35 @@ export default class EditSpendModal extends Component {
               //value={this.props.selectOnEdit.amount+''}
               style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
           </View>
+        </View> */}
+
+        <View style={{flexDirection: this.state.resizeCurr? 'column' : 'row', alignContent: 'center', margin: 5}}>
+          <View style={{width: this.state.resizeCurr? '100%' : '42%', justifyContent: 'center', }}>
+            <TouchableOpacity onPress={this.resizeCurrency} 
+                style={{backgroundColor: 'rgb(36,152,219)', borderRadius: 10, padding: 5, margin: 5 }}>
+                <Text style={{textAlign: 'center',color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
+                    Selected: {this.state.currency}
+                </Text>
+            </TouchableOpacity>
+            {this.state.resizeCurr && 
+                <Picker style={{backgroundColor: 'rgb(255,255,255)'}}
+                    selectedValue={this.state.currency} mode="dropdown"
+                    onValueChange={(itemVal, itemIndex) => {
+                        this.setState({currency: itemVal, resizeCurr: false })
+                }}>
+                    {currencyGrp}
+                </Picker>}
+          </View>
+          <View style={{width: this.state.resizeCurr? '100%' : '50%'}}>
+            <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
+              onChangeText={text => this.setState({ amount: text })}
+              defaultValue={this.props.selectOnEdit.amount.toString()}
+              style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)', fontFamily: 'Avenir' }} />
+          </View>
         </View>
         
         
-        <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
+        {/* <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
             <TouchableOpacity onPress={()=>this.resizeSelector("resizeCat")} style={{backgroundColor: 'rgba(49,90,158,0.5)'}}>
                 <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
                     {this.state.resizeCat? this.state.category+' selected' : 
@@ -314,7 +333,20 @@ export default class EditSpendModal extends Component {
                 </Text>
             </TouchableOpacity>
             {this.state.resizeCat && catButtonGrp}
- 
+        </View> */}
+
+        <View style={{padding: 10, backgroundColor: 'rgb(36,152,219)', margin: 20, borderRadius: 10}}>
+            <TouchableOpacity onPress={this.resizeCat} >
+                <Text style={{color: 'rgb(255,255,255)', fontSize: 18, fontFamily: 'Avenir'}}>
+                    {this.state.resizeCat? 'Select a category' : 
+                        this.state.category!=='' ? 
+                        'Category: '+this.state.category+' selected': 'Select a category'}
+                </Text>
+            </TouchableOpacity>
+            {this.state.resizeCat && 
+                <View style={{backgroundColor: 'rgb(255,255,255)', borderWidth: 1, borderColor: 'silver'}}>
+                    {catButtonGrp}
+                </View>}
         </View>
         
         <TextInput label='A little more about it maybe? (optional)' mode="outlined" multiline={true}
@@ -323,14 +355,27 @@ export default class EditSpendModal extends Component {
             value={this.state.note}
             style={{margin: 20, borderRadius: 10, backgroundColor: 'rgb(255,255,255)' }} />
     
-        <TouchableOpacity onPress={this.submitEditSpendInfo} style={modalStyles["create_btn"]}>
+        {/* <TouchableOpacity onPress={this.submitEditSpendInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Update Expense
             </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 50, marginBottom: 100}}>
+            <Button onPress={()=>this.props.setModalEdit(false,"modalEdit","selectOnEdit")} 
+                style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this.submitEditSpendInfo} 
+                style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                <Text style={{color: 'white'}}>Update Expense</Text>
+            </Button>
+        </View>
+
 
       </KeyboardAwareScrollView>
-    </ScrollView>
+
     </React.Fragment>
         )
     }
