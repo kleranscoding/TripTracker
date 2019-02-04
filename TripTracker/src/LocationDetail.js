@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import PureChart from 'react-native-pure-chart';
 
 import { serverURL, tokenName, regexWhitespaceOnly, 
     Categories, CategoryPieChart, currencyInfo } from './config/envConst';
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
     rowFront: {
         alignItems: 'flex-start',
         justifyContent: 'center',
-        height: 125,
+        height: 105,
         padding: 5,
 		backgroundColor: 'rgb(255,255,255)',
 		borderBottomColor: 'silver', borderBottomWidth: 1,
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		backgroundColor: 'transparent',
-        paddingLeft: 10,
+        paddingLeft: 5, paddingRight: 5,
         borderBottomColor: 'silver', borderBottomWidth: 1,
     },
 })
@@ -187,8 +188,8 @@ class SpendingContainer extends Component {
     render() {
         let numSpends = this.props.spendings.length>0 ? 
             this.props.spendings.length > 1 ?
-                <Text style={styles.spendInfo}>{`${this.props.spendings.length} spendings`}</Text> :
-                <Text style={styles.spendInfo}>{`${this.props.spendings.length} spending`}</Text> :
+                <Text style={styles.spendInfo}>{`${this.props.spendings.length} expenses`}</Text> :
+                <Text style={styles.spendInfo}>{`${this.props.spendings.length} expense`}</Text> :
             <Text style={styles.spendInfo}>You don't have any expense at this location yet</Text>
         
         return(
@@ -218,7 +219,8 @@ export default class LocationDetail extends Component {
             locDetails: props.navigation.getParam("locDetails"),
             resize: false, showChart: false,
             modalVisible: false, modalDelete: false, modalEdit: false,
-            modalEditLoc: false,
+            modalEditLoc: false, 
+            modalChart: false, modalMap: false, 
             imgView: styles.imgView, imgSize: styles.imgSmall,
         }
     }
@@ -408,17 +410,24 @@ export default class LocationDetail extends Component {
         return(
     <React.Fragment>
         <View >
-            <Text>{this.state.locDetails.location}</Text>
-            {allSpendings.length>0 && <Button onPress={()=>{this.setState({showChart: !this.state.showChart})}}>
-                show Graph
-            </Button>}
+            <View style={{margin: 10}}>
+                <Text style={{fontSize: 18, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                    {this.state.locDetails.location}
+                </Text>
+            </View>
+           
+            {allSpendings.length>0 && 
+                <Button onPress={()=>{this.setState({modalChart: true})}}>
+                    Show Expense Graph </Button>}
+
             {/* <MapContainer location={this.state.locDetails.location} 
                 geocode={this.state.locDetails.geocode} /> */}
-                {this.state.showChart &&  <PieChart2 spendingCat={spendingCat}/> }
+                {//this.state.showChart &&  <PieChart2 spendingCat={spendingCat}/> 
+            }
             
         </View>
         
-        <View style={{margin: 10, flexDirection: 'row', justifyContent: ''}}>
+        <View style={{margin: 10, flexDirection: 'row', }}>
             <TouchableOpacity style={spendStyles.deleteBtn} onPress={this.toggleView}>
                 <Text style={{textAlign: 'center', padding: 10, color: 'rgb(255,255,255)', fontSize: 14 }}>
                     Change to {!this.state.typeFlatList ? 'Normal View' : 'Category View'}
@@ -437,7 +446,7 @@ export default class LocationDetail extends Component {
         </View>
 
         <View style={{margin: 5}}>
-        {this.state.locDetails.spendings!==undefined?
+          {this.state.locDetails.spendings!==undefined?
             <SpendingContainer spendings={this.state.locDetails.spendings} />:null}
         </View>
 
@@ -452,7 +461,7 @@ export default class LocationDetail extends Component {
                 return(
                 <View style={styles.rowFront}>
                     
-                  <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                  {/* <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                     <View style={{flex: 1, flexDirection: 'column'}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {spend.name}
@@ -466,7 +475,20 @@ export default class LocationDetail extends Component {
                         {spend.currency+' '+spend.amount}
                       </Text>
                     </View>
-                  </View>
+                  </View> */}
+                  <View style={{flexDirection: 'column'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir', paddingLeft: 10, paddingRight: 10}}>
+                        {spend.name}
+                      </Text>
+                      <Text style={{color: 'rgb(49,90,158)', fontSize: 14, fontFamily: 'Avenir', paddingLeft: 10, paddingRight: 10}}>
+                        on {spend.date.split('-').join('/')}
+                      </Text>
+                    </View>
+                    <View style={{position: 'absolute', right: 5}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                        {spend.currency+' '+spend.amount}
+                      </Text>
+                    </View>
                     
                 </View >)
             }}
@@ -476,14 +498,32 @@ export default class LocationDetail extends Component {
                 console.log(index)
                 return(
                 <View style={styles.rowBack}>
-                    <Button style={{borderRadius: 5 }} 
+                    {/* <Button style={{borderRadius: 5 }} 
                         onPress={()=>this._onEditSpending(index)}>
                         <Text>Edit</Text>
                     </Button>
                     <Button style={{borderRadius: 5,  }} 
                         onPress={()=>this._onDeleteSpending(index)}>
                         <Text style={{color: 'rgb(255,0,0)'}}>Delete</Text>
-                    </Button>
+                    </Button> */}
+                    <TouchableOpacity style={{borderRadius: 5, }} onPress={()=>this._onEditSpending(index,rowMap)}>
+                        <View style={{flexDirection: 'column', marginLeft: 10}}>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir', textAlign: 'center'}}> 
+                                Edit
+                            </Text>
+                            <Text style={{color: 'rgb(49,90,158)', margin: 5, fontSize: 16, fontFamily: 'Avenir', textAlign: 'center'}}> 
+                                Expense
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'red',padding: 5, marginRight: 5}} 
+                        onPress={()=>this._onDeleteSpending(index,rowMap)}>
+                        <View style={{flexDirection: 'column', }}>
+                            <Text style={{color: 'rgb(255,255,255)', margin: 5, fontSize: 16, fontFamily: 'Avenir'}}> 
+                                DELETE
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>)
             }}
             renderSectionHeader={({section}) => <Text>{section.title}</Text>}
@@ -500,22 +540,22 @@ export default class LocationDetail extends Component {
                 return(
                 <View style={styles.rowFront}>
                     
-                  <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <View style={{flex: 1, flexDirection: 'column'}}>
-                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir', paddingLeft: 10, paddingRight: 10}}>
                         {spend.name}
                       </Text>
-                      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
-                        <Text>on {spend.date.split('-').join('/')}</Text>
-                        <Text>{spend.category}</Text>
-                      </View>
+                      <Text style={{color: 'rgb(49,90,158)', fontSize: 14, fontFamily: 'Avenir', paddingLeft: 10, paddingRight: 10}}>
+                        on {spend.date.split('-').join('/')}
+                      </Text>
+                      <Text style={{color: 'rgb(49,90,158)', fontSize: 14, fontFamily: 'Avenir', paddingLeft: 10, paddingRight: 10}}>
+                        {spend.category}
+                      </Text>
                     </View>
-                    <View style={{alignSelf: 'flex-end', flexDirection: 'column'}}>
+                    <View style={{position: 'absolute', right: 5}}>
                       <Text style={{fontSize: 20, marginBottom: 5, fontFamily: 'Avenir'}}>
                         {spend.currency+' '+spend.amount}
                       </Text>
                     </View>
-                  </View>
                     
                 </View >)
             }}
@@ -591,6 +631,15 @@ export default class LocationDetail extends Component {
             <EditLocModal selectOnEdit={this.state.selectOnEdit} 
                 setModalEdit={this.setModal}
                 editLoc={this._editLoc} />
+        </Modal>
+
+        <Modal animationType="slide" transparent={false} visible={this.state.modalChart}
+          onRequestClose={() => {
+              Alert.alert('Modal has been closed.')
+              this.setModal(false,"modalChart","")
+            }}>
+            <PieChartModal spendingCat={spendingCat} setModalChart={this.setModal} />
+            
         </Modal>
 
     </React.Fragment>
@@ -688,9 +737,9 @@ class DeleteSpendModal extends Component {
     }
 }
 
-import PureChart from 'react-native-pure-chart';
 
-class PieChart2 extends Component {
+
+class PieChartModal extends Component {
     render() {
         let sampleData = [], sampleData2= []
         CategoryPieChart.map(catOpt=>{
@@ -710,15 +759,49 @@ class PieChart2 extends Component {
             
         })
         
-        console.log(sampleData)
+        //console.log(sampleData)
         
+        let spends = sampleData.filter(spend=>{
+            return spend.value>0.0
+        })
+
+        let spendInfo = []
+        spends.map((spend,index)=>{
+            console.log(spend)
+            return spendInfo.push(
+            <View style={{flexDirection: 'row', alignContent: 'center', paddingBottom: 5, paddingTop: 5}} key={index}>
+                <View style={{
+                    backgroundColor: spend.color, 
+                    borderRadius: '50%', height: 25, width: 25, marginRight: 10}} 
+                />
+                <Text style={{color: 'rgb(49,90,158)', fontFamily: 'Avenir', fontSize: 20, marginLeft: 10}}>
+                    {spend.label+': $'+spend.value }
+                </Text>
+            </View>
+            )
+        })
+
         return (
-            <View>
+        <React.Fragment>
+            <View style={modalStyles.modalHeader}>
+                <TouchableHighlight onPress={()=>this.props.setModalChart(false,"modalChart","")}>
+                    <Text style={modalStyles.closeModalText}>
+                    Close &times;
+                    </Text>
+                </TouchableHighlight>
+                <Text style={modalStyles.newLocGreeting}>
+                    Expense Summary
+                </Text>
+            </View>
+            <View style={{justifyContent: 'center', alignSelf: 'center'}}>
                 <PureChart data={sampleData} type='pie' />
-            
+            </View>
+            <View style={{flex: 1, justifyContent: 'center', alignSelf: 'center'}}>
+                {spendInfo}
             </View>
             
+
+        </React.Fragment>
         )
-        //return <Text>Bang!</Text>
     }
 }
