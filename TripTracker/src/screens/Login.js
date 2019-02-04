@@ -87,7 +87,10 @@ export default class Login extends Component {
             }),
         })
         .then(res=>{
-            if (res.status!==200) { return console.log(res._bodyText) }
+            if (res.status!==200) { 
+                Alert.alert(JSON.parse(res._bodyText).message)
+                return console.log(res._bodyText) 
+            }
             console.log("user found")
             this._loginAsync(res)
             //this._showToken()

@@ -541,7 +541,7 @@ class TripList extends Component {
                 return allLocs.push({ loc: loc ,key: index.toString() })
             })  
         }
-        console.log(allLocs)
+        
         if (!validateWhtieSpaceOnly(this.state.queryLoc) ) {
             allLocs = allLocs.filter(item=>{
                 return item.loc.location.toLowerCase().indexOf(this.state.queryLoc)!==-1

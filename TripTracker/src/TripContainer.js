@@ -260,7 +260,7 @@ class NewTripModal extends Component {
         </View>}
 
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
-            {/* <Button onPress={this._cancelDelete} 
+            {/* <Button onPress={()=>this.props.setModalVisible(false)} 
             style={modalStyles["create_btn"]}
                     //style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
             >
@@ -271,7 +271,7 @@ class NewTripModal extends Component {
                     Create Trip
                 </Text>
             </TouchableOpacity> */}
-            <Button onPress={this._cancelDelete} 
+            <Button onPress={()=>this.props.setModalVisible(false)} 
                 style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
             >
                 <Text>Cancel</Text>
@@ -426,7 +426,6 @@ class TripContainer extends Component {
             }).then(res=>{
                 if (res.status===200) {
                     res.json().then(data=>{
-                        //console.log(data)
                         let filteredTrips = this.state.trips.filter(trip=>{
                             return (trip.id!==data.id)
                         })
