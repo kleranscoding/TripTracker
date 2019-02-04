@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, Modal, Alert, Image, 
     TouchableHighlight, TouchableOpacity, } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button, TextInput, Card, Title, Paragraph, Searchbar, TouchableRipple } from  'react-native-paper';
+import { Appbar, Button, TextInput, Paragraph, Searchbar, } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import ModalDatePicker from 'react-native-datepicker-modal';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import CalendarPicker from 'react-native-calendar-picker';
 
@@ -126,7 +127,7 @@ class NewTripModal extends Component {
     state= {
         tripTitle: '',
         dateStart: '', dateEnd: '',
-        errTripTitle: false,
+        errTripTitle: false, openCalendar: false,
         errDateStartStyle: {fontSize: 18}, errDateEndStyle: {fontSize: 18},
     }
 
@@ -198,7 +199,7 @@ class NewTripModal extends Component {
 
     onDateChange = (date, type) => {
         if (type === 'END_DATE') {
-          this.setState({ dateEnd: dateToString(date),})
+          this.setState({ dateEnd: dateToString(date), openCalendar: false})
         } else {
           this.setState({ dateStart: dateToString(date),dateEnd: ''})
         }
@@ -209,47 +210,80 @@ class NewTripModal extends Component {
     <React.Fragment>
       
       <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-        <Appbar.Content title="New Trip Info" titleStyle={styles.contentTitle} />
+        <Appbar.Content title="Create New Trip" titleStyle={styles.contentTitle} />
         <Button onPress={()=>this.props.setModalVisible(false)}
             style={{alignItems: 'center', alignContent: 'flex-end'}}>
             <Text style={{color: "rgb(255,255,255)"}}>Close</Text>
         </Button> 
       </Appbar.Header>
 
-      <ScrollView>
+      <KeyboardAwareScrollView>
         
-        <TextInput label='Enter Trip Title' mode="outlined" value={this.state.tripTitle}
+        <TextInput label='Enter Trip Name' mode="outlined" value={this.state.tripTitle}
             onChangeText={text => this.setState({ tripTitle: text })}
             onBlur={this.onBlur} onFocus={this.onFocus}
             style={{margin: 20, borderRadius: 5, backgroundColor: 'rgb(255,255,255)' }} 
             error={this.state.errTripTitle}
         />
-
-
-      <View >
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={true}
-          todayBackgroundColor="#f2e6ff"
-          selectedDayColor="#7300e6"
-          selectedDayTextColor="#FFFFFF"
-          onDateChange={this.onDateChange}
-        />
- 
-        <View>
-          <Text>SELECTED START DATE:{ this.state.dateStart }</Text>
-          <Text>SELECTED END DATE:{ this.state.dateEnd }</Text>
-        </View>
-      </View>
         
-        <TouchableOpacity onPress={this.submitTripInfo} style={modalStyles["create_btn"]}>
-            <Text style={modalStyles["create_btn_text"]}>
-                Create Trip
+        <View style={{margin: 10}}>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                START DATE:{' '+this.state.dateStart }
+            </Text>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                END DATE:{ ' '+this.state.dateEnd }
+            </Text>
+        </View>
+
+        <TouchableOpacity style={{
+                width:'50%', marginLeft: 10, backgroundColor: 'rgb(36,152,219)',
+                borderColor: 'silver', borderWidth: 1, borderRadius: 10, padding: 5
+            }}
+            onPress={()=>this.setState({openCalendar: !this.state.openCalendar})}>
+            <Text style={{
+                textAlign: 'center', fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)'}}
+            >
+                {this.state.openCalendar? 'Close ' : 'Open '} Calendar
             </Text>
         </TouchableOpacity>
-      
-      </ScrollView>
         
+        {this.state.openCalendar && 
+        <View style={{borderColor: 'silver', borderWidth: 1, margin: 10, borderRadius: 10}}>
+            <CalendarPicker
+                startFromMonday={true}
+                allowRangeSelection={true}
+                todayBackgroundColor="rgb(49,90,158)"
+                selectedDayColor="rgb(49,90,158)"
+                selectedDayTextColor="rgb(255,255,255)"
+                onDateChange={this.onDateChange}
+            />
+        </View>}
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
+            {/* <Button onPress={this._cancelDelete} 
+            style={modalStyles["create_btn"]}
+                    //style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <TouchableOpacity onPress={this.submitTripInfo} style={modalStyles["create_btn"]}>
+                <Text style={modalStyles["create_btn_text"]}>
+                    Create Trip
+                </Text>
+            </TouchableOpacity> */}
+            <Button onPress={this._cancelDelete} 
+                style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this.submitTripInfo} 
+                style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                <Text style={{color: 'white'}}>Create Trip</Text>
+            </Button>
+        </View>
+        
+      </KeyboardAwareScrollView>
+
     </React.Fragment>
         )
     }
@@ -269,7 +303,7 @@ class TripContainer extends Component {
         this.state= {
             query: '',
             selectOnDelete: {}, selectOnEdit: {}, trips: [],
-            modalVisible: false, modalDelete: false,
+            modalVisible: !false, modalDelete: false,
         }
     }
 
@@ -326,7 +360,6 @@ class TripContainer extends Component {
         trips.push(trip)
         this.setState({ trips })
     }
-
 
     setModalVisible = (visible) => { this.setState({modalVisible: visible}) }
 
@@ -546,8 +579,8 @@ class TripContainer extends Component {
               this.setModalVisible(false)
         }}>
             <DeleteTripModal setModalDelete={this.setModalDelete}
-                    selectOnDelete={this.state.selectOnDelete} 
-                    removeTrip={this._removeTrip} />
+                selectOnDelete={this.state.selectOnDelete} 
+                removeTrip={this._removeTrip} />
         </Modal>
 
     </React.Fragment>
@@ -599,7 +632,7 @@ class DeleteTripModal extends Component {
 
                 <View style={{flex: 1, justifyContent: 'center'}}>
                     
-                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'center' }}>
                         <Button onPress={this._cancelDelete} 
                             style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
                         >
