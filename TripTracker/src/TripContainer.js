@@ -303,7 +303,7 @@ class TripContainer extends Component {
         this.state= {
             query: '',
             selectOnDelete: {}, selectOnEdit: {}, trips: [],
-            modalVisible: !false, modalDelete: false,
+            modalVisible: false, modalDelete: false,
         }
     }
 
@@ -495,7 +495,7 @@ class TripContainer extends Component {
                 <TouchableHighlight style={styles.rowFront}
                     onPress={()=>this.toTripDetails(index)}>
                   <View>
-                    <Text style={{fontSize: tripTitleLen>=50? 12 : tripTitleLen>=25? 16 : 20, fontFamily: 'Avenir', marginTop: 10}}>
+                    <Text style={{fontSize: tripTitleLen>=40? 12 : tripTitleLen>=25? 16 : 20, fontFamily: 'Avenir', marginTop: 10}}>
                         {trip.title.toUpperCase()}
                       </Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>

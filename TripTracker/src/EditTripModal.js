@@ -74,6 +74,7 @@ export default class EditTripModal extends Component {
             dateStart: props.selectOnEdit.startDate, 
             dateEnd: props.selectOnEdit.endDate,
             errTripTitle: false,
+            openCalendar: false,
         }
     }
 
@@ -154,16 +155,16 @@ export default class EditTripModal extends Component {
     <React.Fragment>
         
       <Appbar.Header statusBarHeight={20} style={styles.appbarHeader}>
-        <Appbar.Content title="New Location Info" titleStyle={styles.contentTitle} />
+        <Appbar.Content title="Edit Trip Info" titleStyle={styles.contentTitle} />
         <Button onPress={()=>this.props.setModalEdit(false,"modalEditTrip","")}
             style={{alignItems: 'center', alignContent: 'flex-end'}}>
             <Text style={{color: "rgb(255,255,255)"}}>Close</Text>
         </Button> 
       </Appbar.Header>
 
-      <ScrollView>
+      <KeyboardAwareScrollView>
         
-      <TextInput label='Enter Trip Title' mode="outlined" value={this.state.tripTitle}
+        <TextInput label='Enter Trip Name' mode="outlined" value={this.state.tripTitle}
             defaultValue={this.state.tripTitle}
             onChangeText={text => this.setState({ tripTitle: text })}
             onBlur={this.onBlur} onFocus={this.onFocus}
@@ -171,29 +172,58 @@ export default class EditTripModal extends Component {
             error={this.state.errTripTitle}
         />
 
-      <View >
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={true}
-          todayBackgroundColor="#f2e6ff"
-          selectedDayColor="#7300e6"
-          selectedDayTextColor="#FFFFFF"
-          onDateChange={this.onDateChange}
-        />
- 
-        <View>
-          <Text>SELECTED START DATE:{ this.state.dateStart }</Text>
-          <Text>SELECTED END DATE:{ this.state.dateEnd }</Text>
+        <View style={{margin: 10}}>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                START DATE:{' '+this.state.dateStart }
+            </Text>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                END DATE:{ ' '+this.state.dateEnd }
+            </Text>
         </View>
-      </View>
 
-        <TouchableOpacity onPress={this.submitEditTripInfo} style={modalStyles["create_btn"]}>
+        <TouchableOpacity style={{
+                width:'50%', marginLeft: 10, backgroundColor: 'rgb(36,152,219)',
+                borderColor: 'silver', borderWidth: 1, borderRadius: 10, padding: 5
+            }}
+            onPress={()=>this.setState({openCalendar: !this.state.openCalendar})}>
+            <Text style={{
+                textAlign: 'center', fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)'}}
+            >
+                {this.state.openCalendar? 'Close ' : 'Open '} Calendar
+            </Text>
+        </TouchableOpacity>
+
+        {this.state.openCalendar && 
+        <View style={{borderColor: 'silver', borderWidth: 1, margin: 10, borderRadius: 10}}>
+            <CalendarPicker
+                startFromMonday={true}
+                allowRangeSelection={true}
+                todayBackgroundColor="rgb(49,90,158)"
+                selectedDayColor="rgb(49,90,158)"
+                selectedDayTextColor="rgb(255,255,255)"
+                onDateChange={this.onDateChange}
+            />
+        </View>}
+
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
+            <Button onPress={()=>this.props.setModalEdit(false,"modalEditTrip","")} 
+                style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this.submitEditTripInfo} 
+                style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                <Text style={{color: 'white'}}>Update Trip Info</Text>
+            </Button>
+        </View>
+
+        {/* <TouchableOpacity onPress={this.submitEditTripInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Update Trip Info
             </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         
-      </ScrollView>
+      </KeyboardAwareScrollView>
         
     </React.Fragment>
         )
