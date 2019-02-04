@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import CalendarPicker from 'react-native-calendar-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { serverURL, tokenName, regexWhitespaceOnly } from './config/envConst';
@@ -163,7 +164,7 @@ class NewLocModal extends Component {
         this.formatAddr= ''
         this.geocode = {}
         this.state = {
-            dateStart: '', dateEnd: '',
+            dateStart: '', dateEnd: '', openCalendar: false,
         }
     }
     
@@ -251,7 +252,7 @@ class NewLocModal extends Component {
         </Button> 
       </Appbar.Header>
 
-      <ScrollView>
+      <KeyboardAwareScrollView>
         
       <GooglePlacesAutocomplete 
         ref="location" query={{ key: GOOGLAPI, types: ['geocode', 'cities'] }}
@@ -286,31 +287,58 @@ class NewLocModal extends Component {
 
         />
 
-        <View >
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={true}
-          todayBackgroundColor="#f2e6ff"
-          selectedDayColor="#7300e6"
-          selectedDayTextColor="#FFFFFF"
-          onDateChange={this.onDateChange}
-        />
- 
-        <View>
-          <Text>SELECTED START DATE:{ this.state.dateStart }</Text>
-          <Text>SELECTED END DATE:{ this.state.dateEnd }</Text>
+        <View style={{margin: 10}}>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                START DATE:{' '+this.state.dateStart }
+            </Text>
+            <Text style={{margin: 10, fontSize: 16, fontFamily: 'Avenir', color: 'rgb(49,90,158)'}}>
+                END DATE:{ ' '+this.state.dateEnd }
+            </Text>
         </View>
-      </View>
 
+        <TouchableOpacity style={{
+                width:'50%', marginLeft: 10, backgroundColor: 'rgb(36,152,219)',
+                borderColor: 'silver', borderWidth: 1, borderRadius: 10, padding: 5
+            }}
+            onPress={()=>this.setState({openCalendar: !this.state.openCalendar})}>
+            <Text style={{
+                textAlign: 'center', fontSize: 20, fontFamily: 'Avenir', color: 'rgb(255,255,255)'}}
+            >
+                {this.state.openCalendar? 'Close ' : 'Open '} Calendar
+            </Text>
+        </TouchableOpacity>
         
+        {this.state.openCalendar && 
+        <View style={{borderColor: 'silver', borderWidth: 1, margin: 10, borderRadius: 10}}>
+            <CalendarPicker
+                startFromMonday={true}
+                allowRangeSelection={true}
+                todayBackgroundColor="rgb(49,90,158)"
+                selectedDayColor="rgb(49,90,158)"
+                selectedDayTextColor="rgb(255,255,255)"
+                onDateChange={this.onDateChange}
+            />
+        </View>}
 
-        <TouchableOpacity onPress={this.submitLocInfo} style={modalStyles["create_btn"]}>
+        {/* <TouchableOpacity onPress={this.submitLocInfo} style={modalStyles["create_btn"]}>
             <Text style={modalStyles["create_btn_text"]}>
                 Add Location
             </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 100}}>
+            <Button onPress={()=>this.props.setModalVisible(false)} 
+                style={{marginLeft: 10, marginRight: 10, borderColor: 'silver', borderWidth: 1, borderRadius: 10}}
+            >
+                <Text>Cancel</Text>
+            </Button>
+            <Button onPress={this.submitLocInfo} 
+                style={{backgroundColor: 'rgb(49,90,158)', borderRadius: 10, marginLeft: 10, marginRight: 10 }}>
+                <Text style={{color: 'white'}}>Add Location</Text>
+            </Button>
+        </View>
       
-      </ScrollView>
+      </KeyboardAwareScrollView>
         
     </React.Fragment>
         )
@@ -359,11 +387,12 @@ class TripList extends Component {
         this.state = { 
             tripDetails: {}, locations: [],
             resize: false,
-            modalVisible: false, modalDelete: false, modalEdit: false,
+            modalVisible: !false, modalDelete: false, modalEdit: false,
             modalEditLoc: false, modalEditTrip: false, 
             modalTripImg: false,
             selectOnDelete: {}, selectOnEdit: {},
             imgView: styles.imgViewSmall, imgSize: styles.imgSmall,
+
         }
     }
 
