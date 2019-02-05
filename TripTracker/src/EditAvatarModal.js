@@ -4,7 +4,6 @@ import { Appbar, Button } from 'react-native-paper';
 import { Camera, Permissions, ImagePicker, } from 'expo';
 
 import { serverURL, tokenName, } from './config/envConst';
-import { ScrollView } from 'react-native-gesture-handler';
 
 
 /**

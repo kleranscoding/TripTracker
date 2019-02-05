@@ -8,7 +8,7 @@ import { serverURL, tokenName } from '../config/envConst';
 
 const styles = StyleSheet.create({
     appbarHeader:{
-      backgroundColor: 'rgb(36,152,216)',
+      backgroundColor: 'rgb(36,152,219)',
     },
     contentTitle: {
       fontSize: 24, fontFamily: 'Avenir',

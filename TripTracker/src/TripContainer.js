@@ -4,7 +4,6 @@ import { AsyncStorage, StyleSheet, View, Text, ScrollView, Modal, Alert, Image,
 import { createStackNavigator } from 'react-navigation';
 import { Appbar, Button, TextInput, Paragraph, Searchbar, } from  'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import ModalDatePicker from 'react-native-datepicker-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import CalendarPicker from 'react-native-calendar-picker';

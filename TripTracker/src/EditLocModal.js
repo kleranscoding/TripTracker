@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, ScrollView, 
     TouchableHighlight, Alert, TouchableOpacity, Picker, Dimensions, } from 'react-native';
 import { Appbar, Button, TextInput, } from  'react-native-paper';
-import ModalDatePicker from 'react-native-datepicker-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CalendarPicker from 'react-native-calendar-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';

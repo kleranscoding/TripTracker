@@ -70,7 +70,7 @@ const modalStyles = StyleSheet.create({
     },
     modalHeader: {
         marginBottom: 20, 
-        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,216)' 
+        paddingBottom: 20, paddingTop: 35, backgroundColor: 'rgb(36,152,219)' 
     },
     datepicker: {
         justifyContent: 'flex-start', flexDirection: 'row', alignItems: 'center',
