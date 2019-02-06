@@ -401,7 +401,6 @@ class TripList extends Component {
 
     _getTripDetails = () => {
         _getToken().then(token=>{
-            console.log("trip details= ",token)
             const tripId = this.props.navigation.getParam('tripId', null)
             if (!tripId) { this.props.navigation.goBack() }
             fetch(serverURL+'/api/trips/'+tripId,{

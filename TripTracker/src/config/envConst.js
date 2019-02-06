@@ -2,6 +2,7 @@
 const index = 0
 
 const urls = [
+    "https://triptracker49.herokuapp.com",
     "http://10.1.6.227:8001",
     "http://10.0.0.152:8001",
     "http://192.168.1.147:8001",
