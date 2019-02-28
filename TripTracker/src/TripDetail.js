@@ -128,9 +128,9 @@ class LocationContainer extends Component {
             <Text style={styles.locInfo}>You don't have any location in this trip yet</Text>
         
         return(
-        <React.Fragment>
-            {numLocs}
-        </React.Fragment>
+            <React.Fragment>
+                {numLocs}
+            </React.Fragment>
         )
     }
 }

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { AsyncStorage, StyleSheet, View, Text, Image, Alert,
     ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
-import { createStackNavigator } from 'react-navigation';
-import { Appbar, Button } from  'react-native-paper';
+import { Appbar, Button, TextInput } from  'react-native-paper';
 import MapView, {Marker, AnimatedRegion} from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { Constants, Location, Permissions } from 'expo';
@@ -23,7 +22,7 @@ const styles = StyleSheet.create({
         fontSize: 24, fontFamily: 'Avenir',
     },
     profileInfo: {
-        fontSize: 20, fontFamily: 'Avenir',
+        fontSize: 18, fontFamily: 'Avenir', width: 200,
     },
     tripInfo: {
         textAlign: 'center',
@@ -33,7 +32,8 @@ const styles = StyleSheet.create({
       width: imgHgtWdt, height: imgHgtWdt, 
     },
     profileInfoWrapper: {
-      flexDirection: 'row', backgroundColor: 'rgba(49,90,158,0.25)', 
+      flexDirection: 'row', 
+      backgroundColor: 'rgba(49,90,158,0.25)', 
       borderBottomWidth: 2, borderBottomColor: 'grey', 
     },
 })
@@ -85,6 +85,7 @@ export default class Profile extends Component {
         username: '', email: '', image: '', trips: [],
         modalExit: false, geolocation: null,
         modalAvatar: false,
+        editProfile: false,
       }
     }
 
@@ -189,10 +190,23 @@ export default class Profile extends Component {
             <Image source={{uri: serverURL+'/'+this.state.image}} style={styles.imgStyle}  />
           </TouchableOpacity>
                     
-          <View style={{justifyContent: 'center', margin: 10, }}>
-            <Text style={styles.profileInfo}>{this.state.username}</Text>
+          <TouchableOpacity 
+            style={{justifyContent: 'center', margin: 10, }}>
+            {this.state.editProfile?
+              <TextInput type="outlined" onChangeText={(text)=>this.setState({ username: text})}
+                style={styles.profileInfo}>{this.state.username}
+              </TextInput> :
+              <Text style={styles.profileInfo}>{this.state.username}</Text>
+            }
             <Text style={styles.profileInfo}>{this.state.email}</Text>
-          </View> 
+          </TouchableOpacity> 
+
+          <TouchableOpacity style={{alignSelf: 'center'}}
+            onPress={()=>this.setState({ editProfile: !this.state.editProfile })}>
+            <Text style={{padding: 10, fontSize: 20}}>
+              {this.state.editProfile? "Save" : "Edit" }
+            </Text>
+          </TouchableOpacity>
         </View>
 
          { this.state.geolocation && 
@@ -200,9 +214,6 @@ export default class Profile extends Component {
           
         <ScrollView style={{marginTop: 25}}>
           {numTrips}
-          {/* <Button onPress={()=>this.setState({modalAvatar: true})}>
-            Edit Avatar
-          </Button> */}
         </ScrollView>
 
         <Modal animationType="slide" transparent={false} visible={this.state.modalExit}

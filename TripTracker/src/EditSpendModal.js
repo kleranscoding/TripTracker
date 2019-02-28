@@ -157,12 +157,10 @@ export default class EditSpendModal extends Component {
         if (this.state[name]) {
             this.setState({
                 [name]: false,
-                
             })
         } else {
             this.setState({
                 [name]: true,
-                
             })
         }
     }
@@ -171,26 +169,20 @@ export default class EditSpendModal extends Component {
         if (this.state.resizeCurr) {
             this.setState({
                 resizeCurr: false,
-                
             })
         } else {
-            this.setState({
-                resizeCurr: true,
-                
-            })
+            this.setState({ resizeCurr: true, })
         }
     }
 
     resizeCat = () => {
         if (this.state.resizeCat) {
             this.setState({
-                resizeCat: false,
-                
+                resizeCat: false, 
             })
         } else {
             this.setState({
                 resizeCat: true,
-                
             })
         }
     }
@@ -315,13 +307,12 @@ export default class EditSpendModal extends Component {
                 </Picker>}
           </View>
           <View style={{width: this.state.resizeCurr? '100%' : '50%'}}>
-            <TextInput label='How much is that?' mode="outlined" keyboardType='numeric'
+            <TextInput mode="outlined" keyboardType='numeric'
               onChangeText={text => this.setState({ amount: text })}
               defaultValue={this.props.selectOnEdit.amount.toString()}
               style={{margin: 10, borderRadius: 10, backgroundColor: 'rgb(255,255,255)', fontFamily: 'Avenir' }} />
           </View>
         </View>
-        
         
         {/* <View style={{padding: 20, flex: 1, backgroundColor: 'rgb(49,90,158)', margin: 20}}>
             <TouchableOpacity onPress={()=>this.resizeSelector("resizeCat")} style={{backgroundColor: 'rgba(49,90,158,0.5)'}}>

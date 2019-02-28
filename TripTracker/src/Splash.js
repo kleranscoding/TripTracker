@@ -25,11 +25,13 @@ class Intro extends React.Component {
           </Appbar.Header>
         <ScrollView style={{paddingTop: 30, backgroundColor: 'rgba(36,152,219,0.25)'}}>
           <View style={{borderRadius: '50%'}}>
-          <Image resizeMode="contain" style={{justifyContent: 'center', width: '100%', height: 200}}
-              source={require('../assets/travel_logo.png')}/>
+          <Image resizeMode="contain" source={require('../assets/globe.png')}
+            style={{justifyContent: 'center', width: '100%', height: 200, tintColor: 'rgb(36,152,219)'}}
+          />
           </View>
-          <Text style={{margin: 20, fontSize: 18, padding: 5, textAlign: 'center',}}>
-            Sur casernes eut pic criaient couvrent defoncat heureuse. Bon oeil aux mats tuer chez poil peur. Saut poil il fils un nous je eu idee. Si mais haut oh ah quoi loin. Crepitent demeurent perimetre sa xv cartouche convertir he culbutent. Cercle qu valoir ca bruits le ca. Oeufs feu dit sorte rente trois ecole mur moins. 
+          <Text style={{margin: 20, fontSize: 18, padding: 5, textAlign: 'center',color: 'rgb(36,129,183)'}}>
+            Trip Tracker is a React-Native mobile application that stores your trip information.
+            You can add locations to your trips and add expenses to each location.
           </Text>
         </ScrollView>
         
