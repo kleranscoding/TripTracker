@@ -1,4 +1,6 @@
 # Trip Tracker
+![Alt text](/triptracker_screenshots/triptracker_intro.PNG?raw=true "Intro_1")
+![Alt text](/triptracker_screenshots/triptracker_trips.PNG?raw=true "Intro_2")
 Trip Tracker is a React-Native mobile application built around Expo that tracks trips, locations and expenses.
 
 ## Features
@@ -10,15 +12,15 @@ Trip Tracker is a React-Native mobile application built around Expo that tracks 
 
 ## Tech Stack
 ```
-- MongoDB / Mongoose  
+- MongoDB/Mongoose  
 - Express  
-- React / React-Native  
+- React/React-Native (Expo)
 - Node  
-- Expo  
 ```
 
 ## Libraries
 ```
+- react-native-paper  
 - react-navigation  
 - react-native-swipe-list-view  
 - react-native-pure-chart  
@@ -26,7 +28,6 @@ Trip Tracker is a React-Native mobile application built around Expo that tracks 
 - react-native-keyboard-aware-scroll-view  
 - react-native-google-places-autocomplete  
 - react-native-calendar-picker  
-- react-native-paper  
 ```
 
 ## Future Features
