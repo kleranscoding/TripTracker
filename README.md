@@ -1,6 +1,7 @@
 # Trip Tracker
 ![Alt text](/triptracker_screenshots/triptracker_screen1.png?raw=true "Screen_1")
 ![Alt text](/triptracker_screenshots/triptracker_screen2.png?raw=true "Screen_2")
+<br/>
 Trip Tracker is a React-Native mobile application built around Expo that tracks trips, locations and expenses.
 
 ## Features
@@ -37,3 +38,8 @@ Trip Tracker is a React-Native mobile application built around Expo that tracks 
 - include photo albums  
 - share trip info with friends  
 ```
+
+## Screenshots
+[Screenshots Folder](/triptracker_screenshots)
+
+
